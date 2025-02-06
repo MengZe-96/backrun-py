@@ -1,4 +1,3 @@
-import asyncio
 from collections.abc import Sequence
 from typing import Literal
 
@@ -56,7 +55,7 @@ class TxMonitor:
         logger.info(f"Mode: {self.mode}")
 
         # 启动监听器
-        asyncio.create_task(self.monitor.start())
+        await self.monitor.start()
 
         # 从数据库中获取已激活的目标地址
         monitor_addresses = await Monitor.get_active_wallet_addresses()

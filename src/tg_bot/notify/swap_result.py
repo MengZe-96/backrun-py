@@ -98,12 +98,11 @@ class SwapResultNotify:
             symbol = token_info.symbol
             name = token_info.token_name
 
-            sol_ui_amount = swap_record.input_ui_amount
-            token_ui_amount = swap_record.output_ui_amount
-
             if swap_record is None:
                 return _BUY_FAILED_TEMPLATE.render(symbol=symbol, name=name)
             elif swap_record.status != TransactionStatus.SUCCESS:
+                sol_ui_amount = swap_record.input_ui_amount
+                token_ui_amount = swap_record.output_ui_amount
                 return _BUY_FAILED_TEMPLATE.render(
                     symbol=symbol, name=name, signature=swap_record.signature
                 )

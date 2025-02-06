@@ -167,15 +167,19 @@ class TransactionDetailSubscriber:
 
         # 启动 worker
         self.workers = [asyncio.create_task(self.worker()) for _ in range(num_workers)]
-        try:
-            # 启动日志订阅
-            await self.account_log_monitor.start()
-            await asyncio.gather(*self.workers)
-        except Exception as e:
-            logger.error(f"Worker pool error: {e}")
-            logger.exception(e)
-            for worker in self.workers:
-                worker.cancel()
+
+        async def _f():
+            try:
+                # 启动日志订阅
+                await self.account_log_monitor.start()
+                await asyncio.gather(*self.workers)
+            except Exception as e:
+                logger.error(f"Worker pool error: {e}")
+                logger.exception(e)
+                for worker in self.workers:
+                    worker.cancel()
+
+        asyncio.create_task(_f())
 
     async def stop(self) -> None:
         """Stop the wallet monitor gracefully."""

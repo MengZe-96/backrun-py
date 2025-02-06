@@ -1,14 +1,9 @@
 from enum import Enum
-from typing import TYPE_CHECKING
 
-from solders.signature import Signature  # type: ignore
 from sqlalchemy import BIGINT
 from sqlmodel import Field
 
 from common.models.base import Base
-
-if TYPE_CHECKING:
-    from common.types.swap import SwapEvent
 
 
 class TransactionStatus(str, Enum):

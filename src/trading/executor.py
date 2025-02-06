@@ -42,6 +42,15 @@ class TradingExecutor:
         return Keypair.from_bytes(private_key)
 
     async def exec(self, swap_event: SwapEvent):
+        """执行交易
+
+        Args:
+            swap_event (SwapEvent): 交易事件
+
+        Raises:
+            ConnectTimeout: If connection to the RPC node times out
+            ConnectError: If connection to the RPC node fails
+        """
         if swap_event.slippage_bps is not None:
             slippage_bps = swap_event.slippage_bps
         else:
@@ -71,11 +80,15 @@ class TradingExecutor:
             should_use_pump = True
             logger.info("Program ID is PumpFun, using Pump protocol to trade")
 
-        if check_mint and not await self._is_lanuch_on_raydium(check_mint):
-            should_use_pump = True
-            logger.info(
-                f"Token {check_mint} is not launched on Raydium, using Pump protocol to trade"
-            )
+        try:
+            is_lanuch_on_raydium = await self._is_lanuch_on_raydium(check_mint)
+            if check_mint and not is_lanuch_on_raydium:
+                should_use_pump = True
+                logger.info(
+                    f"Token {check_mint} is not launched on Raydium, using Pump protocol to trade"
+                )
+        except Exception as e:
+            logger.warning(f"Failed to check launch status, cause: {e}")
 
         if should_use_pump:
             sig = await Pump(self._client).swap(

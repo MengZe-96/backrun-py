@@ -21,8 +21,7 @@ class WalletTracker:
         self.redis = RedisClient.get_instance()
         self.client = get_async_client()
         self.wallets = init_wallets
-        # NOTE: 暂时写死
-        self.transaction_monitor = TxMonitor(self.wallets, mode="wss")
+        self.transaction_monitor = TxMonitor(self.wallets, mode=settings.monitor.mode)
         self.transaction_worker = TransactionWorker(self.redis)
         self.benchmark_service = BenchmarkService()
 

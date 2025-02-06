@@ -2,7 +2,7 @@
 private_key = ""
 
 [monitor]
-mode = "wss" # wss or geyser
+mode = "geyser" # wss or geyser
 
 [rpc]
 network = "mainnet-beta"
@@ -12,8 +12,8 @@ endpoints = [
 commitment = "finalized"
 
 [rpc.geyser]
-enable = false
-endpoint = ""
+enable = true
+endpoint = "solana-yellowstone-grpc.publicnode.com:443"
 api_key = ""
 
 [trading]

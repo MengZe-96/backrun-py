@@ -1,5 +1,6 @@
 import asyncio
 
+from aiogram.types import LinkPreviewOptions
 import aioredis
 from aiogram import Bot
 
@@ -9,21 +10,35 @@ from common.log import logger
 from common.types.swap import SwapEvent
 from tg_bot.services.copytrade import CopyTradeService
 from tg_bot.services.user import UserService
+from jinja2 import BaseLoader, Environment
 
-__BUY_TEMPLATE = """
-🎯 触发跟单：买入
-{target_wallet} {wallet_alias} 买入 ${symbol} {amount} SOL
+from tg_bot.utils.text import short_text
 
-{mint}
-"""
+env = Environment(
+    loader=BaseLoader(),
+)
+_BUY_TEMPLATE = env.from_string("""🎯 触发跟单：买入
+🟢 {{wallet_name}} 买入 {{token_ui_amount}} ${{symbol}}
+
+钱包地址
+<code>{{wallet_address}}</code>
+代币地址
+<code>{{mint}}</code>
+
+<a href="https://solscan.io/tx/{{signature}}">查看交易</a>
+""")
 
 
-__SELL_TEMPLATE = """
-🎯 触发跟单：卖出
-{target_wallet} {wallet_alias} 卖出 {amount} ${symbol}
+_SELL_TEMPLATE = env.from_string("""🎯 触发跟单：卖出
+🔴 {{wallet_name}} 卖出 {{token_ui_amount}} ${{symbol}}
 
-{mint}
-"""
+钱包地址
+<code>{{wallet_address}}</code>
+代币地址
+<code>{{mint}}</code>
+
+<a href="https://solscan.io/tx/{{signature}}">查看交易</a>
+""")
 
 
 class CopyTradeNotify:
@@ -40,8 +55,8 @@ class CopyTradeNotify:
         self.bot = bot
         self.consumer = NotifyCopyTradeConsumer(
             redis_client=redis,
-            consumer_group="notify_copytrade",
-            consumer_name="notify_copytrade",
+            consumer_group="copytrade_notify",
+            consumer_name="copytrade_notify",
             batch_size=batch_size,
             poll_timeout_ms=poll_timeout_ms,
         )
@@ -60,8 +75,16 @@ class CopyTradeNotify:
             raise ValueError("tx_event is None")
 
         tx_event = data.tx_event
-        template = __SELL_TEMPLATE
-        amount = tx_event.from_decimals
+        if tx_event.tx_direction == "buy":
+            template = _BUY_TEMPLATE
+            sol_ui_amount = tx_event.to_amount / (10**tx_event.from_decimals)
+            token_ui_amount = tx_event.from_amount / (10**tx_event.to_decimals)
+        elif tx_event.tx_direction == "sell":
+            template = _SELL_TEMPLATE
+            token_ui_amount = tx_event.from_amount / (10**tx_event.from_decimals)
+            sol_ui_amount = tx_event.to_amount / (10**tx_event.to_decimals)
+        else:
+            raise ValueError("Invalid by")
 
         token_info = await self.token_info_cache.get(tx_event.mint)
         if token_info is None:
@@ -75,12 +98,14 @@ class CopyTradeNotify:
             chat_id=chat_id,
         )
 
-        return template.format(
-            target_wallet=tx_event.who,
-            wallet_alias=wallet_alias if wallet_alias else "Unknown",
+        return template.render(
+            wallet_address=tx_event.who,
+            wallet_name=wallet_alias if wallet_alias else short_text(tx_event.who),
             symbol=token_symbol,
-            amount=amount,
+            sol_ui_amount=sol_ui_amount,
+            token_ui_amount=token_ui_amount,
             mint=tx_event.mint,
+            signature=tx_event.signature,
         )
 
     async def _handle_event(self, data: SwapEvent):
@@ -90,12 +115,23 @@ class CopyTradeNotify:
         tasks = []
         for chat_id in chat_ids:
             message = await self._build_message(data, chat_id)
+            tasks.append(
+                self.bot.send_message(
+                    chat_id=chat_id,
+                    text=message,
+                    parse_mode="HTML",
+                    link_preview_options=LinkPreviewOptions(
+                        is_disabled=True,
+                    ),
+                )
+            )
 
-            tasks.append(self.bot_service.send_message(chat_id, data.message))
+        await asyncio.gather(*tasks)
 
     async def start(self):
         """启动跟单通知"""
-        await asyncio.create_task(self.consumer.start())
+        # 创建任务但不等待它完成
+        asyncio.create_task(self.consumer.start())
 
     def stop(self):
         """停止跟单通知"""

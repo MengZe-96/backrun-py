@@ -1,5 +1,9 @@
 import asyncio
 import time
+import httpx
+from typing import Optional
+
+import backoff
 
 from common.cp.swap_event import SwapEventConsumer
 from common.cp.swap_result import SwapResultProducer
@@ -44,50 +48,86 @@ class Trading:
         async with self.semaphore:
             logger.info(f"Processing swap event: {swap_event}")
             sig = None
+            swap_result = None
+
             try:
-                # 获取开始处理时的区块高度
-                start_slot = (await self.rpc_client.get_slot()).value
-
-                sig = await self.trading_executor.exec(swap_event)
-
-                # 获取交易完成时的区块高度
-                end_slot = (await self.rpc_client.get_slot()).value
-                blocks_passed = end_slot - start_slot
-                logger.info(
-                    f"Transaction submitted: {sig}, Blocks passed: {blocks_passed}, Slot: {start_slot}-{end_slot}"
-                )
-
-                # TODO: 考虑查询交易失败的情况
-                swap_record = await self.swap_settlement_processor.process(
-                    sig, swap_event
-                )
-                await self.swap_result_producer.produce(
-                    SwapResult(
-                        swap_event=swap_event,
-                        swap_record=swap_record,
-                        user_pubkey=swap_event.user_pubkey,
-                        transaction_hash=str(sig) if sig else None,
-                        submmit_time=int(time.time()),
-                        blocks_passed=blocks_passed,  # 添加经过的区块数
-                    )
-                )
-                confirmed_slot = (await self.rpc_client.get_slot()).value
-                logger.info(
-                    f"Recorded transaction: {sig}, Confirmed Slot: {confirmed_slot}"
-                )
+                sig = await self._execute_swap(swap_event)
+                swap_result = await self._record_swap_result(sig, swap_event)
+                logger.info(f"Successfully processed swap event: {swap_event}")
+                return swap_result
+            except (httpx.ConnectTimeout, httpx.ConnectError):
+                logger.error("Connection error")
+                await self._record_failed_swap(swap_event)
+                return
             except Exception as e:
-                logger.exception(
-                    f"Error processing swap event: {swap_event}, Cause: {e}"
-                )
+                logger.exception(f"Failed to process swap event: {swap_event}")
                 # 即使发生错误也要记录结果
-                await self.swap_result_producer.produce(
-                    SwapResult(
-                        swap_event=swap_event,
-                        user_pubkey=swap_event.user_pubkey,
-                        transaction_hash=None,
-                        submmit_time=int(time.time()),
-                    )
-                )
+                await self._record_failed_swap(swap_event)
+                raise e
+
+    @backoff.on_exception(
+        backoff.expo,
+        (httpx.ConnectTimeout, httpx.ConnectError),
+        max_tries=3,
+        base=1.5,
+        factor=0.1,
+        max_time=2,
+    )
+    async def _execute_swap(self, swap_event: SwapEvent) -> Optional[str]:
+        """执行交易并返回签名"""
+        start_slot = (await self.rpc_client.get_slot()).value
+        sig = await self.trading_executor.exec(swap_event)
+        end_slot = (await self.rpc_client.get_slot()).value
+
+        blocks_passed = end_slot - start_slot
+        logger.info(
+            f"Transaction submitted: {sig}, Blocks passed: {blocks_passed}, "
+            f"Slot: {start_slot}-{end_slot}"
+        )
+        return sig
+
+    @backoff.on_exception(
+        backoff.expo,
+        (httpx.ConnectTimeout, httpx.ConnectError),
+        max_tries=2,
+        base=1.5,
+        factor=0.1,
+        max_time=2,
+    )
+    async def _record_swap_result(
+        self, sig: Optional[str], swap_event: SwapEvent
+    ) -> SwapResult:
+        """记录交易结果"""
+        if not sig:
+            return await self._record_failed_swap(swap_event)
+
+        start_slot = (await self.rpc_client.get_slot()).value
+        swap_record = await self.swap_settlement_processor.process(sig, swap_event)
+        end_slot = (await self.rpc_client.get_slot()).value
+
+        swap_result = SwapResult(
+            swap_event=swap_event,
+            swap_record=swap_record,
+            user_pubkey=swap_event.user_pubkey,
+            transaction_hash=str(sig),
+            submmit_time=int(time.time()),
+            blocks_passed=end_slot - start_slot,
+        )
+
+        await self.swap_result_producer.produce(swap_result)
+        logger.info(f"Recorded transaction: {sig}, Confirmed Slot: {end_slot}")
+        return swap_result
+
+    async def _record_failed_swap(self, swap_event: SwapEvent) -> SwapResult:
+        """记录失败的交易结果"""
+        swap_result = SwapResult(
+            swap_event=swap_event,
+            user_pubkey=swap_event.user_pubkey,
+            transaction_hash=None,
+            submmit_time=int(time.time()),
+        )
+        await self.swap_result_producer.produce(swap_result)
+        return swap_result
 
     async def _process_swap_event(self, swap_event: SwapEvent):
         """创建新的任务来处理交易事件"""

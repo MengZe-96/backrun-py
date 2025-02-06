@@ -1,7 +1,7 @@
 import time
 import asyncio
 import signal
-from typing import Sequence
+from typing import AsyncGenerator, Sequence
 import base58
 from google.protobuf.json_format import _Printer  # type: ignore
 from google.protobuf.message import Message
@@ -18,6 +18,7 @@ from yellowstone_grpc.client import GeyserClient
 from yellowstone_grpc.types import (
     SubscribeRequest,
     SubscribeRequestFilterTransactions,
+    SubscribeRequestPing,
 )
 from wallet_tracker.constants import NEW_TX_DETAIL_CHANNEL
 
@@ -84,6 +85,7 @@ class TransactionDetailSubscriber:
         self.retry_delay = 5  # seconds
 
         self.request_queue: asyncio.Queue[geyser_pb2.SubscribeRequest] | None = None
+        self.responses: AsyncGenerator[geyser_pb2.SubscribeUpdate, None] | None = None
         # 响应处理相关
         self.response_queue = asyncio.Queue(maxsize=1000)
         self.worker_nums = 2
@@ -200,46 +202,59 @@ class TransactionDetailSubscriber:
             if self.geyser_client is None:
                 raise Exception("Geyser client is not connected")
 
-            while self.is_running:
-                try:
-                    # Create subscription request
-                    subscribe_request = SubscribeRequest(
-                        transactions={
-                            "key": SubscribeRequestFilterTransactions(
-                                account_include=list(self.subscribed_wallets)
+            # Create subscription request
+            subscribe_request = SubscribeRequest(ping=SubscribeRequestPing(id=1))
+            json_str = subscribe_request.model_dump_json()
+            pb_request = Parse(json_str, geyser_pb2.SubscribeRequest())
+
+            # Subscribe to updates
+            logger.info("Subscribing to account updates...")
+            (
+                self.request_queue,
+                self.responses,
+            ) = await self.geyser_client.subscribe_with_request(pb_request)
+
+            async def _f():
+                while self.is_running:
+                    try:
+                        async for response in self.responses:
+                            if not self.is_running:
+                                break
+                            await self.response_queue.put(response)
+
+                    except Exception as e:
+                        logger.error(f"Error in subscription loop: {e}")
+                        logger.exception(e)
+                        if self.is_running:
+                            logger.info("Attempting to reconnect...")
+                            await asyncio.sleep(self.retry_delay)
+                            await self._connect()
+
+                            if self.geyser_client is None:
+                                raise Exception("Geyser client is not connected")
+
+                            # Create subscription request
+                            subscribe_request = SubscribeRequest(
+                                ping=SubscribeRequestPing(id=1)
                             )
-                        }
-                    )
-                    json_str = subscribe_request.model_dump_json()
-                    pb_request = Parse(json_str, geyser_pb2.SubscribeRequest())
+                            json_str = subscribe_request.model_dump_json()
+                            pb_request = Parse(json_str, geyser_pb2.SubscribeRequest())
 
-                    # Subscribe to updates
-                    logger.info("Subscribing to account updates...")
-                    (
-                        self.request_queue,
-                        responses,
-                    ) = await self.geyser_client.subscribe_with_request(pb_request)
+                            # Subscribe to updates
+                            logger.info("Subscribing to account updates...")
+                            (
+                                self.request_queue,
+                                self.responses,
+                            ) = await self.geyser_client.subscribe_with_request(
+                                pb_request
+                            )
 
-                    async for response in responses:
-                        if not self.is_running:
-                            break
-                        await self.response_queue.put(response)
-
-                except Exception as e:
-                    logger.error(f"Error in subscription loop: {e}")
-                    logger.exception(e)
-                    if self.is_running:
-                        logger.info("Attempting to reconnect...")
-                        await asyncio.sleep(self.retry_delay)
-                        await self._connect()
-
+            asyncio.create_task(_f())
         except asyncio.CancelledError:
             logger.info("Monitor cancelled, shutting down...")
         except Exception as e:
             logger.error(f"Fatal error in wallet monitor: {e}")
             raise
-        finally:
-            await self.stop()
 
     async def stop(self) -> None:
         """Stop the wallet monitor gracefully."""
