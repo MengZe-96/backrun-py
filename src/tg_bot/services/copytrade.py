@@ -3,11 +3,11 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
+from common.cp.monitor_events import MonitorEventProducer
 from common.models.tg_bot.copytrade import CopyTrade as CopyTradeModel
 from db.redis import RedisClient
 from db.session import NEW_ASYNC_SESSION, provide_session
 from tg_bot.models.copytrade import CopyTrade, CopyTradeSummary
-from common.cp.monitor_events import MonitorEventProducer
 
 
 def from_db_model(obj: CopyTradeModel) -> CopyTrade:
@@ -173,6 +173,34 @@ class CopyTradeService:
         if obj is None:
             raise ValueError(f"Copytrade with pk {pk} not found")
         return from_db_model(obj)
+
+    @provide_session
+    async def get_wallet_alias(
+        self,
+        target_wallet: str,
+        chat_id: int,
+        *,
+        session: AsyncSession = NEW_ASYNC_SESSION,
+    ) -> str | None:
+        """ "Get the wallet alias of a target wallet
+
+
+        Args:
+            target_wallet (str): The target wallet
+            chat_id (int): The chat ID
+
+        Returns:
+            str: The wallet alias
+        """
+        stmt = select(CopyTradeModel).where(
+            CopyTradeModel.target_wallet == target_wallet,
+            CopyTradeModel.chat_id == chat_id,
+        )
+        result = await session.execute(stmt)
+        obj = result.scalar_one_or_none()
+        if obj is None:
+            return None
+        return obj.wallet_alias
 
     @provide_session
     async def list_by_owner(

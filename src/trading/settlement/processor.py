@@ -19,7 +19,12 @@ from db.redis import RedisClient
 from .analyzer import TransactionAnalyzer
 
 
-class TransactionProcessor:
+class SwapSettlementProcessor:
+    """Swap交易结算处理器
+
+    验证交易结果并写入数据库
+    """
+
     def __init__(self):
         self.gmgn_api = GmgnAPI()
         self.analyzer = TransactionAnalyzer()
@@ -82,7 +87,9 @@ class TransactionProcessor:
             await asyncio.sleep(1)
         return None
 
-    async def process(self, signature: Signature | None, swap_event: SwapEvent) -> None:
+    async def process(
+        self, signature: Signature | None, swap_event: SwapEvent
+    ) -> SwapRecord:
         """处理交易
 
         Args:
@@ -131,11 +138,12 @@ class TransactionProcessor:
                     user_account=swap_event.user_pubkey,
                     mint=swap_event.output_mint,
                 )
+                logger.debug(f"Transaction analysis data: {data}")
 
                 if swap_event.swap_mode == "ExactIn":
-                    output_amount = int(abs(data["token_change"])) * 10**6
+                    output_amount = int(abs(data["token_change"]) * 10**6)
                 else:
-                    output_amount = int(abs(data["swap_sol_change"])) * 10**9
+                    output_amount = int(abs(data["swap_sol_change"]) * 10**9)
 
                 swap_record = SwapRecord(
                     signature=str(signature),
@@ -157,4 +165,6 @@ class TransactionProcessor:
                     other_sol_change=int(data["other_sol_change"] * SOL_DECIMAL),
                 )
 
+        swap_record_clone = swap_record.copy()
         await self.record(swap_record)
+        return swap_record_clone

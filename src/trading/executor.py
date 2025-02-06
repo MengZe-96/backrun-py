@@ -10,7 +10,7 @@ from db.session import NEW_ASYNC_SESSION, provide_session
 from trading.swap import SwapDirection, SwapInType
 from common.utils.raydium import RaydiumAPI
 
-from .swap_protocols import Gmgn, Pump, RayV4
+from .swap_protocols import Gmgn, Pump
 from cache import get_preferred_pool
 
 PUMP_FUN_PROGRAM_ID = str(PUMP_FUN_PROGRAM)
@@ -61,12 +61,13 @@ class TradingExecutor:
         # 检查是否需要使用 Pump 协议进行交易
         should_use_pump = False
         check_mint = None
+        program_id = swap_event.program_id
 
         if swap_event.input_mint.endswith("pump"):
             check_mint = swap_event.input_mint
         elif swap_event.output_mint.endswith("pump"):
             check_mint = swap_event.output_mint
-        elif swap_event.program_id == PUMP_FUN_PROGRAM_ID:
+        elif program_id == PUMP_FUN_PROGRAM_ID:
             should_use_pump = True
             logger.info("Program ID is PumpFun, using Pump protocol to trade")
 
@@ -97,7 +98,7 @@ class TradingExecutor:
         #         slippage_bps=slippage_bps,
         #         in_type=swap_in_type,
         #     )
-        elif swap_event.program_id is None:
+        elif program_id is None or program_id == RAY_V4_PROGRAM_ID:
             logger.warning("Program ID is Unknown, So We use thrid party to trade")
             sig = await Gmgn(self._client).swap(
                 keypair=keypair,

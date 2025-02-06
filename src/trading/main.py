@@ -7,9 +7,9 @@ from common.log import logger
 from common.types.swap import SwapEvent, SwapResult
 from db.redis import RedisClient
 from db.session import init_db
-from trading.copytrade_processor import CopyTradeProcessor
+from trading.copytrade import CopyTradeProcessor
 from trading.executor import TradingExecutor
-from trading.settlement import TransactionProcessor
+from trading.settlement import SwapSettlementProcessor
 from trading.utils import get_async_client
 
 
@@ -18,7 +18,7 @@ class Trading:
         self.redis = RedisClient.get_instance()
         self.rpc_client = get_async_client()
         self.trading_executor = TradingExecutor(self.rpc_client)
-        self.transaction_processor = TransactionProcessor()
+        self.swap_settlement_processor = SwapSettlementProcessor()
         # 创建多个消费者实例
         self.num_consumers = 3  # 可以根据需要调整消费者数量
         self.swap_event_consumers = []
@@ -53,21 +53,24 @@ class Trading:
                 # 获取交易完成时的区块高度
                 end_slot = (await self.rpc_client.get_slot()).value
                 blocks_passed = end_slot - start_slot
+                logger.info(
+                    f"Transaction submitted: {sig}, Blocks passed: {blocks_passed}, Slot: {start_slot}-{end_slot}"
+                )
 
+                # TODO: 考虑查询交易失败的情况
+                swap_record = await self.swap_settlement_processor.process(
+                    sig, swap_event
+                )
                 await self.swap_result_producer.produce(
                     SwapResult(
                         swap_event=swap_event,
+                        swap_record=swap_record,
                         user_pubkey=swap_event.user_pubkey,
                         transaction_hash=str(sig) if sig else None,
                         submmit_time=int(time.time()),
                         blocks_passed=blocks_passed,  # 添加经过的区块数
                     )
                 )
-                logger.info(
-                    f"Transaction submitted: {sig}, Blocks passed: {blocks_passed}, Slot: {start_slot}-{end_slot}"
-                )
-                # TODO: 考虑查询交易失败的情况
-                await self.transaction_processor.process(sig, swap_event)
                 confirmed_slot = (await self.rpc_client.get_slot()).value
                 logger.info(
                     f"Recorded transaction: {sig}, Confirmed Slot: {confirmed_slot}"

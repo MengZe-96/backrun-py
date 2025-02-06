@@ -7,6 +7,7 @@ import asyncio
 from typing import Literal
 
 from common.constants import SOL_DECIMAL, WSOL
+from common.cp.copytrade_event import NotifyCopyTradeProducer
 from common.cp.swap_event import SwapEventProducer
 from common.cp.tx_event import TxEventConsumer
 from common.log import logger
@@ -35,6 +36,7 @@ class CopyTradeProcessor:
         self.setting_service = SettingService()
         self.holding_service = HoldingService()
         self.swap_event_producer = SwapEventProducer(redis_client)
+        self.notify_copytrade_producer = NotifyCopyTradeProducer(redis_client)
 
     async def _process_copytrade(
         self,
@@ -113,8 +115,13 @@ class CopyTradeProcessor:
                 program_id=program_id,
                 amount_pct=amount_pct,
                 swap_in_type=swap_in_type,
+                by="copytrade",
+                tx_event=tx_event,
             )
+            # PERF: 理论上,这两个 producer 是重复的
+            # 只需要在 consumer 处, 使用不同的消费组即可
             await self.swap_event_producer.produce(swap_event=swap_event)
+            await self.notify_copytrade_producer.produce(data=swap_event)
             logger.info(f"New Copy Trade: {swap_event}")
         except Exception as e:
             logger.exception(f"Failed to process copytrade: {e}")

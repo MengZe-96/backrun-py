@@ -60,3 +60,11 @@ class SwapRecord(Base, table=True):
         sa_type=BIGINT,
         description="其他 SOL 改变量",
     )
+
+    @property
+    def input_ui_amount(self) -> float:
+        return self.input_amount / 10**self.input_token_decimals
+
+    @property
+    def output_ui_amount(self) -> float:
+        return self.output_amount / 10**self.output_token_decimals
