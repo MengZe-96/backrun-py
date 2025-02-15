@@ -1,6 +1,7 @@
 import re
 from typing import TypedDict
 
+from common.config import settings
 import httpx
 
 
@@ -51,7 +52,7 @@ class ShyftAPI:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str = settings.api.shyft_api_key):
         self.api_key = api_key
         self.client = httpx.AsyncClient(
             base_url="https://api.shyft.to",
