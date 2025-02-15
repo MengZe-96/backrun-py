@@ -171,3 +171,19 @@ class ShyftAPI:
         if js["success"] is True:
             return js["result"]
         raise ValueError(js["message"])
+
+    async def is_transaction_swap(self, tx_hash: str) -> bool:
+        response = await self.client.get(
+            "/sol/v1/transaction/parsed",
+            params={
+                "network": "mainnet-beta",
+                "txn_signature": tx_hash,
+            },
+        )
+
+        response.raise_for_status()
+        js = response.json()
+        if js["success"] is True and js["result"]["type"] == "SWAP":
+            return True
+        else:
+            return False
