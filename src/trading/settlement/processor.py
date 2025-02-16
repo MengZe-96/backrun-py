@@ -15,6 +15,7 @@ from common.types.swap import SwapEvent
 from common.utils.gmgn import GmgnAPI
 from db.session import NEW_ASYNC_SESSION, provide_session
 from db.redis import RedisClient
+from trading.swap import SwapDirection
 
 from .analyzer import TransactionAnalyzer
 
@@ -99,17 +100,21 @@ class SwapSettlementProcessor:
         input_mint = swap_event.input_mint
         output_mint = swap_event.output_mint
         # PERF: 需要优化，不应该将 deciamls 写死
-        if swap_event.swap_mode == "ExactIn":
-            input_token_decimals = 9
-            output_token_decimals = 6
-        else:
-            input_token_decimals = 6
-            output_token_decimals = 9
+        # if swap_event.swap_mode == "ExactIn":
+        #     input_token_decimals = 9
+        #     output_token_decimals = 6
+        # else:
+        #     input_token_decimals = 6
+        #     output_token_decimals = 9
+
+        input_token_decimals = swap_event.tx_event.from_decimals
+        output_token_decimals = swap_event.tx_event.to_decimals
+
 
         if signature is None:
             swap_record = SwapRecord(
                 user_pubkey=swap_event.user_pubkey,
-                swap_mode=swap_event.swap_mode,
+                swap_diretcion=swap_event.swap_direction,
                 input_mint=swap_event.input_mint,
                 output_mint=swap_event.output_mint,
                 input_amount=swap_event.amount,
@@ -120,11 +125,12 @@ class SwapSettlementProcessor:
         else:
             tx_status = await self.validate(signature)
             if tx_status is None:
+                logger.warning(f"Tx_status is None. Transaction {signature} expired.")
                 swap_record = SwapRecord(
                     signature=str(signature),
                     status=TransactionStatus.EXPIRED,
                     user_pubkey=swap_event.user_pubkey,
-                    swap_mode=swap_event.swap_mode,
+                    swap_direction=swap_event.swap_direction,
                     input_mint=swap_event.input_mint,
                     output_mint=swap_event.output_mint,
                     input_amount=swap_event.amount,
@@ -140,16 +146,16 @@ class SwapSettlementProcessor:
                 )
                 logger.debug(f"Transaction analysis data: {data}")
 
-                if swap_event.swap_mode == "ExactIn":
-                    output_amount = int(abs(data["token_change"]) * 10**6)
+                if swap_event.swap_direction == SwapDirection.BUY:
+                    output_amount = int(abs(data["token_change"]) * 10 ** output_token_decimals)
                 else:
-                    output_amount = int(abs(data["swap_sol_change"]) * 10**9)
+                    output_amount = int(abs(data["swap_sol_change"]) * 10 ** SOL_DECIMAL)
 
                 swap_record = SwapRecord(
                     signature=str(signature),
                     status=tx_status,
                     user_pubkey=swap_event.user_pubkey,
-                    swap_mode=swap_event.swap_mode,
+                    swap_direction=swap_event.swap_direction,
                     input_mint=input_mint,
                     output_mint=output_mint,
                     input_amount=input_amount,

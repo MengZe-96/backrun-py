@@ -19,6 +19,7 @@ from services.copytrade import CopyTradeService
 from tg_bot.services.holding import HoldingService
 from tg_bot.services.setting import SettingService
 from tg_bot.utils.slippage import calculate_auto_slippage
+from trading.swap import SwapDirection
 
 
 class CopyTradeProcessor:
@@ -44,10 +45,10 @@ class CopyTradeProcessor:
         copytrade_items = await self.copytrade_service.get_by_target_wallet(
             tx_event.who
         )
-        swap_mode = "ExactIn" if tx_event.tx_direction == "buy" else "ExactOut"
+
         # buy_pct = 0
         sell_pct = 0
-        if swap_mode == "ExactIn":
+        if tx_event.tx_direction == SwapDirection.Buy:
             input_mint = WSOL.__str__()
             output_mint = tx_event.mint
             # buy_pct = round(
@@ -73,7 +74,7 @@ class CopyTradeProcessor:
         tasks = []
         for copytrade in copytrade_items:
             coro = self._process_copytrade(
-                swap_mode=swap_mode,
+                swap_direction=tx_event.tx_direction,
                 tx_event=tx_event,
                 program_id=program_id,
                 sell_pct=sell_pct,
@@ -88,7 +89,7 @@ class CopyTradeProcessor:
 
     async def _process_copytrade(
         self,
-        swap_mode: Literal["ExactIn", "ExactOut"],
+        swap_direction: SwapDirection,
         tx_event: TxEvent,
         program_id: str | None,
         sell_pct: float,
@@ -107,7 +108,7 @@ class CopyTradeProcessor:
                     )
                 )
 
-            if swap_mode == "ExactIn":
+            if swap_direction == SwapDirection.Buy:
                 if copytrade.is_fixed_buy:
                     ui_amount = copytrade.fixed_buy_amount
                     if ui_amount is None:
@@ -145,10 +146,10 @@ class CopyTradeProcessor:
                     input_mint=input_mint,
                     output_mint=output_mint,
                     amount=amount,
-                    swap_mode=swap_mode,
+                    swap_mode="ExactIn",
                 )
 
-            if swap_mode == "ExactOut":
+            if swap_direction == SwapDirection.Sell:
                 amount_pct = sell_pct
                 swap_in_type = "pct"
             else:
@@ -158,7 +159,7 @@ class CopyTradeProcessor:
             priority_fee = copytrade.priority
             swap_event = SwapEvent(
                 user_pubkey=copytrade.owner,
-                swap_mode=swap_mode,
+                swap_direction=swap_direction,
                 input_mint=input_mint,
                 output_mint=output_mint,
                 amount=amount,
