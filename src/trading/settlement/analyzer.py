@@ -48,7 +48,6 @@ class TransactionAnalyzer:
         slot = tx_detail["slot"]
         timestamp = tx_detail["timestamp"]
         tx_type = tx_detail["type"]
-        logger.info("1")
         if tx_type != "SWAP":
             logger.warning(f"不支持的交易类型: {tx_type}, 使用 Shyft API 进行确认...")
             confirm_swap = await self.shyft_api.is_transaction_swap(tx_signature)
@@ -62,37 +61,36 @@ class TransactionAnalyzer:
         token_change = 0
         swap_sol_change = 0
         token_transfers = tx_detail["tokenTransfers"]
-        logger.info("2")
         for token_transfer in token_transfers:
             # Buy
             if token_transfer["fromUserAccount"] == user_account and token_transfer[
                 "mint"
             ] == str(WSOL):
-                sol_change -= token_transfer["tokenAmount"]
+                # sol_change -= token_transfer["tokenAmount"]
                 swap_sol_change -= token_transfer["tokenAmount"]
-            elif (
+            if (
                 token_transfer["toUserAccount"] == user_account
                 and token_transfer["mint"] == mint
             ):
                 token_change += token_transfer["tokenAmount"]
             # Sell
-            elif (
+            if (
                 token_transfer["fromUserAccount"] == user_account
                 and token_transfer["mint"] == mint
             ):
                 token_change -= token_transfer["tokenAmount"]
-            elif token_transfer["toUserAccount"] == user_account and token_transfer[
+            if token_transfer["toUserAccount"] == user_account and token_transfer[
                 "mint"
             ] == str(WSOL):
-                sol_change += token_transfer["tokenAmount"]
+                # sol_change += token_transfer["tokenAmount"]
                 swap_sol_change += token_transfer["tokenAmount"]
-        logger.info("3")
+                logger.info(f"swap_sol_change: {swap_sol_change}, token_transfer[tokenAmount]: {token_transfer['tokenAmount']}")
         for native_transfer in tx_detail["nativeTransfers"]:
             if native_transfer["fromUserAccount"] == user_account:
                 sol_change -= native_transfer["amount"] / 10 ** SOL_DECIMAL
             elif native_transfer["toUserAccount"] == user_account:
                 sol_change += native_transfer["amount"] / 10 ** SOL_DECIMAL
-        logger.info("4")
+        
         return {
             "fee": fee,
             "slot": slot,
