@@ -86,7 +86,7 @@ class SwapResultNotify:
         event = data.swap_event
         swap_record = data.swap_record
 
-        if event.swap_direction == SwapDirection.BUY:
+        if event.swap_direction == SwapDirection.Buy:
             mint = event.output_mint
             token_info = await self.token_info_cache.get(mint)
             if token_info is None:
