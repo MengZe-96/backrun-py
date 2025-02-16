@@ -55,7 +55,7 @@ class Gmgn(TraderProtocol):
             token_in = str(WSOL)
             token_out = token_address
             swap_mode = "ExactIn"
-            amount = str(int(ui_amount * SOL_DECIMAL))
+            amount = str(int(ui_amount * 10 ** SOL_DECIMAL))
         elif swap_direction == SwapDirection.Sell:
             token_info = await self.token_info_cache.get(token_address)
             if token_info is None:

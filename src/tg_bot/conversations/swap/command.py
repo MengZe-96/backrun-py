@@ -106,7 +106,7 @@ async def swap_command(message: Message):
     if cmd == "buy":
         input_mint = WSOL.__str__()
         output_mint = token_info.mint
-        from_amount = int(float(ui_amount) * SOL_DECIMAL)
+        from_amount = int(float(ui_amount) * 10 ** SOL_DECIMAL)
         swap_direction = SwapDirection.Buy
     else:
         if ui_amount.endswith("%"):
