@@ -51,6 +51,7 @@ class BlockhashCache(BaseAutoUpdateCache):
             blockhash_cache = cls(redis)
             raw_cached_value = await blockhash_cache._gen_new_value()
             await redis.set(cls.key, raw_cached_value, ex=timedelta(seconds=30))
+            logger.info("Blockhash update success.")
         cached_value = json.loads(raw_cached_value)
         return Hash.from_string(cached_value["blockhash"]), int(
             cached_value["last_valid_block_height"]
