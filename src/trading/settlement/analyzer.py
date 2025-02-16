@@ -11,6 +11,7 @@ from typing import TypedDict
 from common.constants import SOL_DECIMAL, WSOL
 from common.utils.helius import HeliusAPI
 from common.utils.shyft import ShyftAPI
+from common.log import logger
 
 # [
 #   {
@@ -363,11 +364,13 @@ class TransactionAnalyzer:
         timestamp = tx_detail["timestamp"]
         tx_type = tx_detail["type"]
         if tx_type != "SWAP":
+            logger.warning(f"不支持的交易类型: {tx_type}, 使用 Shyft API 进行确认...")
             confirm_swap = await self.shyft_api.is_transaction_swap(tx_signature)
             if not confirm_swap:
-                raise NotImplementedError(f"不支持的交易类型: {tx_type}")
+                raise NotImplementedError(f"双重确认完成，发现不支持的交易类型: {tx_type}.")
             else:
                 tx_type = "SWAP"
+                logger.warning(f"使用 Shyft API 确认完成，交易类型：SWAP.")
 
         sol_change = 0
         token_change = 0

@@ -103,7 +103,7 @@ class Trading:
             transaction_hash=str(sig),
             submmit_time=int(time.time()),
         )
-
+        logger.info(f"Generated transaction result: {sig}")
         await self.swap_result_producer.produce(swap_result)
         logger.info(f"Recorded transaction: {sig}")
         return swap_result
