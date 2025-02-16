@@ -45,7 +45,7 @@ class TradingExecutor:
         else:
             raise ValueError("slippage_bps must be specified")
 
-        assert swap_event.swap_direction is SwapDirection
+        assert isinstance(swap_event.swap_direction, SwapDirection)
         token_address = swap_event.output_mint if swap_event.swap_direction == SwapDirection.Buy else swap_event.input_mint
 
         sig = None
