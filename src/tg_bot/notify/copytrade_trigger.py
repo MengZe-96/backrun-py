@@ -79,8 +79,8 @@ class CopyTradeNotify:
         tx_event = data.tx_event
         if tx_event.tx_direction == "buy":
             template = _BUY_TEMPLATE
-            sol_ui_amount = tx_event.to_amount / (10**tx_event.from_decimals)
-            token_ui_amount = tx_event.from_amount / (10**tx_event.to_decimals)
+            sol_ui_amount = tx_event.from_amount / (10**tx_event.from_decimals)
+            token_ui_amount = tx_event.to_amount / (10**tx_event.to_decimals)
         elif tx_event.tx_direction == "sell":
             template = _SELL_TEMPLATE
             token_ui_amount = tx_event.from_amount / (10**tx_event.from_decimals)
