@@ -43,6 +43,7 @@ class LaunchCache:
             PUMP_FUN_PROGRAM,
         )
         if result is None:
-            raise BondingCurveNotFound("bonding curve account not found")
+            return True
+            # raise BondingCurveNotFound("bonding curve account not found")
         _, _, bonding_curve_account = result
         return bonding_curve_account.virtual_sol_reserves == 0
