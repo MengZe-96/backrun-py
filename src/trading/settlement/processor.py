@@ -13,6 +13,7 @@ from common.log import logger
 from common.models.swap_record import SwapRecord, TransactionStatus
 from common.types.swap import SwapEvent
 from common.utils.gmgn import GmgnAPI
+from common.utils.shyft import ShyftAPI
 from db.session import NEW_ASYNC_SESSION, provide_session
 from db.redis import RedisClient
 from trading.swap import SwapDirection
@@ -29,6 +30,7 @@ class SwapSettlementProcessor:
     def __init__(self):
         self.gmgn_api = GmgnAPI()
         self.analyzer = TransactionAnalyzer()
+        self.shyft_api = ShyftAPI()
 
     @provide_session
     async def record(
@@ -99,16 +101,19 @@ class SwapSettlementProcessor:
         input_amount = swap_event.amount
         input_mint = swap_event.input_mint
         output_mint = swap_event.output_mint
-        # PERF: 需要优化，不应该将 deciamls 写死
-        # if swap_event.swap_mode == "ExactIn":
-        #     input_token_decimals = 9
-        #     output_token_decimals = 6
-        # else:
-        #     input_token_decimals = 6
-        #     output_token_decimals = 9
 
-        input_token_decimals = swap_event.tx_event.from_decimals
-        output_token_decimals = swap_event.tx_event.to_decimals
+        # 手动卖出时无tx_event，需要手动设置decimals
+        if swap_event.tx_event:
+            input_token_decimals = swap_event.tx_event.from_decimals
+            output_token_decimals = swap_event.tx_event.to_decimals
+        elif swap_event.swap_direction == SwapDirection.Buy:
+            input_token_decimals = 9
+            token_info = await self.shyft_api.get_token_info(output_mint)
+            output_token_decimals = token_info['decimals']
+        else:
+            token_info = await self.shyft_api.get_token_info(input_mint)
+            input_token_decimals = token_info['decimals']
+            output_token_decimals = 9
 
 
         if signature is None:
