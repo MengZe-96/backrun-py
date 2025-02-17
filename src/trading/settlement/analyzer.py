@@ -84,7 +84,6 @@ class TransactionAnalyzer:
             ] == str(WSOL):
                 # sol_change += token_transfer["tokenAmount"]
                 swap_sol_change += token_transfer["tokenAmount"]
-                logger.info(f"swap_sol_change: {swap_sol_change}, token_transfer[tokenAmount]: {token_transfer['tokenAmount']}")
         for native_transfer in tx_detail["nativeTransfers"]:
             if native_transfer["fromUserAccount"] == user_account:
                 sol_change -= native_transfer["amount"] / 10 ** SOL_DECIMAL
