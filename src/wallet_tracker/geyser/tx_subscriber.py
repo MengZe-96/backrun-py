@@ -137,14 +137,20 @@ class TransactionDetailSubscriber:
 
     def __build_subscribe_request(self) -> SubscribeRequest:
         logger.info(f"Subscribing to accounts: {self.subscribed_wallets}")
-        subscribe_request = SubscribeRequest(
-            transactions={
+
+        params = {}
+
+        if len(self.subscribed_wallets) != 0:
+            params["transactions"] = {
                 "key": SubscribeRequestFilterTransactions(
                     account_include=list(self.subscribed_wallets),
                     failed=False,
                 )
-            },
-        )
+            }
+        else:
+            params["ping"] = SubscribeRequestPing(id=1)
+
+        subscribe_request = SubscribeRequest(**params)
         return subscribe_request
 
     async def _process_transaction(self, transaction: dict) -> None:
@@ -237,8 +243,10 @@ class TransactionDetailSubscriber:
 
             # Create subscription request
             subscribe_request = SubscribeRequest(ping=SubscribeRequestPing(id=1))
-            json_str = subscribe_request.model_dump_json()
-            pb_request = Parse(json_str, geyser_pb2.SubscribeRequest())
+
+            pb_request = Parse(
+                subscribe_request.model_dump_json(), geyser_pb2.SubscribeRequest()
+            )
 
             # Subscribe to updates
             logger.info("Subscribing to account updates...")
