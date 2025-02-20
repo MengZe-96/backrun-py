@@ -691,14 +691,6 @@ async def handle_sellx(message: Message, state: FSMContext):
     sell_pct = sell_pct / 100
     data = await state.get_data()
     token_mint = cast(str, data.get("token_mint"))
-
-    if not (0 < sell_pct <= 100):
-        await message.answer("❌ 请输入正确的比例，取值范围：0~100")
-        return
-
-    # 将百分比转换为小数
-    sell_pct = sell_pct / 100
-
     token_info = cast(TokenInfo, data.get("token_info"))
     if token_info is None:
         token_info = await token_info_cache.get(token_mint)

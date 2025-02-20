@@ -6,7 +6,7 @@ on:
   issues:
     types: [opened, closed, reopened]
   release:
-    types: [published, created, edited, released, prereleased]
+    types: [released, prereleased]
   discussion:
     types: [created]
   fork:
