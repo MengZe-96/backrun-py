@@ -4,7 +4,6 @@
 """
 
 import asyncio
-from typing import Literal
 
 from common.constants import SOL_DECIMAL, WSOL
 from common.cp.copytrade_event import NotifyCopyTradeProducer
@@ -144,8 +143,8 @@ class CopyTradeProcessor:
 
                 # 自动跟买跟卖
                 if copytrade.auto_follow:
-                    amount = int(int(balance.balance * balance.decimals) * sell_pct)
-                    ui_amount = amount / balance.decimals
+                    amount = int(int(balance.balance * 10 ** balance.decimals) * sell_pct)
+                    ui_amount = amount / 10 ** balance.decimals
                 else:
                     logger.info("Not auto follow, skip...")
                     return
@@ -172,7 +171,7 @@ class CopyTradeProcessor:
             priority_fee = copytrade.priority
             swap_event = SwapEvent(
                 user_pubkey=copytrade.owner,
-                swap_mode=swap_mode,
+                swap_direction=swap_direction,
                 input_mint=input_mint,
                 output_mint=output_mint,
                 amount=amount,
