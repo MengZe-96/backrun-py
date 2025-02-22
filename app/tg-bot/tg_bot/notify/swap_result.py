@@ -79,7 +79,7 @@ class SwapResultNotify:
     async def _build_message_for_copytrade(self, data: SwapResult) -> str:
         """构建用于跟单交易结果的消息"""
         event = data.swap_event
-        assert event.swap_direction is SwapDirection
+        assert isinstance(event.swap_direction, SwapDirection)
 
     async def _build_message_by_user_swap(self, data: SwapResult) -> str:
         """构建用于用户主动交易结果的消息"""
