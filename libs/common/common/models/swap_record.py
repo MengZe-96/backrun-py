@@ -4,7 +4,6 @@ from sqlalchemy import BIGINT
 from sqlmodel import Field
 
 from common.models.base import Base
-from common.types.enums import SwapDirection
 
 class TransactionStatus(str, Enum):
     SUCCESS = "success"
@@ -13,6 +12,7 @@ class TransactionStatus(str, Enum):
 
 
 class SwapRecord(Base, table=True):
+    # from common.types.enums import SwapDirection
     __tablename__ = "swap_record"  # type: ignore
 
     signature: str | None = Field(default=None, nullable=True, description="交易 hash")
@@ -20,7 +20,8 @@ class SwapRecord(Base, table=True):
         default=None, nullable=True, description="交易状态"
     )
     user_pubkey: str = Field(nullable=False, index=True)
-    swap_direction: SwapDirection = Field(nullable=False)
+    # swap_direction: SwapDirection = Field(nullable=False, description="交易方向")
+    swap_direction: str = Field(nullable=False, description="交易方向")
     input_mint: str = Field(nullable=False)
     output_mint: str = Field(nullable=False)
     input_amount: int = Field(nullable=False, sa_type=BIGINT, description="输入金额")

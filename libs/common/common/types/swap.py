@@ -1,8 +1,6 @@
 from typing import Literal
 from pydantic import BaseModel
-
 from typing_extensions import Self
-from common.models.swap_record import SwapRecord
 from common.types.enums import SwapDirection
 from common.types.tx import TxEvent
 
@@ -45,6 +43,7 @@ class SwapEvent(BaseModel):
 
 
 class SwapResult(BaseModel):
+    from common.models.swap_record import SwapRecord
     swap_event: SwapEvent
     user_pubkey: str
     submmit_time: int  # unix timestamp
