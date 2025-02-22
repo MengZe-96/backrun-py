@@ -125,7 +125,7 @@ class CopyTradeProcessor:
                     ui_amount = copytrade.fixed_buy_amount
                     if ui_amount is None:
                         raise ValueError("fixed_buy_amount is None")
-                    amount = int(ui_amount * SOL_DECIMAL)
+                    amount = int(ui_amount * 10 ** SOL_DECIMAL)
                 elif copytrade.auto_follow:
                     # TODO: 跟随买入
                     raise NotImplementedError("auto_follow")

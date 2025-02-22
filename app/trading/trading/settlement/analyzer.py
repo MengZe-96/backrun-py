@@ -398,9 +398,9 @@ class TransactionAnalyzer:
 
         for native_transfer in tx_detail["nativeTransfers"]:
             if native_transfer["fromUserAccount"] == user_account:
-                sol_change -= native_transfer["amount"] / SOL_DECIMAL
+                sol_change -= native_transfer["amount"] / 10 ** SOL_DECIMAL
             elif native_transfer["toUserAccount"] == user_account:
-                sol_change += native_transfer["amount"] / SOL_DECIMAL
+                sol_change += native_transfer["amount"] / 10 ** SOL_DECIMAL
 
         return {
             "fee": fee,

@@ -99,7 +99,7 @@ class PumpTransactionBuilder(TransactionBuilder):
                     owner, owner, token_out
                 )
 
-            amount_specified = int(ui_amount * SOL_DECIMAL)
+            amount_specified = int(ui_amount * 10 ** SOL_DECIMAL)
         elif swap_direction == SwapDirection.Sell:
             in_amount = await AccountAmountCache().get_amount(in_ata)
             in_mint = await MintAccountCache().get_mint_account(token_in)

@@ -18,7 +18,7 @@
 
 #     swap_resp = swap_builder._fetch_swap_response(sol_in, slippage, mint)
 #     assert swap_resp is not None
-#     assert swap_resp.data["inputAmount"] == str(int(sol_in * SOL_DECIMAL))
+#     assert swap_resp.data["inputAmount"] == str(int(sol_in * 10 ** SOL_DECIMAL))
 
 
 # def test_build_buy_transaction(swap_builder):

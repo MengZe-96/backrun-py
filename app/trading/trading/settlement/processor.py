@@ -110,7 +110,7 @@ class SwapSettlementProcessor:
             if tx_status is None:
                 swap_record = SwapRecord(
                     signature=str(signature),
-                    status=TransactionStatus.EXPIRED,
+                    status=tx_status,
                     user_pubkey=swap_event.user_pubkey,
                     swap_direction=swap_event.swap_direction,
                     input_mint=swap_event.input_mint,
@@ -148,9 +148,9 @@ class SwapSettlementProcessor:
                     timestamp=swap_event.timestamp,
                     fee=data["fee"],
                     slot=data["slot"],
-                    sol_change=int(data["sol_change"] * SOL_DECIMAL),
-                    swap_sol_change=int(data["swap_sol_change"] * SOL_DECIMAL),
-                    other_sol_change=int(data["other_sol_change"] * SOL_DECIMAL),
+                    sol_change=int(data["sol_change"] * 10 ** SOL_DECIMAL),
+                    swap_sol_change=int(data["swap_sol_change"] * 10 ** SOL_DECIMAL),
+                    other_sol_change=int(data["other_sol_change"] * 10 ** SOL_DECIMAL),
                 )
 
         swap_record_clone = swap_record.model_copy()
