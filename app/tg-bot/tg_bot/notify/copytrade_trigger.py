@@ -7,7 +7,8 @@ from aiogram import Bot
 from cache.token_info import TokenInfoCache
 from common.cp.copytrade_event import NotifyCopyTradeConsumer
 from common.log import logger
-from common.types.swap import SwapEvent, SwapDirection
+from common.types.swap import SwapEvent
+from common.types.enums import SwapDirection
 from tg_bot.services.copytrade import CopyTradeService
 from tg_bot.services.user import UserService
 from jinja2 import BaseLoader, Environment

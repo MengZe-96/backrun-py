@@ -10,7 +10,8 @@ from cache.token_info import TokenInfoCache
 from common.cp.swap_result import SwapResultConsumer
 from common.log import logger
 from common.models.swap_record import TransactionStatus
-from common.types.swap import SwapResult, SwapDirection
+from common.types.swap import SwapResult
+from common.types.enums import SwapDirection
 from tg_bot.services.user import UserService
 
 

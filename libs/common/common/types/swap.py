@@ -3,17 +3,8 @@ from pydantic import BaseModel
 
 from typing_extensions import Self
 from common.models.swap_record import SwapRecord
+from common.types.enums import SwapDirection
 from common.types.tx import TxEvent
-
-from enum import Enum
-
-class SwapDirection(str, Enum):
-    Buy = "buy"
-    Sell = "sell"
-
-class SwapInType(str, Enum):
-    Qty = "qty"  # 按数量交易
-    Pct = "pct"  # 按百分比交易
 
 class SwapEvent(BaseModel):
     user_pubkey: str

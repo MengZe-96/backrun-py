@@ -7,7 +7,7 @@ from cache.token_info import TokenInfoCache
 from common.config import settings
 from common.constants import SOL_DECIMAL, WSOL
 from trading.exceptions import NoRouteFound
-from common.types.swap import SwapDirection, SwapInType
+from common.types.enums import SwapDirection, SwapInType
 from trading.tx import sign_transaction_from_raw
 
 from .base import TransactionBuilder

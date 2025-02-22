@@ -3,7 +3,8 @@ from common.config import settings
 from common.constants import PUMP_FUN_PROGRAM, RAY_V4
 from common.log import logger
 from common.models.tg_bot.user import User
-from common.types.swap import SwapEvent, SwapDirection, SwapInType
+from common.types.swap import SwapEvent
+from common.types.enums import SwapDirection, SwapInType
 from common.utils.jito import JitoClient
 from common.utils.raydium import RaydiumAPI
 from db.session import NEW_ASYNC_SESSION, provide_session

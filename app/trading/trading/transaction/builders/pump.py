@@ -22,7 +22,7 @@ from common.constants import (
     TOKEN_PROGRAM_ID,
     WSOL,
 )
-from common.types.swap import SwapDirection, SwapInType
+from common.types.enums import SwapDirection, SwapInType
 from common.IDL.pumpfun import PumpFunInterface
 from common.log import logger
 from trading.exceptions import BondingCurveNotFound
