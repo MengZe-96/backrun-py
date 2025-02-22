@@ -108,14 +108,14 @@ class CopyTradeProcessor:
                 )
 
             if swap_direction == SwapDirection.Buy:
-                if copytrade.is_fixed_buy:
+                if copytrade.auto_follow:
+                    ui_amount = tx_event.from_amount / 10 ** tx_event.from_decimals * copytrade.auto_buy_ratio
+                    amount = int(ui_amount * 10 ** tx_event.from_decimals)
+                elif copytrade.is_fixed_buy: # 当自动跟随关闭时执行固定买入
                     ui_amount = copytrade.fixed_buy_amount
                     if ui_amount is None:
                         raise ValueError("fixed_buy_amount is None")
-                    amount = int(ui_amount * 10 ** SOL_DECIMAL)
-                elif copytrade.auto_follow:
-                    # TODO: 跟随买入
-                    raise NotImplementedError("auto_follow")
+                    amount = int(ui_amount * 10 ** tx_event.from_decimals)
                 else:
                     assert False, "not possible"
             else:

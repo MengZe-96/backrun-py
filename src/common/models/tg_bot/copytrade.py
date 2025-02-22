@@ -14,6 +14,7 @@ class CopyTrade(Base, table=True):
     is_fixed_buy: bool = Field(nullable=False, description="是否固定买入")
     fixed_buy_amount: float | None = Field(nullable=True, description="固定买入金额")
     auto_follow: bool = Field(nullable=False, description="是否跟随自动买入卖出")
+    auto_buy_ratio: float = Field(nullable=False, description="自动买入比例")
     stop_loss: bool = Field(nullable=False, description="是否设置止盈止损")
     no_sell: bool = Field(nullable=False, description="只跟买")
     priority: float = Field(nullable=False, description="优先费用(单位 SOL)")
