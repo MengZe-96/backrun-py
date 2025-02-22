@@ -91,8 +91,18 @@ class SwapSettlementProcessor:
         input_mint = swap_event.input_mint
         output_mint = swap_event.output_mint
 
-        input_token_decimals = swap_event.tx_event.from_decimals
-        output_token_decimals = swap_event.tx_event.to_decimals
+        # 手动卖出时无tx_event，需要手动设置decimals
+        if swap_event.tx_event:
+            input_token_decimals = swap_event.tx_event.from_decimals
+            output_token_decimals = swap_event.tx_event.to_decimals
+        elif swap_event.swap_direction == SwapDirection.Buy:
+            input_token_decimals = 9
+            token_info = await self.analyzer.shyft_api.get_token_info(output_mint)
+            output_token_decimals = token_info['decimals']
+        else:
+            token_info = await self.analyzer.shyft_api.get_token_info(input_mint)
+            input_token_decimals = token_info['decimals']
+            output_token_decimals = 9
 
         if signature is None:
             swap_record = SwapRecord(
