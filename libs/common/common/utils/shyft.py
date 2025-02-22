@@ -1,6 +1,6 @@
 import re
 from typing import TypedDict
-
+from common.config import settings
 import httpx
 
 
@@ -51,7 +51,7 @@ class ShyftAPI:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str = settings.api.shyft_api_key):
         self.api_key = api_key
         self.client = httpx.AsyncClient(
             base_url="https://api.shyft.to",
@@ -171,3 +171,19 @@ class ShyftAPI:
         if js["success"] is True:
             return js["result"]
         raise ValueError(js["message"])
+
+    async def is_transaction_swap(self, tx_hash: str) -> bool:
+        response = await self.client.get(
+            "/sol/v1/transaction/parsed",
+            params={
+                "network": "mainnet-beta",
+                "txn_signature": tx_hash,
+            },
+        )
+
+        response.raise_for_status()
+        js = response.json()
+        if js["success"] is True and js["result"]["type"] == "SWAP":
+            return True
+        else:
+            return False

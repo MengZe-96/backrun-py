@@ -10,6 +10,7 @@ from typing import TypedDict
 
 from common.constants import SOL_DECIMAL, WSOL
 from common.utils.helius import HeliusAPI
+from common.utils.shyft import ShyftAPI
 
 # [
 #   {
@@ -341,6 +342,7 @@ class TransactionAnalyzer:
 
     def __init__(self) -> None:
         self.helius_api = HeliusAPI()
+        self.shyft_api = ShyftAPI()
 
     async def analyze_transaction(
         self, tx_signature: str, user_account: str, mint: str
@@ -360,7 +362,11 @@ class TransactionAnalyzer:
         timestamp = tx_detail["timestamp"]
         tx_type = tx_detail["type"]
         if tx_type != "SWAP":
-            raise NotImplementedError(f"不支持的交易类型: {tx_type}")
+            confirm_swap = await self.shyft_api.is_transaction_swap(tx_signature)
+            if not confirm_swap:
+                raise NotImplementedError(f"不支持的交易类型: {tx_type}")
+            else:
+                tx_type = "SWAP"            
 
         sol_change = 0
         token_change = 0
