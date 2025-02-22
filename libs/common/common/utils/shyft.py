@@ -178,6 +178,7 @@ class ShyftAPI:
             params={
                 "network": "mainnet-beta",
                 "txn_signature": tx_hash,
+                "commitment": "confirmed",
             },
         )
 
