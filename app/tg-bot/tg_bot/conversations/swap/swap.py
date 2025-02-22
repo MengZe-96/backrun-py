@@ -22,6 +22,8 @@ from tg_bot.utils import get_setting_from_db
 from tg_bot.utils.message import invalid_input_and_request_reinput
 from tg_bot.utils.swap import get_token_account_balance
 
+from trading.swap import SwapDirection
+
 from .render import render
 
 router = Router()
@@ -265,7 +267,7 @@ async def buy(callback: CallbackQuery, state: FSMContext):
         slippage_bps = setting.sandwich_slippage_bps
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=int(from_amount * SOL_DECIMAL),
@@ -280,13 +282,13 @@ async def buy(callback: CallbackQuery, state: FSMContext):
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=int(from_amount * SOL_DECIMAL),
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
             min_slippage_bps=setting.min_slippage,
             max_slippage_bps=setting.max_slippage,
         )
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=int(from_amount * SOL_DECIMAL),
@@ -302,7 +304,7 @@ async def buy(callback: CallbackQuery, state: FSMContext):
         slippage_bps = setting.quick_slippage
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=int(from_amount * SOL_DECIMAL),
@@ -444,7 +446,7 @@ async def handle_buyx(message: Message, state: FSMContext):
         slippage_bps = setting.sandwich_slippage_bps
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=amount,
@@ -459,11 +461,11 @@ async def handle_buyx(message: Message, state: FSMContext):
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=int(ui_amount * SOL_DECIMAL),
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
         )
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=amount,
@@ -479,7 +481,7 @@ async def handle_buyx(message: Message, state: FSMContext):
         slippage_bps = setting.quick_slippage
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactIn",
+            swap_direction=SwapDirection.Buy,
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=amount,
@@ -570,7 +572,7 @@ async def sell(callback: CallbackQuery, state: FSMContext):
         slippage_bps = setting.sandwich_slippage_bps
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=amount,
@@ -585,13 +587,13 @@ async def sell(callback: CallbackQuery, state: FSMContext):
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=int(ui_amount * SOL_DECIMAL),
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
             min_slippage_bps=setting.min_slippage,
             max_slippage_bps=setting.max_slippage,
         )
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=amount,
@@ -607,7 +609,7 @@ async def sell(callback: CallbackQuery, state: FSMContext):
         slippage_bps = setting.quick_slippage
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=amount,
@@ -763,7 +765,7 @@ async def handle_sellx(message: Message, state: FSMContext):
         slippage_bps = setting.sandwich_slippage_bps
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=amount,
@@ -778,11 +780,11 @@ async def handle_sellx(message: Message, state: FSMContext):
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=int(ui_amount * SOL_DECIMAL),
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
         )
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=amount,
@@ -798,7 +800,7 @@ async def handle_sellx(message: Message, state: FSMContext):
         slippage_bps = setting.quick_slippage
         swap_event = SwapEvent(
             user_pubkey=wallet,
-            swap_mode="ExactOut",
+            swap_direction=SwapDirection.Sell,
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=amount,

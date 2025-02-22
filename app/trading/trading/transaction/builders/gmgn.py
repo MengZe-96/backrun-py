@@ -47,7 +47,7 @@ class GMGNTransactionBuilder(TransactionBuilder):
         Returns:
             VersionedTransaction: The built transaction ready to be signed and sent
         """
-        if swap_direction == "sell" and in_type is None:
+        if swap_direction == SwapDirection.Sell and in_type is None:
             raise ValueError("in_type must be specified when selling")
 
         if swap_direction == SwapDirection.Buy:
@@ -62,7 +62,7 @@ class GMGNTransactionBuilder(TransactionBuilder):
             decimals = token_info.decimals
             token_in = token_address
             token_out = str(WSOL)
-            swap_mode = "ExactOut"
+            swap_mode = "ExactIn"
             amount = str(int(ui_amount * 10**decimals))
         else:
             raise ValueError("swap_direction must be buy or sell")

@@ -4,7 +4,7 @@ from sqlalchemy import BIGINT
 from sqlmodel import Field
 
 from common.models.base import Base
-
+from trading.swap import SwapDirection
 
 class TransactionStatus(str, Enum):
     SUCCESS = "success"
@@ -20,7 +20,7 @@ class SwapRecord(Base, table=True):
         default=None, nullable=True, description="交易状态"
     )
     user_pubkey: str = Field(nullable=False, index=True)
-    swap_mode: str = Field(nullable=False)
+    swap_direction: SwapDirection = Field(nullable=False)
     input_mint: str = Field(nullable=False)
     output_mint: str = Field(nullable=False)
     input_amount: int = Field(nullable=False, sa_type=BIGINT, description="输入金额")

@@ -12,6 +12,7 @@ from common.log import logger
 from common.models.swap_record import TransactionStatus
 from common.types.swap import SwapResult
 from tg_bot.services.user import UserService
+from trading.swap import SwapDirection
 
 
 env = Environment(
@@ -78,19 +79,14 @@ class SwapResultNotify:
     async def _build_message_for_copytrade(self, data: SwapResult) -> str:
         """构建用于跟单交易结果的消息"""
         event = data.swap_event
-        if event.swap_mode == "ExactIn":
-            pass
-        elif event.swap_mode == "ExactOut":
-            pass
-        else:
-            raise ValueError(f"Invalid swap_mode: {event.swap_mode}")
+        assert event.swap_direction is SwapDirection
 
     async def _build_message_by_user_swap(self, data: SwapResult) -> str:
         """构建用于用户主动交易结果的消息"""
         event = data.swap_event
         swap_record = data.swap_record
 
-        if event.swap_mode == "ExactIn":
+        if event.swap_direction == SwapDirection.Buy:
             mint = event.output_mint
             token_info = await self.token_info_cache.get(mint)
             if token_info is None:
@@ -115,7 +111,7 @@ class SwapResultNotify:
                     name=name,
                     signature=data.transaction_hash,
                 )
-        elif event.swap_mode == "ExactOut":
+        elif event.swap_direction == SwapDirection.Sell:
             mint = event.input_mint
             token_info = await self.token_info_cache.get(mint)
             if token_info is None:

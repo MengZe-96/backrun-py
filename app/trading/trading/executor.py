@@ -48,14 +48,8 @@ class TradingExecutor:
         else:
             raise ValueError("slippage_bps must be specified")
 
-        if swap_event.swap_mode == "ExactIn":
-            swap_direction = SwapDirection.Buy
-            token_address = swap_event.output_mint
-        elif swap_event.swap_mode == "ExactOut":
-            swap_direction = SwapDirection.Sell
-            token_address = swap_event.input_mint
-        else:
-            raise ValueError("swap_mode must be ExactIn or ExactOut")
+        assert swap_event.swap_direction is SwapDirection
+        token_address = swap_event.output_mint if swap_event.swap_direction == SwapDirection.Buy else swap_event.input_mint
 
         sig = None
         keypair = await self.__get_keypair(swap_event.user_pubkey)
@@ -107,7 +101,7 @@ class TradingExecutor:
             keypair,
             token_address,
             swap_event.ui_amount,
-            swap_direction,
+            swap_event.swap_direction,
             slippage_bps,
             swap_in_type,
             use_jito=settings.trading.use_jito,

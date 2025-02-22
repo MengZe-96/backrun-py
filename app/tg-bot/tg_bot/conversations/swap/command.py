@@ -14,6 +14,7 @@ from tg_bot.templates import BUY_SELL_TEMPLATE
 from common.utils import calculate_auto_slippage
 from tg_bot.utils.solana import validate_solana_address
 from .render import render
+from trading.swap import SwapDirection
 
 setting_service = SettingService()
 user_service = UserService()
@@ -104,7 +105,7 @@ async def swap_command(message: Message):
         input_mint = WSOL.__str__()
         output_mint = token_info.mint
         from_amount = int(float(ui_amount) * SOL_DECIMAL)
-        swap_mode = "ExactIn"
+        swap_direction = SwapDirection.Buy
     else:
         if ui_amount.endswith("%"):
             await message.answer(
@@ -114,7 +115,7 @@ async def swap_command(message: Message):
         from_amount = int(float(ui_amount) * 10**token_info.decimals)
         input_mint = token_info.mint
         output_mint = WSOL.__str__()
-        swap_mode = "ExactOut"
+        swap_direction = SwapDirection.Sell
 
     if setting.sandwich_mode:
         slippage_bps = setting.sandwich_slippage_bps
@@ -123,7 +124,9 @@ async def swap_command(message: Message):
             input_mint=input_mint,
             output_mint=output_mint,
             amount=from_amount,
-            swap_mode=swap_mode,
+            # TODO: add swap_mode
+            # swap_mode="ExactIn" if cmd == "buy" else "ExactOut"
+            swap_mode="ExactIn",
             min_slippage_bps=setting.min_slippage,
             max_slippage_bps=setting.max_slippage,
         )
@@ -134,7 +137,7 @@ async def swap_command(message: Message):
 
     swap_event = SwapEvent(
         user_pubkey=wallet,
-        swap_mode=swap_mode,
+        swap_direction=swap_direction,
         input_mint=input_mint,
         output_mint=output_mint,
         amount=from_amount,
