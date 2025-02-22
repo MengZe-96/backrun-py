@@ -377,23 +377,23 @@ class TransactionAnalyzer:
             if token_transfer["fromUserAccount"] == user_account and token_transfer[
                 "mint"
             ] == str(WSOL):
-                sol_change -= token_transfer["tokenAmount"]
+                # sol_change -= token_transfer["tokenAmount"]
                 swap_sol_change -= token_transfer["tokenAmount"]
-            elif (
+            if (
                 token_transfer["toUserAccount"] == user_account
                 and token_transfer["mint"] == mint
             ):
                 token_change += token_transfer["tokenAmount"]
             # Sell
-            elif (
+            if (
                 token_transfer["fromUserAccount"] == user_account
                 and token_transfer["mint"] == mint
             ):
                 token_change -= token_transfer["tokenAmount"]
-            elif token_transfer["toUserAccount"] == user_account and token_transfer[
+            if token_transfer["toUserAccount"] == user_account and token_transfer[
                 "mint"
             ] == str(WSOL):
-                sol_change += token_transfer["tokenAmount"]
+                # sol_change += token_transfer["tokenAmount"]
                 swap_sol_change += token_transfer["tokenAmount"]
 
         for native_transfer in tx_detail["nativeTransfers"]:
