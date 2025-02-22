@@ -128,7 +128,7 @@ class SwapSettlementProcessor:
                 )
                 logger.debug(f"Transaction analysis data: {data}")
 
-                if swap_event.swap_direction == SwapDirection.BUY:
+                if swap_event.swap_direction == SwapDirection.Buy:
                     output_amount = int(abs(data["token_change"]) * 10 ** output_token_decimals)
                 else:
                     output_amount = int(abs(data["swap_sol_change"]) * 10 ** SOL_DECIMAL)
