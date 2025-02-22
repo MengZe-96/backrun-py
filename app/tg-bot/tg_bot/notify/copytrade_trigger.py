@@ -7,7 +7,7 @@ from aiogram import Bot
 from cache.token_info import TokenInfoCache
 from common.cp.copytrade_event import NotifyCopyTradeConsumer
 from common.log import logger
-from common.types.swap import SwapEvent
+from common.types.swap import SwapEvent, SwapDirection
 from tg_bot.services.copytrade import CopyTradeService
 from tg_bot.services.user import UserService
 from jinja2 import BaseLoader, Environment
@@ -77,11 +77,11 @@ class CopyTradeNotify:
             raise ValueError("tx_event is None")
 
         tx_event = data.tx_event
-        if tx_event.tx_direction == "buy":
+        if tx_event.tx_direction == SwapDirection.Buy:
             template = _BUY_TEMPLATE
             sol_ui_amount = tx_event.from_amount / (10**tx_event.from_decimals)
             token_ui_amount = tx_event.to_amount / (10**tx_event.to_decimals)
-        elif tx_event.tx_direction == "sell":
+        elif tx_event.tx_direction == SwapDirection.Sell:
             template = _SELL_TEMPLATE
             token_ui_amount = tx_event.from_amount / (10**tx_event.from_decimals)
             sol_ui_amount = tx_event.to_amount / (10**tx_event.to_decimals)

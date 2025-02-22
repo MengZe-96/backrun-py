@@ -22,10 +22,10 @@ from common.constants import (
     TOKEN_PROGRAM_ID,
     WSOL,
 )
+from common.types.swap import SwapDirection, SwapInType
 from common.IDL.pumpfun import PumpFunInterface
 from common.log import logger
 from trading.exceptions import BondingCurveNotFound
-from trading.swap import SwapDirection, SwapInType
 from trading.tx import build_transaction
 from trading.utils import (
     get_bonding_curve_account,

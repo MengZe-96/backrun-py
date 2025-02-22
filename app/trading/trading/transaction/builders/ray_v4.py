@@ -34,7 +34,7 @@ from common.utils.pool import (
     make_amm_v4_swap_instruction,
 )
 from common.utils.utils import get_token_balance
-from trading.swap import SwapDirection, SwapInType
+from common.types.swap import SwapDirection, SwapInType
 from trading.tx import build_transaction
 
 from .base import TransactionBuilder

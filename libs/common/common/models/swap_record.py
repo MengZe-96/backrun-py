@@ -4,7 +4,7 @@ from sqlalchemy import BIGINT
 from sqlmodel import Field
 
 from common.models.base import Base
-from trading.swap import SwapDirection
+from common.types.swap import SwapDirection
 
 class TransactionStatus(str, Enum):
     SUCCESS = "success"

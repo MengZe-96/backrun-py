@@ -4,8 +4,16 @@ from pydantic import BaseModel
 from typing_extensions import Self
 from common.models.swap_record import SwapRecord
 from common.types.tx import TxEvent
-from trading.swap import SwapDirection
 
+from enum import Enum
+
+class SwapDirection(str, Enum):
+    Buy = "buy"
+    Sell = "sell"
+
+class SwapInType(str, Enum):
+    Qty = "qty"  # 按数量交易
+    Pct = "pct"  # 按百分比交易
 
 class SwapEvent(BaseModel):
     user_pubkey: str
@@ -67,3 +75,6 @@ class SwapResult(BaseModel):
     @classmethod
     def from_json(cls, json_str: str) -> "Self":
         return cls.model_validate_json(json_str)
+
+
+

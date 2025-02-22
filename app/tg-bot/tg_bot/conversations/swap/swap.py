@@ -9,7 +9,7 @@ from cache import TokenInfoCache
 from common.constants import SOL_DECIMAL, WSOL
 from common.cp.swap_event import SwapEventProducer
 from common.types.bot_setting import BotSetting as Setting
-from common.types.swap import SwapEvent
+from common.types.swap import SwapEvent, SwapDirection
 from common.utils import calculate_auto_slippage
 from db.redis import RedisClient
 from loguru import logger
@@ -21,8 +21,6 @@ from tg_bot.services.user import UserService
 from tg_bot.utils import get_setting_from_db
 from tg_bot.utils.message import invalid_input_and_request_reinput
 from tg_bot.utils.swap import get_token_account_balance
-
-from trading.swap import SwapDirection
 
 from .render import render
 

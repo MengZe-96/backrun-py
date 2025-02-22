@@ -6,15 +6,16 @@ from cache import TokenInfoCache
 from common.constants import SOL_DECIMAL, WSOL
 from common.cp.swap_event import SwapEventProducer
 from common.log import logger
-from common.types.swap import SwapEvent
+from common.types.swap import SwapEvent, SwapDirection
+from common.utils import calculate_auto_slippage
 from db.redis import RedisClient
 from services.bot_setting import BotSettingService as SettingService
 from tg_bot.services.user import UserService
 from tg_bot.templates import BUY_SELL_TEMPLATE
-from common.utils import calculate_auto_slippage
+
+
 from tg_bot.utils.solana import validate_solana_address
 from .render import render
-from trading.swap import SwapDirection
 
 setting_service = SettingService()
 user_service = UserService()

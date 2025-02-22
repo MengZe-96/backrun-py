@@ -8,14 +8,12 @@ import asyncio
 from common.constants import SOL_DECIMAL
 from common.log import logger
 from common.models.swap_record import SwapRecord, TransactionStatus
-from common.types.swap import SwapEvent
+from common.types.swap import SwapEvent, SwapDirection
 from common.utils.utils import validate_transaction
 from db.session import NEW_ASYNC_SESSION, provide_session
 from solders.signature import Signature  # type: ignore
 
 from .analyzer import TransactionAnalyzer
-from trading.swap import SwapDirection
-
 
 class SwapSettlementProcessor:
     """Swap交易结算处理器

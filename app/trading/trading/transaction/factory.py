@@ -6,7 +6,7 @@ from solders.signature import Signature
 
 from common.log import logger
 from common.utils.jito import JitoClient
-from trading.swap import SwapDirection, SwapInType
+from common.types.swap import SwapDirection, SwapInType
 from trading.transaction.base import TransactionSender
 from trading.transaction.builders.base import TransactionBuilder
 from trading.transaction.builders.gmgn import GMGNTransactionBuilder
