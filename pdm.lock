@@ -4,14 +4,21 @@
 [metadata]
 groups = ["default", "dev", "local"]
 strategy = ["inherit_metadata"]
-lock_version = "4.4.1"
-content_hash = "sha256:3bfb6a67da9624203f30685160f3521d85b9e5d371858615184ff1ee6724e922"
+lock_version = "4.5.0"
+content_hash = "sha256:877014579a461df2f2311c24f3007b5e5b094077853ea2c37aa27d6e8b1e4062"
+
+[[metadata.targets]]
+requires_python = "==3.10.16"
+platform = "macos_15_3_arm64"
+implementation = "cpython"
+gil_disabled = false
 
 [[package]]
 name = "aiocache"
 version = "0.12.3"
 summary = "multi backend asyncio cache"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "aiocache-0.12.3-py2.py3-none-any.whl", hash = "sha256:889086fc24710f431937b87ad3720a289f7fc31c4fd8b68e9f918b9bacd8270d"},
     {file = "aiocache-0.12.3.tar.gz", hash = "sha256:f528b27bf4d436b497a1d0d1a8f59a542c153ab1e37c3621713cb376d44c4713"},
@@ -23,6 +30,7 @@ version = "0.12.3"
 extras = ["redis"]
 summary = "multi backend asyncio cache"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiocache==0.12.3",
     "redis>=4.2.0",
@@ -38,6 +46,7 @@ version = "24.1.0"
 requires_python = ">=3.8"
 summary = "File support for asyncio."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5"},
     {file = "aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c"},
@@ -49,6 +58,7 @@ version = "3.17.0"
 requires_python = ">=3.9"
 summary = "Modern and fully asynchronous framework for Telegram Bot API"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiofiles<24.2,>=23.2.1",
     "aiohttp<3.12,>=3.9.0",
@@ -68,6 +78,7 @@ version = "2.4.6"
 requires_python = ">=3.9"
 summary = "Happy Eyeballs for asyncio"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "aiohappyeyeballs-2.4.6-py3-none-any.whl", hash = "sha256:147ec992cf873d74f5062644332c539fcd42956dc69453fe5204195e560517e1"},
     {file = "aiohappyeyeballs-2.4.6.tar.gz", hash = "sha256:9b05052f9042985d32ecbe4b59a77ae19c006a78f1344d7fdad69d28ded3d0b0"},
@@ -79,6 +90,7 @@ version = "3.10.11"
 requires_python = ">=3.8"
 summary = "Async http client/server framework (asyncio)"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiohappyeyeballs>=2.3.0",
     "aiosignal>=1.1.2",
@@ -113,6 +125,7 @@ version = "0.2.0"
 requires_python = ">=3.7"
 summary = "MySQL driver for asyncio."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "PyMySQL>=1.0",
 ]
@@ -127,6 +140,7 @@ version = "2.0.1"
 requires_python = ">=3.6"
 summary = "asyncio (PEP 3156) Redis support"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "async-timeout",
     "typing-extensions",
@@ -143,6 +157,7 @@ extras = ["hiredis"]
 requires_python = ">=3.6"
 summary = "asyncio (PEP 3156) Redis support"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aioredis==2.0.1",
     "hiredis>=1.0; implementation_name == \"cpython\"",
@@ -158,6 +173,7 @@ version = "1.3.2"
 requires_python = ">=3.9"
 summary = "aiosignal: a list of registered asynchronous callbacks"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "frozenlist>=1.1.0",
 ]
@@ -172,6 +188,7 @@ version = "0.20.1"
 requires_python = "<4.0,>=3.9"
 summary = "The Python Anchor client."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "anchorpy-core<0.3.0,>=0.2.0",
     "based58<0.2.0,>=0.1.1",
@@ -196,6 +213,7 @@ version = "0.2.0"
 requires_python = ">=3.9"
 summary = "Python bindings for Anchor Rust code"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "jsonalias==0.1.1",
 ]
@@ -219,6 +237,10 @@ version = "0.7.0"
 requires_python = ">=3.8"
 summary = "Reusable constraint types to use with typing.Annotated"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "typing-extensions>=4.0.0; python_version < \"3.9\"",
+]
 files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
@@ -230,6 +252,7 @@ version = "4.8.0"
 requires_python = ">=3.9"
 summary = "High level compatibility layer for multiple asynchronous event loop implementations"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "exceptiongroup>=1.0.2; python_version < \"3.11\"",
     "idna>=2.8",
@@ -242,13 +265,27 @@ files = [
 ]
 
 [[package]]
+name = "appnope"
+version = "0.1.4"
+requires_python = ">=3.6"
+summary = "Disable App Nap on macOS >= 10.9"
+groups = ["dev"]
+marker = "platform_system == \"Darwin\" and python_full_version == \"3.10.16\""
+files = [
+    {file = "appnope-0.1.4-py2.py3-none-any.whl", hash = "sha256:502575ee11cd7a28c0205f379b525beefebab9d161b7c964670864014ed7213c"},
+    {file = "appnope-0.1.4.tar.gz", hash = "sha256:1de3860566df9caf38f01f86f65e0e13e379af54f9e4bee1e66b48f2efffd1ee"},
+]
+
+[[package]]
 name = "argon2-cffi"
 version = "23.1.0"
 requires_python = ">=3.7"
 summary = "Argon2 for Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "argon2-cffi-bindings",
+    "typing-extensions; python_version < \"3.8\"",
 ]
 files = [
     {file = "argon2_cffi-23.1.0-py3-none-any.whl", hash = "sha256:c670642b78ba29641818ab2e68bd4e6a78ba53b7eff7b4c3815ae16abf91c7ea"},
@@ -261,6 +298,7 @@ version = "21.2.0"
 requires_python = ">=3.6"
 summary = "Low-level CFFI bindings for Argon2"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "cffi>=1.0.1",
 ]
@@ -284,6 +322,7 @@ version = "1.3.0"
 requires_python = ">=3.8"
 summary = "Better dates & times for Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "python-dateutil>=2.7.0",
     "types-python-dateutil>=2.8.10",
@@ -299,6 +338,7 @@ version = "3.0.0"
 requires_python = ">=3.8"
 summary = "Annotate AST trees with source code positions"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "asttokens-3.0.0-py3-none-any.whl", hash = "sha256:e3078351a059199dd5138cb1c706e6430c05eff2ff136af5eb4790f9d28932e2"},
     {file = "asttokens-3.0.0.tar.gz", hash = "sha256:0dcd8baa8d62b0c1d118b399b2ddba3c4aff271d0d7a9e0d4c1681c79035bbc7"},
@@ -310,6 +350,7 @@ version = "2.0.4"
 requires_python = ">=3.8"
 summary = "Simple LRU cache for asyncio"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "typing-extensions>=4.0.0; python_version < \"3.11\"",
 ]
@@ -324,6 +365,7 @@ version = "5.0.1"
 requires_python = ">=3.8"
 summary = "Timeout context manager for asyncio programs"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "async_timeout-5.0.1-py3-none-any.whl", hash = "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c"},
     {file = "async_timeout-5.0.1.tar.gz", hash = "sha256:d9321a7a3d5a6a5e187e824d2fa0793ce379a202935782d555d6e9d2735677d3"},
@@ -335,6 +377,7 @@ version = "25.1.0"
 requires_python = ">=3.8"
 summary = "Classes Without Boilerplate"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "attrs-25.1.0-py3-none-any.whl", hash = "sha256:c75a69e28a550a7e93789579c22aa26b0f5b83b75dc4e08fe092980051e1090a"},
     {file = "attrs-25.1.0.tar.gz", hash = "sha256:1c97078a80c814273a76b2a298a932eb681c87415c11dee0a6921de7f1b02c3e"},
@@ -346,6 +389,10 @@ version = "2.17.0"
 requires_python = ">=3.8"
 summary = "Internationalization utilities"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "pytz>=2015.7; python_version < \"3.9\"",
+]
 files = [
     {file = "babel-2.17.0-py3-none-any.whl", hash = "sha256:4d0b53093fdfb4b21c92b5213dba5a1b23885afa8383709427046b21c366e5f2"},
     {file = "babel-2.17.0.tar.gz", hash = "sha256:0c54cffb19f690cdcc52a3b50bcbf71e07a808d1c80d549f2459b9d2cf0afb9d"},
@@ -357,6 +404,7 @@ version = "2.2.1"
 requires_python = ">=3.7,<4.0"
 summary = "Function decoration for backoff and retry"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "backoff-2.2.1-py3-none-any.whl", hash = "sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8"},
     {file = "backoff-2.2.1.tar.gz", hash = "sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba"},
@@ -368,6 +416,7 @@ version = "2.1.1"
 requires_python = ">=3.5"
 summary = "Base58 and Base58Check implementation."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "base58-2.1.1-py3-none-any.whl", hash = "sha256:11a36f4d3ce51dfc1043f3218591ac4eb1ceb172919cebe05b52a5bcc8d245c2"},
     {file = "base58-2.1.1.tar.gz", hash = "sha256:c5d0cb3f5b6e81e8e35da5754388ddcc6d0d14b6c6a132cb93d69ed580a7278c"},
@@ -379,6 +428,7 @@ version = "0.1.1"
 requires_python = ">=3.7"
 summary = "A fast Python library for Base58 and Base58Check"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "based58-0.1.1-cp37-abi3-macosx_10_7_x86_64.whl", hash = "sha256:745851792ce5fada615f05ec61d7f360d19c76950d1e86163b2293c63a5d43bc"},
     {file = "based58-0.1.1-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:f8448a71678bd1edc0a464033695686461ab9d6d0bc3282cb29b94f883583572"},
@@ -404,6 +454,7 @@ version = "4.13.3"
 requires_python = ">=3.7.0"
 summary = "Screen-scraping library"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "soupsieve>1.2",
     "typing-extensions>=4.0.0",
@@ -419,6 +470,7 @@ version = "6.2.0"
 requires_python = ">=3.9"
 summary = "An easy safelist-based HTML-sanitizing tool."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "webencodings",
 ]
@@ -434,6 +486,7 @@ extras = ["css"]
 requires_python = ">=3.9"
 summary = "An easy safelist-based HTML-sanitizing tool."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "bleach==6.2.0",
     "tinycss2<1.5,>=1.1.0",
@@ -449,6 +502,7 @@ version = "0.1.0"
 requires_python = ">=3.8.3,<4.0.0"
 summary = "Python implementation of Borsh serialization, built on the Construct library."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "construct-typing<0.6.0,>=0.5.1",
     "sumtypes<0.2,>=0.1a5",
@@ -464,6 +518,7 @@ version = "2025.1.31"
 requires_python = ">=3.6"
 summary = "Python package for providing Mozilla's CA Bundle."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "certifi-2025.1.31-py3-none-any.whl", hash = "sha256:ca78db4565a652026a4db2bcdf68f2fb589ea80d0be70e03929ed730746b84fe"},
     {file = "certifi-2025.1.31.tar.gz", hash = "sha256:3d5da6925056f6f18f119200434a4780a94263f10d1c21d032a6f6b2baa20651"},
@@ -475,6 +530,7 @@ version = "1.17.1"
 requires_python = ">=3.8"
 summary = "Foreign Function Interface for Python calling C code."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "pycparser",
 ]
@@ -500,6 +556,7 @@ version = "3.4.0"
 requires_python = ">=3.8"
 summary = "Validate configuration and produce human readable error messages."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "cfgv-3.4.0-py2.py3-none-any.whl", hash = "sha256:b7265b1f29fd3316bfcd2b330d63d024f2bfd8bcb8b0272f8e19a504856c48f9"},
     {file = "cfgv-3.4.0.tar.gz", hash = "sha256:e52591d4c5f5dead8e0f673fb16db7949d2cfb3f7da4582893288f0ded8fe560"},
@@ -511,6 +568,7 @@ version = "3.4.1"
 requires_python = ">=3.7"
 summary = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "charset_normalizer-3.4.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:91b36a978b5ae0ee86c394f5a54d6ef44db1de0815eb43de826d41d21e4af3de"},
     {file = "charset_normalizer-3.4.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7461baadb4dc00fd9e0acbe254e3d7d2112e7f92ced2adc96e54ef6501c5f176"},
@@ -535,6 +593,7 @@ version = "0.2.2"
 requires_python = ">=3.8"
 summary = "Jupyter Python Comm implementation, for usage in ipykernel, xeus-python etc."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "traitlets>=4",
 ]
@@ -549,6 +608,7 @@ version = "2.10.68"
 requires_python = ">=3.6"
 summary = "A powerful declarative symmetric parser/builder for binary data"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "construct-2.10.68.tar.gz", hash = "sha256:7b2a3fd8e5f597a5aa1d614c3bd516fa065db01704c72a1efaaeec6ef23d8b45"},
 ]
@@ -559,6 +619,7 @@ version = "0.5.6"
 requires_python = ">=3.7"
 summary = "Extension for the python package 'construct' that adds typing features"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "construct==2.10.68",
 ]
@@ -573,6 +634,7 @@ version = "44.0.1"
 requires_python = "!=3.9.0,!=3.9.1,>=3.7"
 summary = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "cffi>=1.12; platform_python_implementation != \"PyPy\"",
 ]
@@ -616,6 +678,7 @@ version = "1.8.12"
 requires_python = ">=3.8"
 summary = "An implementation of the Debug Adapter Protocol for Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "debugpy-1.8.12-cp310-cp310-macosx_14_0_x86_64.whl", hash = "sha256:a2ba7ffe58efeae5b8fad1165357edfe01464f9aef25e814e891ec690e7dd82a"},
     {file = "debugpy-1.8.12-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cbbd4149c4fc5e7d508ece083e78c17442ee13b0e69bfa6bd63003e486770f45"},
@@ -631,6 +694,7 @@ version = "5.1.1"
 requires_python = ">=3.5"
 summary = "Decorators for Humans"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
     {file = "decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330"},
@@ -642,6 +706,7 @@ version = "0.7.1"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 summary = "XML bomb protection for Python stdlib modules"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61"},
     {file = "defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69"},
@@ -652,6 +717,7 @@ name = "distlib"
 version = "0.3.9"
 summary = "Distribution utilities"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "distlib-0.3.9-py2.py3-none-any.whl", hash = "sha256:47f8c22fd27c27e25a65601af709b38e4f0a45ea4fc2e710f65755fa8caaaf87"},
     {file = "distlib-0.3.9.tar.gz", hash = "sha256:a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403"},
@@ -663,7 +729,7 @@ version = "1.2.2"
 requires_python = ">=3.7"
 summary = "Backport of PEP 654 (exception groups)"
 groups = ["dev", "local"]
-marker = "python_version < \"3.11\""
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
     {file = "exceptiongroup-1.2.2.tar.gz", hash = "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"},
@@ -675,6 +741,7 @@ version = "2.2.0"
 requires_python = ">=3.8"
 summary = "Get the currently executing AST node of a frame, and other information"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "executing-2.2.0-py2.py3-none-any.whl", hash = "sha256:11387150cad388d62750327a53d3339fad4888b39a6fe233c3afbb54ecffd3aa"},
     {file = "executing-2.2.0.tar.gz", hash = "sha256:5d108c028108fe2551d1a7b2e8b713341e2cb4fc0aa7dcf966fa4327a5226755"},
@@ -685,6 +752,7 @@ name = "fastjsonschema"
 version = "2.21.1"
 summary = "Fastest Python implementation of JSON schema"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "fastjsonschema-2.21.1-py3-none-any.whl", hash = "sha256:c9e5b7e908310918cf494a434eeb31384dd84a98b57a30bcb1f535015b554667"},
     {file = "fastjsonschema-2.21.1.tar.gz", hash = "sha256:794d4f0a58f848961ba16af7b9c85a3e88cd360df008c59aac6fc5ae9323b5d4"},
@@ -696,6 +764,7 @@ version = "3.17.0"
 requires_python = ">=3.9"
 summary = "A platform independent file lock."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "filelock-3.17.0-py3-none-any.whl", hash = "sha256:533dc2f7ba78dc2f0f531fc6c4940addf7b70a481e269a5a3b93be94ffbe8338"},
     {file = "filelock-3.17.0.tar.gz", hash = "sha256:ee4e77401ef576ebb38cd7f13b9b28893194acc20a8e68e18730ba9c0e54660e"},
@@ -707,6 +776,10 @@ version = "1.5.1"
 requires_python = ">=2.7, !=3.0, !=3.1, !=3.2, !=3.3, !=3.4, <4"
 summary = "Validates fully-qualified domain names against RFC 1123, so that they are acceptable to modern bowsers"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "cached-property>=1.3.0; python_version < \"3.8\"",
+]
 files = [
     {file = "fqdn-1.5.1-py3-none-any.whl", hash = "sha256:3a179af3761e4df6eb2e026ff9e1a3033d3587bf980a0b1b2e1e5d08d7358014"},
     {file = "fqdn-1.5.1.tar.gz", hash = "sha256:105ed3677e767fb5ca086a0c1f4bb66ebc3c100be518f0e0d755d9eae164d89f"},
@@ -718,6 +791,7 @@ version = "1.5.0"
 requires_python = ">=3.8"
 summary = "A list-like structure which implements collections.abc.MutableSequence"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "frozenlist-1.5.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:5b6a66c18b5b9dd261ca98dffcb826a525334b2f29e7caa54e182255c5f6a65a"},
     {file = "frozenlist-1.5.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d1b3eb7b05ea246510b43a7e53ed1653e55c2121019a97e60cad7efb881a97bb"},
@@ -743,7 +817,8 @@ name = "greenlet"
 version = "3.1.1"
 requires_python = ">=3.7"
 summary = "Lightweight in-process concurrent programming"
-groups = ["dev", "local"]
+groups = ["local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "greenlet-3.1.1-cp310-cp310-macosx_11_0_universal2.whl", hash = "sha256:0bbae94a29c9e5c7e4a2b7f0aae5c17e8e90acbfd3bf6270eeba60c39fce3563"},
     {file = "greenlet-3.1.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0fde093fb93f35ca72a556cf72c92ea3ebfda3d79fc35bb19fbe685853869a83"},
@@ -763,6 +838,7 @@ version = "1.70.0"
 requires_python = ">=3.8"
 summary = "HTTP/2-based RPC framework"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "grpcio-1.70.0-cp310-cp310-linux_armv7l.whl", hash = "sha256:95469d1977429f45fe7df441f586521361e235982a0b39e33841549143ae2851"},
     {file = "grpcio-1.70.0-cp310-cp310-macosx_12_0_universal2.whl", hash = "sha256:ed9718f17fbdb472e33b869c77a16d0b55e166b100ec57b016dc7de9c8d236bf"},
@@ -782,6 +858,7 @@ version = "1.70.0"
 requires_python = ">=3.8"
 summary = "Standard Health Checking Service for gRPC"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "grpcio>=1.70.0",
     "protobuf<6.0dev,>=5.26.1",
@@ -797,6 +874,7 @@ version = "1.70.0"
 requires_python = ">=3.8"
 summary = "Protobuf code generator for gRPC"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "grpcio>=1.70.0",
     "protobuf<6.0dev,>=5.26.1",
@@ -821,6 +899,10 @@ version = "0.14.0"
 requires_python = ">=3.7"
 summary = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "typing-extensions; python_version < \"3.8\"",
+]
 files = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
@@ -832,7 +914,7 @@ version = "3.1.0"
 requires_python = ">=3.8"
 summary = "Python wrapper for hiredis"
 groups = ["dev", "local"]
-marker = "implementation_name == \"cpython\""
+marker = "implementation_name == \"cpython\" and python_full_version == \"3.10.16\""
 files = [
     {file = "hiredis-3.1.0-cp310-cp310-macosx_10_15_universal2.whl", hash = "sha256:2892db9db21f0cf7cc298d09f85d3e1f6dc4c4c24463ab67f79bc7a006d51867"},
     {file = "hiredis-3.1.0-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:93cfa6cc25ee2ceb0be81dc61eca9995160b9e16bdb7cca4a00607d57e998918"},
@@ -864,6 +946,7 @@ version = "1.0.7"
 requires_python = ">=3.8"
 summary = "A minimal low-level HTTP client."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "certifi",
     "h11<0.15,>=0.13",
@@ -879,6 +962,7 @@ version = "0.28.1"
 requires_python = ">=3.8"
 summary = "The next generation HTTP client."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "anyio",
     "certifi",
@@ -896,6 +980,7 @@ version = "2.6.7"
 requires_python = ">=3.9"
 summary = "File identification library for Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "identify-2.6.7-py2.py3-none-any.whl", hash = "sha256:155931cb617a401807b09ecec6635d6c692d180090a1cedca8ef7d58ba5b6aa0"},
     {file = "identify-2.6.7.tar.gz", hash = "sha256:3fa266b42eba321ee0b2bb0936a6a6b9e36a1351cbb69055b3082f4193035684"},
@@ -907,6 +992,7 @@ version = "3.10"
 requires_python = ">=3.6"
 summary = "Internationalized Domain Names in Applications (IDNA)"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "idna-3.10-py3-none-any.whl", hash = "sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3"},
     {file = "idna-3.10.tar.gz", hash = "sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9"},
@@ -918,6 +1004,7 @@ version = "2.0.0"
 requires_python = ">=3.7"
 summary = "brain-dead simple config-ini parsing"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
@@ -929,7 +1016,9 @@ version = "6.29.5"
 requires_python = ">=3.8"
 summary = "IPython Kernel for Jupyter"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
+    "appnope; platform_system == \"Darwin\"",
     "comm>=0.1.1",
     "debugpy>=1.6.5",
     "ipython>=7.23.1",
@@ -954,7 +1043,9 @@ version = "8.32.0"
 requires_python = ">=3.10"
 summary = "IPython: Productive Interactive Computing"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
+    "colorama; sys_platform == \"win32\"",
     "decorator",
     "exceptiongroup; python_version < \"3.11\"",
     "jedi>=0.16",
@@ -977,6 +1068,7 @@ version = "8.1.5"
 requires_python = ">=3.7"
 summary = "Jupyter interactive widgets"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "comm>=0.1.3",
     "ipython>=6.1.0",
@@ -995,6 +1087,7 @@ version = "20.11.0"
 requires_python = ">=3.7"
 summary = "Operations with ISO 8601 durations"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "arrow>=0.15.0",
 ]
@@ -1009,6 +1102,7 @@ version = "0.19.2"
 requires_python = ">=3.6"
 summary = "An autocompletion tool for Python that can be used for text editors."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "parso<0.9.0,>=0.8.4",
 ]
@@ -1023,6 +1117,7 @@ version = "3.1.5"
 requires_python = ">=3.7"
 summary = "A very fast and expressive template engine."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "MarkupSafe>=2.0",
 ]
@@ -1037,6 +1132,7 @@ version = "0.10.0"
 requires_python = ">=3.8.0"
 summary = "A Python implementation of the JSON5 data format."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "json5-0.10.0-py3-none-any.whl", hash = "sha256:19b23410220a7271e8377f81ba8aacba2fdd56947fbb137ee5977cbe1f5e8dfa"},
     {file = "json5-0.10.0.tar.gz", hash = "sha256:e66941c8f0a02026943c52c2eb34ebeb2a6f819a0be05920a6f5243cd30fd559"},
@@ -1048,6 +1144,7 @@ version = "0.1.1"
 requires_python = ">=3.7,<4.0"
 summary = "A microlibrary that defines a Json type alias for Python."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "jsonalias-0.1.1-py3-none-any.whl", hash = "sha256:a56d2888e6397812c606156504e861e8ec00e188005af149f003c787db3d3f18"},
     {file = "jsonalias-0.1.1.tar.gz", hash = "sha256:64f04d935397d579fc94509e1fcb6212f2d081235d9d6395bd10baedf760a769"},
@@ -1059,6 +1156,7 @@ version = "3.0.0"
 requires_python = ">=3.7"
 summary = "Identify specific nodes in a JSON document (RFC 6901) "
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "jsonpointer-3.0.0-py2.py3-none-any.whl", hash = "sha256:13e088adc14fca8b6aa8177c044e12701e6ad4b28ff10e65f2267a90109c9942"},
     {file = "jsonpointer-3.0.0.tar.gz", hash = "sha256:2b2d729f2091522d61c3b31f82e11870f60b68f43fbc705cb76bf4b832af59ef"},
@@ -1070,9 +1168,12 @@ version = "4.23.0"
 requires_python = ">=3.8"
 summary = "An implementation of JSON Schema validation for Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "attrs>=22.2.0",
+    "importlib-resources>=1.4.0; python_version < \"3.9\"",
     "jsonschema-specifications>=2023.03.6",
+    "pkgutil-resolve-name>=1.3.10; python_version < \"3.9\"",
     "referencing>=0.28.4",
     "rpds-py>=0.7.1",
 ]
@@ -1087,6 +1188,7 @@ version = "2024.10.1"
 requires_python = ">=3.9"
 summary = "The JSON Schema meta-schemas and vocabularies, exposed as a Registry"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "referencing>=0.31.0",
 ]
@@ -1102,6 +1204,7 @@ extras = ["format-nongpl"]
 requires_python = ">=3.8"
 summary = "An implementation of JSON Schema validation for Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "fqdn",
     "idna",
@@ -1123,6 +1226,7 @@ name = "jupiter-python-sdk"
 version = "0.0.2.0"
 summary = "Jupiter Python SDK"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "anchorpy",
     "base58",
@@ -1140,6 +1244,7 @@ name = "jupyter"
 version = "1.1.1"
 summary = "Jupyter metapackage. Install all the Jupyter components in one go."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "ipykernel",
     "ipywidgets",
@@ -1159,7 +1264,9 @@ version = "8.6.3"
 requires_python = ">=3.8"
 summary = "Jupyter protocol implementation and client libraries"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
+    "importlib-metadata>=4.8.3; python_version < \"3.10\"",
     "jupyter-core!=5.0.*,>=4.12",
     "python-dateutil>=2.8.2",
     "pyzmq>=23.0",
@@ -1177,6 +1284,7 @@ version = "6.6.3"
 requires_python = ">=3.7"
 summary = "Jupyter terminal console"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "ipykernel>=6.14",
     "ipython",
@@ -1198,8 +1306,10 @@ version = "5.7.2"
 requires_python = ">=3.8"
 summary = "Jupyter core package. A base package on which Jupyter projects rely."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "platformdirs>=2.5",
+    "pywin32>=300; sys_platform == \"win32\" and platform_python_implementation != \"PyPy\"",
     "traitlets>=5.3",
 ]
 files = [
@@ -1213,6 +1323,7 @@ version = "0.12.0"
 requires_python = ">=3.9"
 summary = "Jupyter Event System library"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "jsonschema[format-nongpl]>=4.18.0",
     "packaging",
@@ -1234,7 +1345,9 @@ version = "2.2.5"
 requires_python = ">=3.8"
 summary = "Multi-Language Server WebSocket proxy for Jupyter Notebook/Lab server"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
+    "importlib-metadata>=4.8.3; python_version < \"3.10\"",
     "jupyter-server>=1.1.2",
 ]
 files = [
@@ -1248,6 +1361,7 @@ version = "2.15.0"
 requires_python = ">=3.9"
 summary = "The backend—i.e. core services, APIs, and REST endpoints—to Jupyter web applications."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "anyio>=3.1.0",
     "argon2-cffi>=21.1",
@@ -1261,6 +1375,7 @@ dependencies = [
     "overrides>=5.0",
     "packaging>=22.0",
     "prometheus-client>=0.9",
+    "pywinpty>=2.0.1; os_name == \"nt\"",
     "pyzmq>=24",
     "send2trash>=1.8.2",
     "terminado>=0.8.3",
@@ -1279,7 +1394,9 @@ version = "0.5.3"
 requires_python = ">=3.8"
 summary = "A Jupyter Server Extension Providing Terminals."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
+    "pywinpty>=2.0.3; os_name == \"nt\"",
     "terminado>=0.8.3",
 ]
 files = [
@@ -1293,9 +1410,12 @@ version = "4.3.5"
 requires_python = ">=3.8"
 summary = "JupyterLab computational environment"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "async-lru>=1.0.0",
     "httpx>=0.25.0",
+    "importlib-metadata>=4.8.3; python_version < \"3.10\"",
+    "importlib-resources>=1.4; python_version < \"3.9\"",
     "ipykernel>=6.5.0",
     "jinja2>=3.0.3",
     "jupyter-core",
@@ -1320,6 +1440,7 @@ version = "0.3.0"
 requires_python = ">=3.8"
 summary = "Pygments theme using JupyterLab CSS variables"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "jupyterlab_pygments-0.3.0-py3-none-any.whl", hash = "sha256:841a89020971da1d8693f1a99997aefc5dc424bb1b251fd6322462a1b8842780"},
     {file = "jupyterlab_pygments-0.3.0.tar.gz", hash = "sha256:721aca4d9029252b11cfa9d185e5b5af4d54772bb8072f9b7036f4170054d35d"},
@@ -1331,8 +1452,10 @@ version = "2.27.3"
 requires_python = ">=3.8"
 summary = "A set of server components for JupyterLab and JupyterLab like applications."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "babel>=2.10",
+    "importlib-metadata>=4.8.3; python_version < \"3.10\"",
     "jinja2>=3.0.3",
     "json5>=0.9.0",
     "jsonschema>=4.18.0",
@@ -1351,6 +1474,7 @@ version = "3.0.13"
 requires_python = ">=3.7"
 summary = "Jupyter interactive widgets for JupyterLab"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "jupyterlab_widgets-3.0.13-py3-none-any.whl", hash = "sha256:e3cda2c233ce144192f1e29914ad522b2f4c40e77214b0cc97377ca3d323db54"},
     {file = "jupyterlab_widgets-3.0.13.tar.gz", hash = "sha256:a2966d385328c1942b683a8cd96b89b8dd82c8b8f81dda902bb2bc06d46f5bed"},
@@ -1362,6 +1486,12 @@ version = "0.7.3"
 requires_python = "<4.0,>=3.5"
 summary = "Python logging made (stupidly) simple"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "aiocontextvars>=0.2.0; python_version < \"3.7\"",
+    "colorama>=0.3.4; sys_platform == \"win32\"",
+    "win32-setctime>=1.0.0; sys_platform == \"win32\"",
+]
 files = [
     {file = "loguru-0.7.3-py3-none-any.whl", hash = "sha256:31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c"},
     {file = "loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6"},
@@ -1373,6 +1503,7 @@ version = "1.0.12"
 requires_python = ">=3.7"
 summary = ""
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "magic_filter-1.0.12-py3-none-any.whl", hash = "sha256:e5929e544f310c2b1f154318db8c5cdf544dd658efa998172acd2e4ba0f6c6a6"},
     {file = "magic_filter-1.0.12.tar.gz", hash = "sha256:4751d0b579a5045d1dc250625c4c508c18c3def5ea6afaf3957cb4530d03f7f9"},
@@ -1384,6 +1515,7 @@ version = "3.0.2"
 requires_python = ">=3.9"
 summary = "Safely add untrusted strings to HTML/XML markup."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "MarkupSafe-3.0.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:7e94c425039cde14257288fd61dcfb01963e658efbc0ff54f5306b06054700f8"},
     {file = "MarkupSafe-3.0.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9e2d922824181480953426608b81967de705c3cef4d1af983af849d7bd619158"},
@@ -1404,6 +1536,7 @@ version = "0.1.7"
 requires_python = ">=3.8"
 summary = "Inline Matplotlib backend for Jupyter"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "traitlets",
 ]
@@ -1418,6 +1551,7 @@ version = "3.1.1"
 requires_python = ">=3.8"
 summary = "A sane and fast Markdown parser with useful plugins and renderers"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "typing-extensions; python_version < \"3.11\"",
 ]
@@ -1432,6 +1566,7 @@ version = "8.14.0"
 requires_python = ">=3.5"
 summary = "More routines for operating on iterables, beyond itertools"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "more-itertools-8.14.0.tar.gz", hash = "sha256:c09443cd3d5438b8dafccd867a6bc1cb0894389e90cb53d227456b0b0bccb750"},
     {file = "more_itertools-8.14.0-py3-none-any.whl", hash = "sha256:1bc4f91ee5b1b31ac7ceacc17c09befe6a40a503907baf9c839c229b5095cfd2"},
@@ -1443,6 +1578,7 @@ version = "6.1.0"
 requires_python = ">=3.8"
 summary = "multidict implementation"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "typing-extensions>=4.1.0; python_version < \"3.11\"",
 ]
@@ -1472,6 +1608,7 @@ version = "0.10.2"
 requires_python = ">=3.9.0"
 summary = "A client library for executing notebooks. Formerly nbconvert's ExecutePreprocessor."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "jupyter-client>=6.1.12",
     "jupyter-core!=5.0.*,>=4.12",
@@ -1489,10 +1626,12 @@ version = "7.16.6"
 requires_python = ">=3.8"
 summary = "Converting Jupyter Notebooks (.ipynb files) to other formats.  Output formats include asciidoc, html, latex, markdown, pdf, py, rst, script.  nbconvert can be used both as a Python library (`import nbconvert`) or as a command line tool (invoked as `jupyter nbconvert ...`)."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "beautifulsoup4",
     "bleach[css]!=5.0.0",
     "defusedxml",
+    "importlib-metadata>=3.6; python_version < \"3.10\"",
     "jinja2>=3.0",
     "jupyter-core>=4.7",
     "jupyterlab-pygments",
@@ -1516,6 +1655,7 @@ version = "5.10.4"
 requires_python = ">=3.8"
 summary = "The Jupyter Notebook format"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "fastjsonschema>=2.15",
     "jsonschema>=2.6",
@@ -1533,6 +1673,7 @@ version = "1.6.0"
 requires_python = ">=3.5"
 summary = "Patch asyncio to allow nested event loops"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c"},
     {file = "nest_asyncio-1.6.0.tar.gz", hash = "sha256:6f172d5449aca15afd6c646851f4e31e02c598d553a667e38cafa997cfec55fe"},
@@ -1544,6 +1685,7 @@ version = "1.9.1"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "Node.js virtual environment builder"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "nodeenv-1.9.1-py2.py3-none-any.whl", hash = "sha256:ba11c9782d29c27c70ffbdda2d7415098754709be8a7056d79a737cd901155c9"},
     {file = "nodeenv-1.9.1.tar.gz", hash = "sha256:6ec12890a2dab7946721edbfbcd91f3319c6ccc9aec47be7c7e6b7011ee6645f"},
@@ -1555,6 +1697,7 @@ version = "7.3.2"
 requires_python = ">=3.8"
 summary = "Jupyter Notebook - A web-based notebook environment for interactive computing"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "jupyter-server<3,>=2.4.0",
     "jupyterlab-server<3,>=2.27.1",
@@ -1573,6 +1716,7 @@ version = "0.2.4"
 requires_python = ">=3.7"
 summary = "A shim layer for notebook traits and config"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "jupyter-server<3,>=1.8",
 ]
@@ -1587,6 +1731,7 @@ version = "3.10.15"
 requires_python = ">=3.8"
 summary = "Fast, correct Python JSON library supporting dataclasses, datetimes, and numpy"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "orjson-3.10.15-cp310-cp310-macosx_10_15_x86_64.macosx_11_0_arm64.macosx_10_15_universal2.whl", hash = "sha256:552c883d03ad185f720d0c09583ebde257e41b9521b74ff40e08b7dec4559c04"},
     {file = "orjson-3.10.15-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:616e3e8d438d02e4854f70bfdc03a6bcdb697358dbaa6bcd19cbe24d24ece1f8"},
@@ -1610,6 +1755,10 @@ version = "7.7.0"
 requires_python = ">=3.6"
 summary = "A decorator to automatically detect mismatch when overriding a method."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "typing; python_version < \"3.5\"",
+]
 files = [
     {file = "overrides-7.7.0-py3-none-any.whl", hash = "sha256:c7ed9d062f78b8e4c1a7b70bd8796b35ead4d9f510227ef9c5dc7626c60d7e49"},
     {file = "overrides-7.7.0.tar.gz", hash = "sha256:55158fa3d93b98cc75299b1e67078ad9003ca27945c76162c1c0766d6f91820a"},
@@ -1621,6 +1770,7 @@ version = "24.2"
 requires_python = ">=3.8"
 summary = "Core utilities for Python packages"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
@@ -1632,6 +1782,7 @@ version = "1.5.1"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 summary = "Utilities for writing pandoc filters in python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "pandocfilters-1.5.1-py2.py3-none-any.whl", hash = "sha256:93be382804a9cdb0a7267585f157e5d1731bbe5545a85b268d6f5fe6232de2bc"},
     {file = "pandocfilters-1.5.1.tar.gz", hash = "sha256:002b4a555ee4ebc03f8b66307e287fa492e4a77b4ea14d3f934328297bb4939e"},
@@ -1643,6 +1794,7 @@ version = "0.8.4"
 requires_python = ">=3.6"
 summary = "A Python Parser"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "parso-0.8.4-py2.py3-none-any.whl", hash = "sha256:a418670a20291dacd2dddc80c377c5c3791378ee1e8d12bffc35420643d43f18"},
     {file = "parso-0.8.4.tar.gz", hash = "sha256:eb3a7b58240fb99099a345571deecc0f9540ea5f4dd2fe14c2a99d6b281ab92d"},
@@ -1653,7 +1805,7 @@ name = "pexpect"
 version = "4.9.0"
 summary = "Pexpect allows easy control of interactive console applications."
 groups = ["dev"]
-marker = "sys_platform != \"win32\" and sys_platform != \"emscripten\""
+marker = "(sys_platform != \"win32\" and sys_platform != \"emscripten\") and python_full_version == \"3.10.16\""
 dependencies = [
     "ptyprocess>=0.5",
 ]
@@ -1668,6 +1820,7 @@ version = "4.3.6"
 requires_python = ">=3.8"
 summary = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "platformdirs-4.3.6-py3-none-any.whl", hash = "sha256:73e575e1408ab8103900836b97580d5307456908a03e92031bab39e4554cc3fb"},
     {file = "platformdirs-4.3.6.tar.gz", hash = "sha256:357fb2acbc885b0419afd3ce3ed34564c13c9b95c89360cd9563f73aa5e2b907"},
@@ -1679,6 +1832,7 @@ version = "1.5.0"
 requires_python = ">=3.8"
 summary = "plugin and hook calling mechanisms for python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669"},
     {file = "pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1"},
@@ -1690,6 +1844,7 @@ version = "4.1.0"
 requires_python = ">=3.9"
 summary = "A framework for managing and maintaining multi-language pre-commit hooks."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "cfgv>=2.0.0",
     "identify>=1.0.0",
@@ -1708,6 +1863,7 @@ version = "0.21.1"
 requires_python = ">=3.8"
 summary = "Python client for the Prometheus monitoring system."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "prometheus_client-0.21.1-py3-none-any.whl", hash = "sha256:594b45c410d6f4f8888940fe80b5cc2521b305a1fafe1c58609ef715a001f301"},
     {file = "prometheus_client-0.21.1.tar.gz", hash = "sha256:252505a722ac04b0456be05c05f75f45d760c2911ffc45f2a06bcaed9f3ae3fb"},
@@ -1719,6 +1875,7 @@ version = "3.0.50"
 requires_python = ">=3.8.0"
 summary = "Library for building powerful interactive command lines in Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "wcwidth",
 ]
@@ -1733,6 +1890,7 @@ version = "0.2.1"
 requires_python = ">=3.9"
 summary = "Accelerated property cache"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "propcache-0.2.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:6b3f39a85d671436ee3d12c017f8fdea38509e4f25b28eb25877293c98c243f6"},
     {file = "propcache-0.2.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:39d51fbe4285d5db5d92a929e3e21536ea3dd43732c5b177c7ef03f918dff9f2"},
@@ -1760,6 +1918,7 @@ version = "5.29.3"
 requires_python = ">=3.8"
 summary = ""
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "protobuf-5.29.3-cp310-abi3-win32.whl", hash = "sha256:3ea51771449e1035f26069c4c7fd51fba990d07bc55ba80701c78f886bf9c888"},
     {file = "protobuf-5.29.3-cp310-abi3-win_amd64.whl", hash = "sha256:a4fa6f80816a9a0678429e84973f2f98cbc218cca434abe8db2ad0bffc98503a"},
@@ -1776,6 +1935,7 @@ version = "7.0.0"
 requires_python = ">=3.6"
 summary = "Cross-platform lib for process and system monitoring in Python.  NOTE: the syntax of this script MUST be kept compatible with Python 2.7."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "psutil-7.0.0-cp36-abi3-macosx_10_9_x86_64.whl", hash = "sha256:101d71dc322e3cffd7cea0650b09b3d08b8e7c4109dd6809fe452dfd00e58b25"},
     {file = "psutil-7.0.0-cp36-abi3-macosx_11_0_arm64.whl", hash = "sha256:39db632f6bb862eeccf56660871433e111b6ea58f2caea825571951d4b6aa3da"},
@@ -1792,7 +1952,7 @@ name = "ptyprocess"
 version = "0.7.0"
 summary = "Run a subprocess in a pseudo terminal"
 groups = ["dev"]
-marker = "sys_platform != \"win32\" and sys_platform != \"emscripten\" or os_name != \"nt\""
+marker = "(sys_platform != \"win32\" and sys_platform != \"emscripten\") and python_full_version == \"3.10.16\" or os_name != \"nt\" and python_full_version == \"3.10.16\""
 files = [
     {file = "ptyprocess-0.7.0-py2.py3-none-any.whl", hash = "sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35"},
     {file = "ptyprocess-0.7.0.tar.gz", hash = "sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220"},
@@ -1803,6 +1963,7 @@ name = "pure-eval"
 version = "0.2.3"
 summary = "Safely evaluate AST nodes without side effects"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "pure_eval-0.2.3-py3-none-any.whl", hash = "sha256:1db8e35b67b3d218d818ae653e27f06c3aa420901fa7b081ca98cbedc874e0d0"},
     {file = "pure_eval-0.2.3.tar.gz", hash = "sha256:5f4e983f40564c576c7c8635ae88db5956bb2229d7e9237d03b3c0b0190eaf42"},
@@ -1814,6 +1975,7 @@ version = "1.10.0"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 summary = "library with cross-python path, ini-parsing, io, code, log facilities"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "py-1.10.0-py2.py3-none-any.whl", hash = "sha256:3b80836aa6d1feeaa108e046da6423ab8f6ceda6468545ae8d02d9d58d18818a"},
     {file = "py-1.10.0.tar.gz", hash = "sha256:21b81bda15b66ef5e1a777a21c4dcd9c20ad3efd0b3f817e7a809035269e1bd3"},
@@ -1825,6 +1987,7 @@ version = "2.22"
 requires_python = ">=3.8"
 summary = "C parser in Python"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
     {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
@@ -1836,6 +1999,7 @@ version = "2.10.6"
 requires_python = ">=3.8"
 summary = "Data validation using Python type hints"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "annotated-types>=0.6.0",
     "pydantic-core==2.27.2",
@@ -1852,6 +2016,7 @@ version = "2.27.2"
 requires_python = ">=3.8"
 summary = "Core functionality for Pydantic validation and serialization"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "typing-extensions!=4.7.0,>=4.6.0",
 ]
@@ -1887,6 +2052,7 @@ version = "2.7.1"
 requires_python = ">=3.8"
 summary = "Settings management using Pydantic"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "pydantic>=2.7.0",
     "python-dotenv>=0.21.0",
@@ -1902,6 +2068,7 @@ version = "0.2.0"
 requires_python = ">=3.9"
 summary = "Custom pydantic setting source for loading settings from toml files"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "pydantic-settings<3.0.0,>=2.0.3",
 ]
@@ -1916,6 +2083,7 @@ version = "2.19.1"
 requires_python = ">=3.8"
 summary = "Pygments is a syntax highlighting package written in Python."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c"},
     {file = "pygments-2.19.1.tar.gz", hash = "sha256:61c16d2a8576dc0649d9f39e089b5f02bcd27fba10d8fb4dcc28173f7a45151f"},
@@ -1927,6 +2095,7 @@ version = "0.1.5"
 requires_python = ">=3.7"
 summary = "Python bindings for heck, the Rust case conversion library"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "pyheck-0.1.5-cp37-abi3-macosx_10_7_x86_64.whl", hash = "sha256:44caf2b7a49d71fdeb0469e9f35886987ad815a8638b3c5b5c83f351d6aed413"},
     {file = "pyheck-0.1.5-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:316a842b94beff6e59a97dbcc590e9be92a932e59126b0faa9ac750384f27eaf"},
@@ -1952,6 +2121,7 @@ version = "1.1.1"
 requires_python = ">=3.7"
 summary = "Pure Python MySQL Driver"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "PyMySQL-1.1.1-py3-none-any.whl", hash = "sha256:4de15da4c61dc132f4fb9ab763063e693d521a80fd0e87943b9a453dd4c19d6c"},
     {file = "pymysql-1.1.1.tar.gz", hash = "sha256:e127611aaf2b417403c60bf4dc570124aeb4a57f5f37b8e95ae399a42f904cd0"},
@@ -1963,7 +2133,9 @@ version = "8.3.4"
 requires_python = ">=3.8"
 summary = "pytest: simple powerful testing with Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
+    "colorama; sys_platform == \"win32\"",
     "exceptiongroup>=1.0.0rc8; python_version < \"3.11\"",
     "iniconfig",
     "packaging",
@@ -1981,6 +2153,7 @@ version = "0.25.3"
 requires_python = ">=3.9"
 summary = "Pytest support for asyncio"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "pytest<9,>=8.2",
 ]
@@ -1995,6 +2168,7 @@ version = "0.18.1"
 requires_python = ">=3.5"
 summary = "A pytest plugin for managing processes across test runs."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "psutil",
     "pytest>=2.8",
@@ -2010,6 +2184,7 @@ version = "2.9.0.post0"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 summary = "Extensions to the standard Python datetime module"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "six>=1.5",
 ]
@@ -2024,6 +2199,7 @@ version = "1.0.1"
 requires_python = ">=3.8"
 summary = "Read key-value pairs from a .env file and set them as environment variables"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "python-dotenv-1.0.1.tar.gz", hash = "sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca"},
     {file = "python_dotenv-1.0.1-py3-none-any.whl", hash = "sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a"},
@@ -2035,6 +2211,10 @@ version = "3.2.1"
 requires_python = ">=3.8"
 summary = "JSON Log Formatter for the Python Logging Package"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "typing-extensions; python_version < \"3.10\"",
+]
 files = [
     {file = "python_json_logger-3.2.1-py3-none-any.whl", hash = "sha256:cdc17047eb5374bd311e748b42f99d71223f3b0e186f4206cc5d52aefe85b090"},
     {file = "python_json_logger-3.2.1.tar.gz", hash = "sha256:8eb0554ea17cb75b05d2848bc14fb02fbdbd9d6972120781b974380bfa162008"},
@@ -2046,6 +2226,7 @@ version = "6.0.2"
 requires_python = ">=3.8"
 summary = "YAML parser and emitter for Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "PyYAML-6.0.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:0a9a2848a5b7feac301353437eb7d5957887edbf81d56e903999a75a3d743086"},
     {file = "PyYAML-6.0.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:29717114e51c84ddfba879543fb232a6ed60086602313ca38cce623c1d62cfbf"},
@@ -2065,6 +2246,10 @@ version = "26.2.1"
 requires_python = ">=3.7"
 summary = "Python bindings for 0MQ"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "cffi; implementation_name == \"pypy\"",
+]
 files = [
     {file = "pyzmq-26.2.1-cp310-cp310-macosx_10_15_universal2.whl", hash = "sha256:f39d1227e8256d19899d953e6e19ed2ccb689102e6d85e024da5acf410f301eb"},
     {file = "pyzmq-26.2.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a23948554c692df95daed595fdd3b76b420a4939d7a8a28d6d7dea9711878641"},
@@ -2092,6 +2277,7 @@ version = "5.2.1"
 requires_python = ">=3.8"
 summary = "Python client for Redis database and key-value store"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "async-timeout>=4.0.3; python_full_version < \"3.11.3\"",
 ]
@@ -2106,6 +2292,7 @@ version = "0.36.2"
 requires_python = ">=3.9"
 summary = "JSON Referencing + Python"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "attrs>=22.2.0",
     "rpds-py>=0.7.0",
@@ -2122,6 +2309,7 @@ version = "2.32.3"
 requires_python = ">=3.8"
 summary = "Python HTTP for Humans."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "certifi>=2017.4.17",
     "charset-normalizer<4,>=2",
@@ -2139,6 +2327,7 @@ version = "0.1.4"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 summary = "A pure python RFC3339 validator"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "six",
 ]
@@ -2153,6 +2342,7 @@ version = "0.1.1"
 requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 summary = "Pure python rfc3986 validator"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "rfc3986_validator-0.1.1-py2.py3-none-any.whl", hash = "sha256:2f235c432ef459970b4306369336b9d5dbdda31b510ca1e327636e01f528bfa9"},
     {file = "rfc3986_validator-0.1.1.tar.gz", hash = "sha256:3d44bde7921b3b9ec3ae4e3adca370438eccebc676456449b145d533b240d055"},
@@ -2164,6 +2354,7 @@ version = "0.22.3"
 requires_python = ">=3.9"
 summary = "Python bindings to Rust's persistent data structures (rpds)"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "rpds_py-0.22.3-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:6c7b99ca52c2c1752b544e310101b98a659b720b21db00e65edca34483259967"},
     {file = "rpds_py-0.22.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:be2eb3f2495ba669d2a985f9b426c1797b7d48d6963899276d22f23e33d47e37"},
@@ -2199,6 +2390,7 @@ version = "1.8.3"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
 summary = "Send file to trash natively under Mac OS X, Windows and Linux"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "Send2Trash-1.8.3-py3-none-any.whl", hash = "sha256:0c31227e0bd08961c7665474a3d1ef7193929fedda4233843689baa056be46c9"},
     {file = "Send2Trash-1.8.3.tar.gz", hash = "sha256:b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf"},
@@ -2210,6 +2402,7 @@ version = "2.21.0"
 requires_python = ">=3.6"
 summary = "Python client for Sentry (https://sentry.io)"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "certifi",
     "urllib3>=1.26.11",
@@ -2225,6 +2418,7 @@ version = "75.8.0"
 requires_python = ">=3.9"
 summary = "Easily download, build, install, upgrade, and uninstall Python packages"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "setuptools-75.8.0-py3-none-any.whl", hash = "sha256:e3982f444617239225d675215d51f6ba05f845d4eec313da4418fdbb56fb27e3"},
     {file = "setuptools-75.8.0.tar.gz", hash = "sha256:c5afc8f407c626b8313a86e10311dd3f661c6cd9c09d4bf8c15c0e11f9f2b0e6"},
@@ -2236,6 +2430,7 @@ version = "1.17.0"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 summary = "Python 2 and 3 compatibility utilities"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
     {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
@@ -2247,6 +2442,7 @@ version = "1.3.1"
 requires_python = ">=3.7"
 summary = "Sniff out which async library your code is running under"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "sniffio-1.3.1-py3-none-any.whl", hash = "sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2"},
     {file = "sniffio-1.3.1.tar.gz", hash = "sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc"},
@@ -2258,6 +2454,7 @@ version = "0.35.1"
 requires_python = "<4.0,>=3.8"
 summary = "Solana Python API"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "construct-typing<0.6.0,>=0.5.2",
     "httpx>=0.23.0",
@@ -2276,6 +2473,7 @@ version = "0.0.5"
 requires_python = ">=3.8"
 summary = "Python bindings for Solana Transaction Parser (tx-parser), enabling Python developers to easily parse and analyze Solana blockchain transactions. This package provides a high-performance C-API wrapper around the original Rust implementation, making blockchain data interpretation accessible in Python while maintaining native-like performance."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "solana_tx_parser-0.0.5-py3-none-any.whl", hash = "sha256:7223d09b3c969dca8747568e1a5744229cfbbf06c534199d886b0b72d04d086c"},
     {file = "solana_tx_parser-0.0.5.tar.gz", hash = "sha256:f041004e383567b6602bceb45c74955eeb36ce9577e8dd6fba9f89295f5375c6"},
@@ -2289,6 +2487,7 @@ editable = true
 path = "./libs/cache"
 summary = "Cache utilities for Solana Trading Bot"
 groups = ["local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiocache[redis]>=0.12.3",
     "aiogram>=3.15.0",
@@ -2330,6 +2529,7 @@ editable = true
 path = "./libs/common"
 summary = "Common utilities for Solana Trading Bot"
 groups = ["local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiocache[redis]>=0.12.3",
     "aiogram>=3.15.0",
@@ -2373,6 +2573,7 @@ editable = true
 path = "./libs/db"
 summary = "Database utilities for Solana Trading Bot"
 groups = ["local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "solbot-common",
     "sqlalchemy[asyncio]>=2.0.36",
@@ -2387,6 +2588,7 @@ editable = true
 path = "./libs/services"
 summary = "Common services for Solana Trading Bot"
 groups = ["local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiocache[redis]>=0.12.3",
     "aiogram>=3.15.0",
@@ -2431,6 +2633,7 @@ editable = true
 path = "./app/tg-bot"
 summary = "Telegram bot for Solana trading"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiocache[redis]>=0.12.3",
     "aiogram>=3.15.0",
@@ -2462,6 +2665,7 @@ editable = true
 path = "./app/trading"
 summary = "Trading for Solana"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "aiocache[redis]>=0.12.3",
     "aiohttp<3.11,>=3.9.0",
@@ -2495,6 +2699,7 @@ editable = true
 path = "./app/wallet-tracker"
 summary = "Wallet tracking service for Solana Trading Bot"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 
 [[package]]
 name = "solbot-yellowstone-grpc"
@@ -2504,6 +2709,7 @@ editable = true
 path = "./libs/yellowstone_grpc"
 summary = "Yellowstone gRPC client for Solana Trading Bot"
 groups = ["local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "grpcio-health-checking>=1.68.1",
     "grpcio-tools>=1.68.1",
@@ -2518,6 +2724,7 @@ version = "0.21.0"
 requires_python = ">=3.7"
 summary = "Python bindings for Solana Rust tools"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "jsonalias==0.1.1",
     "typing-extensions>=4.2.0",
@@ -2540,6 +2747,7 @@ version = "2.6"
 requires_python = ">=3.8"
 summary = "A modern CSS selector implementation for Beautiful Soup."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "soupsieve-2.6-py3-none-any.whl", hash = "sha256:e72c4ff06e4fb6e4b5a9f0f55fe6e81514581fca1515028625d0f299c602ccc9"},
     {file = "soupsieve-2.6.tar.gz", hash = "sha256:e2e68417777af359ec65daac1057404a3c8a5455bb8abc36f1a9866ab1a51abb"},
@@ -2551,8 +2759,10 @@ version = "2.0.38"
 requires_python = ">=3.7"
 summary = "Database Abstraction Library"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "greenlet!=0.4.17; (platform_machine == \"win32\" or platform_machine == \"WIN32\" or platform_machine == \"AMD64\" or platform_machine == \"amd64\" or platform_machine == \"x86_64\" or platform_machine == \"ppc64le\" or platform_machine == \"aarch64\") and python_version < \"3.14\"",
+    "importlib-metadata; python_version < \"3.8\"",
     "typing-extensions>=4.6.0",
 ]
 files = [
@@ -2575,6 +2785,7 @@ extras = ["asyncio"]
 requires_python = ">=3.7"
 summary = "Database Abstraction Library"
 groups = ["local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "greenlet!=0.4.17",
     "sqlalchemy==2.0.38",
@@ -2598,6 +2809,7 @@ version = "0.0.22"
 requires_python = ">=3.7"
 summary = "SQLModel, SQL databases in Python, designed for simplicity, compatibility, and robustness."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "SQLAlchemy<2.1.0,>=2.0.14",
     "pydantic<3.0.0,>=1.10.13",
@@ -2612,6 +2824,7 @@ name = "stack-data"
 version = "0.6.3"
 summary = "Extract data from python stack frames and tracebacks for informative displays"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "asttokens>=2.1.0",
     "executing>=1.2.0",
@@ -2627,6 +2840,7 @@ name = "sumtypes"
 version = "0.1a6"
 summary = "Algebraic types for Python (notably providing Sum Types, aka Tagged Unions)"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "attrs",
 ]
@@ -2641,8 +2855,10 @@ version = "0.18.1"
 requires_python = ">=3.8"
 summary = "Tornado websocket backend for the Xterm.js Javascript terminal emulator library."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "ptyprocess; os_name != \"nt\"",
+    "pywinpty>=1.1.0; os_name == \"nt\"",
     "tornado>=6.1.0",
 ]
 files = [
@@ -2656,6 +2872,7 @@ version = "1.4.0"
 requires_python = ">=3.8"
 summary = "A tiny CSS parser"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "webencodings>=0.4",
 ]
@@ -2670,6 +2887,7 @@ version = "0.10.2"
 requires_python = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 summary = "Python Library for Tom's Obvious, Minimal Language"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
     {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
@@ -2681,6 +2899,7 @@ version = "2.2.1"
 requires_python = ">=3.8"
 summary = "A lil' TOML parser"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "tomli-2.2.1-py3-none-any.whl", hash = "sha256:cb55c73c5f4408779d0cf3eef9f762b9c9f147a77de7b258bef0a5628adc85cc"},
     {file = "tomli-2.2.1.tar.gz", hash = "sha256:cd45e1dc79c835ce60f7404ec8119f2eb06d38b1deba146f07ced3bbc44505ff"},
@@ -2692,6 +2911,7 @@ version = "0.11.2"
 requires_python = ">=3.5"
 summary = "List processing tools and functional utilities"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "toolz-0.11.2-py3-none-any.whl", hash = "sha256:a5700ce83414c64514d82d60bcda8aabfde092d1c1a8663f9200c07fdcc6da8f"},
     {file = "toolz-0.11.2.tar.gz", hash = "sha256:6b312d5e15138552f1bda8a4e66c30e236c831b612b2bf0005f8a1df10a4bc33"},
@@ -2703,6 +2923,7 @@ version = "6.4.2"
 requires_python = ">=3.8"
 summary = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "tornado-6.4.2-cp38-abi3-macosx_10_9_universal2.whl", hash = "sha256:e828cce1123e9e44ae2a50a9de3055497ab1d0aeb440c5ac23064d9e44880da1"},
     {file = "tornado-6.4.2-cp38-abi3-macosx_10_9_x86_64.whl", hash = "sha256:072ce12ada169c5b00b7d92a99ba089447ccc993ea2143c9ede887e0937aa803"},
@@ -2723,6 +2944,7 @@ version = "5.14.3"
 requires_python = ">=3.8"
 summary = "Traitlets Python configuration system"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "traitlets-5.14.3-py3-none-any.whl", hash = "sha256:b74e89e397b1ed28cc831db7aea759ba6640cb3de13090ca145426688ff1ac4f"},
     {file = "traitlets-5.14.3.tar.gz", hash = "sha256:9ed0579d3502c94b4b3732ac120375cda96f923114522847de4b3bb98b96b6b7"},
@@ -2734,6 +2956,7 @@ version = "2.9.0.20241206"
 requires_python = ">=3.8"
 summary = "Typing stubs for python-dateutil"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "types_python_dateutil-2.9.0.20241206-py3-none-any.whl", hash = "sha256:e248a4bc70a486d3e3ec84d0dc30eec3a5f979d6e7ee4123ae043eedbb987f53"},
     {file = "types_python_dateutil-2.9.0.20241206.tar.gz", hash = "sha256:18f493414c26ffba692a72369fea7a154c502646301ebfe3d56a04b3767284cb"},
@@ -2745,6 +2968,7 @@ version = "4.12.2"
 requires_python = ">=3.8"
 summary = "Backported and Experimental Type Hints for Python 3.8+"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
     {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
@@ -2756,6 +2980,7 @@ version = "1.3.0"
 requires_python = ">=3.7"
 summary = "RFC 6570 URI Template Processor"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "uri-template-1.3.0.tar.gz", hash = "sha256:0e00f8eb65e18c7de20d595a14336e9f337ead580c70934141624b6d1ffdacc7"},
     {file = "uri_template-1.3.0-py3-none-any.whl", hash = "sha256:a44a133ea12d44a0c0f06d7d42a52d71282e77e2f937d8abd5655b8d56fc1363"},
@@ -2767,6 +2992,7 @@ version = "2.3.0"
 requires_python = ">=3.9"
 summary = "HTTP library with thread-safe connection pooling, file post, and more."
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "urllib3-2.3.0-py3-none-any.whl", hash = "sha256:1cee9ad369867bfdbbb48b7dd50374c0967a0bb7710050facf0dd6911440e3df"},
     {file = "urllib3-2.3.0.tar.gz", hash = "sha256:f8c5449b3cf0861679ce7e0503c7b44b5ec981bec0d1d3795a07f1ba96f0204d"},
@@ -2778,9 +3004,11 @@ version = "20.29.2"
 requires_python = ">=3.8"
 summary = "Virtual Python Environment builder"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "distlib<1,>=0.3.7",
     "filelock<4,>=3.12.2",
+    "importlib-metadata>=6.6; python_version < \"3.8\"",
     "platformdirs<5,>=3.9.1",
 ]
 files = [
@@ -2793,6 +3021,10 @@ name = "wcwidth"
 version = "0.2.13"
 summary = "Measures the displayed width of unicode strings in a terminal"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
+dependencies = [
+    "backports-functools-lru-cache>=1.2.1; python_version < \"3.2\"",
+]
 files = [
     {file = "wcwidth-0.2.13-py2.py3-none-any.whl", hash = "sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859"},
     {file = "wcwidth-0.2.13.tar.gz", hash = "sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"},
@@ -2804,6 +3036,7 @@ version = "24.11.1"
 requires_python = ">=3.9"
 summary = "A library for working with the color formats defined by HTML and CSS."
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "webcolors-24.11.1-py3-none-any.whl", hash = "sha256:515291393b4cdf0eb19c155749a096f779f7d909f7cceea072791cb9095b92e9"},
     {file = "webcolors-24.11.1.tar.gz", hash = "sha256:ecb3d768f32202af770477b8b65f318fa4f566c22948673a977b00d589dd80f6"},
@@ -2814,6 +3047,7 @@ name = "webencodings"
 version = "0.5.1"
 summary = "Character encoding aliases for legacy web content"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78"},
     {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
@@ -2825,6 +3059,7 @@ version = "1.8.0"
 requires_python = ">=3.8"
 summary = "WebSocket client for Python with low level API options"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526"},
     {file = "websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da"},
@@ -2836,6 +3071,7 @@ version = "10.4"
 requires_python = ">=3.7"
 summary = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "websockets-10.4-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d58804e996d7d2307173d56c297cf7bc132c52df27a3efaac5e8d43e36c21c48"},
     {file = "websockets-10.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:bc0b82d728fe21a0d03e65f81980abbbcb13b5387f733a1a870672c5be26edab"},
@@ -2857,6 +3093,7 @@ version = "4.0.13"
 requires_python = ">=3.7"
 summary = "Jupyter interactive widgets for Jupyter Notebook"
 groups = ["dev"]
+marker = "python_full_version == \"3.10.16\""
 files = [
     {file = "widgetsnbextension-4.0.13-py3-none-any.whl", hash = "sha256:74b2692e8500525cc38c2b877236ba51d34541e6385eeed5aec15a70f88a6c71"},
     {file = "widgetsnbextension-4.0.13.tar.gz", hash = "sha256:ffcb67bc9febd10234a362795f643927f4e0c05d9342c727b65d2384f8feacb6"},
@@ -2868,6 +3105,7 @@ version = "1.18.3"
 requires_python = ">=3.9"
 summary = "Yet another URL library"
 groups = ["dev", "local"]
+marker = "python_full_version == \"3.10.16\""
 dependencies = [
     "idna>=2.0",
     "multidict>=4.0",

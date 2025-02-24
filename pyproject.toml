@@ -28,9 +28,9 @@ dev = [
     "pytest-asyncio>=0.24.0",
     "pytest-xprocess==0.18.1",
     "py==1.10.0",
-    "-e trading @ file:///${PROJECT_ROOT}/app/trading",
-    "-e wallet-tracker @ file:///${PROJECT_ROOT}/app/wallet-tracker",
-    "-e tg-bot @ file:///${PROJECT_ROOT}/app/tg-bot"
+    "-e solbot-trading @ file:///${PROJECT_ROOT}/app/trading",
+    "-e solbot-wallet-tracker @ file:///${PROJECT_ROOT}/app/wallet-tracker",
+    "-e solbot-tgbot @ file:///${PROJECT_ROOT}/app/tg-bot"
 ]
 
 [tool.pytest.ini_options]
