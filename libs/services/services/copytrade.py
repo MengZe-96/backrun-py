@@ -35,3 +35,23 @@ class CopyTradeService:
         )
         result = await session.execute(stmt)
         return result.scalars().all()
+    
+    @classmethod
+    @provide_session
+    async def get_target_setting(
+        cls, target_wallet, *, session: AsyncSession = NEW_ASYNC_SESSION
+    ) -> CopyTrade:
+        """获取target别名、最大仓位、最大加仓次数
+
+        Returns:
+            dict
+        """
+        stmt = (
+            select(CopyTrade).where(CopyTrade.target_wallet == target_wallet).distinct()
+        )
+        result = await session.execute(stmt)
+        target_setting = result.scalar_one_or_none()
+        assert target_setting is not None, f"Copytrade of target wallet {target_wallet} is not found."
+        
+        return target_setting.copy()
+
