@@ -18,17 +18,35 @@ class CopyTradeStates(StatesGroup):
     CREATING = State()  # 创建跟单状态
     CREATE_WAITING_FOR_ADDRESS = State()  # 创建时等待输入钱包地址
     CREATE_WAITING_FOR_ALIAS = State()  # 创建时等待输入别名
-    CREATE_WAITING_FOR_FIXED_BUY_AMOUNT = State()  # 创建时等待输入固定买入数量
+    CREATE_WAITING_FOR_AUTO_BUY_RATIO = State()  # 创建时等待输入自动买入比例
+    CREATE_WAITING_FOR_MIN_BUY_SOL = State()  # 创建时等待输入最小买入数量
+    CREATE_WAITING_FOR_MAX_BUY_SOL = State()  # 创建时等待输入最大买入数量
+    CREATE_WAITING_FOR_MAX_BUY_TIMES = State() # 创建时等待输入最大买入次数
+    CREATE_WAITING_FOR_MIN_SELL_RATIO = State()  # 创建时等待输入最小卖出比例
+    CREATE_WAITING_FOR_FILTER_MIN_BUY = State()
     CREATE_WAITING_FOR_PRIORITY = State()  # 创建时等待输入优先费用
     CREATE_WAITING_FOR_CUSTOM_SLIPPAGE = State()  # 创建时等待输入自定义滑点
+    CREATE_WAITING_FOR_FAST_TRADE_THRESHOLD = State()
+    CREATE_WAITING_FOR_FAST_TRADE_DURATION = State()
+    CREATE_WAITING_FOR_FAST_TRADE_SLEEP_THRESHOLD = State()
+    CREATE_WAITING_FOR_FAST_TRADE_SLEEP_TIME = State()
 
     # 编辑跟单相关状态
     EDITING = State()  # 编辑跟单状态
     EDIT_WAITING_FOR_ADDRESS = State()  # 编辑时等待输入钱包地址
     EDIT_WAITING_FOR_ALIAS = State()  # 编辑时等待输入别名
-    EDIT_WAITING_FOR_FIXED_BUY_AMOUNT = State()  # 编辑时等待输入固定买入数量
+    EDIT_WAITING_FOR_AUTO_BUY_RATIO = State()  # 编辑时等待输入自动买入比例
+    EDIT_WAITING_FOR_MIN_BUY_SOL = State()  # 创建时等待输入最小买入数量
+    EDIT_WAITING_FOR_MAX_BUY_SOL = State()  # 创建时等待输入最大买入数量
+    EDIT_WAITING_FOR_MAX_BUY_TIMES = State() # 创建时等待输入最大买入次数
+    EDIT_WAITING_FOR_MIN_SELL_RATIO = State()  # 创建时等待输入最小卖出比例
+    EDIT_WAITING_FOR_FILTER_MIN_BUY = State()
     EDIT_WAITING_FOR_PRIORITY = State()  # 编辑时等待输入优先费用
     EDIT_WAITING_FOR_CUSTOM_SLIPPAGE = State()  # 编辑时等待输入自定义滑点
+    EDIT_WAITING_FOR_FAST_TRADE_THRESHOLD = State()
+    EDIT_WAITING_FOR_FAST_TRADE_DURATION = State()
+    EDIT_WAITING_FOR_FAST_TRADE_SLEEP_THRESHOLD = State()
+    EDIT_WAITING_FOR_FAST_TRADE_SLEEP_TIME = State()
 
 
 class MonitorStates(StatesGroup):
