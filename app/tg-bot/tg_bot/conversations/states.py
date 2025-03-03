@@ -4,6 +4,10 @@ from aiogram.fsm.state import State, StatesGroup
 class StartStates(StatesGroup):
     WAITING_FOR_ACTIVATION_CODE = State()
 
+class HoldingStates(StatesGroup):
+    MENU = State()
+    DETAIL = State()
+
 
 class CopyTradeStates(StatesGroup):
     """Copy trade states"""
