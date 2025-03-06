@@ -73,7 +73,7 @@ async def get_token_prices(mints: list, vs_token: str = WSOL.__str__()) -> dict:
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params)
         if response.status_code == 200:
-            data = response.json()
+            data = response.json()['data']
             price = {}
             for key in data:
                 price[key] = 0 if data[key]['price'] is None else float(data[key]['price'])
