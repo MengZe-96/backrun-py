@@ -116,6 +116,8 @@ class SwapSettlementProcessor:
             )
         else:
             tx_status = await self.validate(signature)
+            # None 为协程超时，此时重新提交交易。
+            # 
             if tx_status is None:
                 swap_record = SwapRecord(
                     signature=str(signature),

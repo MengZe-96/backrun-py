@@ -139,9 +139,9 @@ class SwapResultNotify:
 
     async def build_message(self, data: SwapResult) -> str:
         """构建消息"""
-        if data.by == "copytrade":
-            return await self._build_message_for_copytrade(data)
-        elif data.by == "user":
+        # if data.by == "copytrade":
+        #     return await self._build_message_for_copytrade(data)
+        if data.by == "user" or data.by == "copytrade":
             return await self._build_message_by_user_swap(data)
         else:
             raise ValueError(f"Invalid by: {data.by}")

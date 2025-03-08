@@ -5,21 +5,20 @@
 
 import asyncio
 
-from common.constants import SOL_DECIMAL, WSOL
+from common.constants import WSOL
 from common.cp.copytrade_event import NotifyCopyTradeProducer
 from common.cp.swap_event import SwapEventProducer
 from common.cp.tx_event import TxEventConsumer
 from common.log import logger
 from common.models.tg_bot.copytrade import CopyTrade
 from common.types.swap import SwapEvent
+from common.types.enums import SwapDirection
 from common.types.tx import TxEvent, TxType
 from common.utils import calculate_auto_slippage
 from db.redis import RedisClient
 from services.copytrade import CopyTradeService
 from services.holding import HoldingService
 from services.bot_setting import BotSettingService as SettingService
-
-from trading.swap import SwapDirection
 
 
 IGNORED_MINTS = {
@@ -42,7 +41,6 @@ class CopyTradeProcessor:
         self.tx_event_consumer.register_callback(self._process_tx_event)
         self.copytrade_service = CopyTradeService()
         self.setting_service = SettingService()
-        self.holding_service = HoldingService()
         self.swap_event_producer = SwapEventProducer(redis_client)
         self.notify_copytrade_producer = NotifyCopyTradeProducer(redis_client)
 
@@ -52,16 +50,10 @@ class CopyTradeProcessor:
         copytrade_items = await self.copytrade_service.get_by_target_wallet(
             tx_event.who
         )
-        # buy_pct = 0
         sell_pct = 0
         if tx_event.tx_direction == SwapDirection.Buy:
             input_mint = WSOL.__str__()
             output_mint = tx_event.mint
-            # buy_pct = round(
-            #     (tx_event.post_token_amount - tx_event.pre_token_amount)
-            #     / tx_event.post_token_amount,
-            #     4,
-            # )
         else:
             input_mint = tx_event.mint
             output_mint = WSOL.__str__()
@@ -74,6 +66,8 @@ class CopyTradeProcessor:
                     / tx_event.pre_token_amount,
                     4,
                 )
+                # 如果卖出比例大于95%，则全部卖出，处理留尾巴
+                sell_pct = 1 if sell_pct > 0.95 else sell_pct
         program_id = tx_event.program_id
         timestamp = tx_event.timestamp
 
@@ -121,38 +115,43 @@ class CopyTradeProcessor:
                 )
 
             if swap_direction == SwapDirection.Buy:
-                if copytrade.is_fixed_buy:
-                    ui_amount = copytrade.fixed_buy_amount
-                    if ui_amount is None:
-                        raise ValueError("fixed_buy_amount is None")
-                    amount = int(ui_amount * 10 ** SOL_DECIMAL)
-                elif copytrade.auto_follow:
-                    # TODO: 跟随买入
-                    raise NotImplementedError("auto_follow")
+                if copytrade.auto_buy:
+                    amount = tx_event.from_amount * copytrade.auto_buy_ratio
+                    amount = min(copytrade.max_buy_sol, amount)
+                    amount = int(max(copytrade.min_buy_sol, amount))
+                    ui_amount = amount / 10 ** tx_event.from_decimals
                 else:
-                    assert False, "not possible"
-            else:
-                # 获取当前持仓的数量
-                balance = await self.holding_service.get_token_account_balance(
-                    mint=tx_event.mint,
-                    wallet=copytrade.owner,
-                )
-                if balance == 0:
-                    logger.info(f"No holdings for {tx_event.mint}, skip...")
+                    # 过滤次数 + 1
+                    logger.info("Not auto buy, skip...")
                     return
+            else:
+                if copytrade.auto_sell:
+                    # 数据库获取token balance
+                    holding = await HoldingService.get_positions(
+                        target_wallets=[tx_event.who], mint=input_mint, mode=3
+                    )
+                    if holding is None:
+                        # 过滤次数 + 1
+                        logger.info(f"No holdings for {tx_event.mint}, skip...")
+                        return
+                    
+                    my_amount = holding.my_amount
 
-                # 自动跟买跟卖
-                if copytrade.auto_follow:
-                    amount = int(int(balance.balance * 10 ** balance.decimals) * sell_pct)
-                    ui_amount = amount / 10 ** balance.decimals
+                    if my_amount <= 0:
+                        # 过滤次数 + 1
+                        logger.info(f"No holdings for {tx_event.mint}, skip...")
+                        return
+
+                    amount = int(my_amount * sell_pct)
+                    ui_amount = amount / 10 ** holding.decimals
                 else:
-                    logger.info("Not auto follow, skip...")
+                    logger.info("Not auto sell, skip...")
                     return
 
             if copytrade.anti_sandwich:
                 slippage_bps = setting.sandwich_slippage_bps
             elif copytrade.auto_slippage is False:
-                slippage_bps = copytrade.custom_slippage_bps
+                slippage_bps = copytrade.custom_slippage * 100
             else:
                 slippage_bps = await calculate_auto_slippage(
                     input_mint=input_mint,
@@ -168,7 +167,7 @@ class CopyTradeProcessor:
                 amount_pct = None
                 swap_in_type = "qty"
 
-            priority_fee = copytrade.priority
+            priority_fee = copytrade.priority / 10 ** 9
             swap_event = SwapEvent(
                 user_pubkey=copytrade.owner,
                 swap_direction=swap_direction,

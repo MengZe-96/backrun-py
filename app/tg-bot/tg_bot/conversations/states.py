@@ -21,7 +21,7 @@ class CopyTradeStates(StatesGroup):
     CREATE_WAITING_FOR_AUTO_BUY_RATIO = State()  # 创建时等待输入自动买入比例
     CREATE_WAITING_FOR_MIN_BUY_SOL = State()  # 创建时等待输入最小买入数量
     CREATE_WAITING_FOR_MAX_BUY_SOL = State()  # 创建时等待输入最大买入数量
-    CREATE_WAITING_FOR_MAX_BUY_TIMES = State() # 创建时等待输入最大买入次数
+    CREATE_WAITING_FOR_MAX_BUY_TIME = State() # 创建时等待输入最大买入次数
     CREATE_WAITING_FOR_MIN_SELL_RATIO = State()  # 创建时等待输入最小卖出比例
     CREATE_WAITING_FOR_FILTER_MIN_BUY = State()
     CREATE_WAITING_FOR_PRIORITY = State()  # 创建时等待输入优先费用
@@ -38,7 +38,7 @@ class CopyTradeStates(StatesGroup):
     EDIT_WAITING_FOR_AUTO_BUY_RATIO = State()  # 编辑时等待输入自动买入比例
     EDIT_WAITING_FOR_MIN_BUY_SOL = State()  # 创建时等待输入最小买入数量
     EDIT_WAITING_FOR_MAX_BUY_SOL = State()  # 创建时等待输入最大买入数量
-    EDIT_WAITING_FOR_MAX_BUY_TIMES = State() # 创建时等待输入最大买入次数
+    EDIT_WAITING_FOR_MAX_BUY_TIME = State() # 创建时等待输入最大买入次数
     EDIT_WAITING_FOR_MIN_SELL_RATIO = State()  # 创建时等待输入最小卖出比例
     EDIT_WAITING_FOR_FILTER_MIN_BUY = State()
     EDIT_WAITING_FOR_PRIORITY = State()  # 编辑时等待输入优先费用

@@ -10,11 +10,14 @@ from common.constants import SOL_DECIMAL, WSOL
 from common.cp.swap_event import SwapEventProducer
 from common.types.bot_setting import BotSetting as Setting
 from common.types.swap import SwapEvent
+from common.types.tx import TxEvent, TxType
 from common.types.enums import SwapDirection
 from common.utils import calculate_auto_slippage
 from db.redis import RedisClient
 from loguru import logger
 from services.bot_setting import BotSettingService as SettingService
+from services.holding import HoldingService
+from services.copytrade import CopyTradeService
 
 from tg_bot.conversations.setting.menu import setting_menu
 from tg_bot.conversations.states import SwapStates
@@ -281,7 +284,6 @@ async def buy(callback: CallbackQuery, state: FSMContext):
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=int(from_amount * 10 ** SOL_DECIMAL),
-            swap_direction=SwapDirection.Buy,
             min_slippage_bps=setting.min_slippage,
             max_slippage_bps=setting.max_slippage,
         )
@@ -460,7 +462,6 @@ async def handle_buyx(message: Message, state: FSMContext):
             input_mint=WSOL.__str__(),
             output_mint=token_info.mint,
             amount=int(ui_amount * 10 ** SOL_DECIMAL),
-            swap_direction=SwapDirection.Buy,
         )
         swap_event = SwapEvent(
             user_pubkey=wallet,
@@ -499,10 +500,132 @@ async def handle_buyx(message: Message, state: FSMContext):
 
     await state.set_state()
 
+# cp_pk, mint
+CLOSE_PATTERN = re.compile(r"close_(\d+)_(\w+)")
+@router.callback_query(lambda c: CLOSE_PATTERN.match(c.data))
+async def close(callback: CallbackQuery, state: FSMContext):
+    if callback.message is None:
+        return
+    
+    if not isinstance(callback.message, Message):
+        return
 
+    if callback.data is None:
+        logger.warning("No data found in callback")
+        return
+    
+    match = CLOSE_PATTERN.match(callback.data)
+    if not match:
+        logger.warning("Invalid callback data for colse operation")
+        return
+    
+    cp_pk = int(match.group(1))
+    token_mint = match.group(2)
+    data = await state.get_data()
+    target_wallet = await CopyTradeService.get_target_wallet_by_pk(cp_pk)
+    holding = await HoldingService.get_positions(target_wallets=[target_wallet], mint=token_mint, mode=3)
+
+    setting = cast(Setting, data.get("setting"))
+    if setting is None:
+        setting = await get_setting_from_db(callback.from_user.id)
+    if setting is None:
+        raise ValueError("Setting not found in state")
+
+    wallet = cast(str, data.get("wallet"))
+    if wallet is None:
+        wallet = await user_service.get_pubkey(callback.from_user.id)
+    if wallet is None:
+        raise ValueError("Wallet not found in state")
+
+    timestamp = int(time.time())
+
+    # 增加tx_event伪造为copytrade，以便更新holding
+    tx_event = TxEvent(
+        signature = "user_close_target_position",
+        from_amount = holding.target_amount,
+        from_decimals = holding.decimals,
+        to_amount = 0,
+        to_decimals = 9,
+        mint = holding.mint,
+        who = target_wallet,
+        tx_type = TxType.CLOSE_POSITION,
+        tx_direction = SwapDirection.Sell,
+        timestamp = timestamp,
+        pre_token_amount = holding.target_amount,
+        post_token_amount = 0,
+        # program_id: str | None = None
+    )
+
+    if holding.my_amount <= 0:
+        await callback.answer("❌ 卖出失败，您的余额不足")
+        return
+
+    timestamp = int(time.time())
+    if setting.sandwich_mode:
+        slippage_bps = setting.sandwich_slippage_bps
+        swap_event = SwapEvent(
+            tx_event = tx_event,
+            by = 'copytrade',
+            user_pubkey=wallet,
+            swap_direction=SwapDirection.Sell,
+            input_mint=holding.mint,
+            output_mint=WSOL.__str__(),
+            amount=holding.my_amount,
+            ui_amount=holding.ui_my_amount,
+            slippage_bps=slippage_bps,
+            timestamp=timestamp,
+            priority_fee=setting.sell_priority_fee,
+        )
+    elif setting.auto_slippage:
+        # 需要计算出 slippage
+        slippage_bps = await calculate_auto_slippage(
+            input_mint=holding.mint,
+            output_mint=WSOL.__str__(),
+            amount=holding.my_amount,
+            min_slippage_bps=setting.min_slippage,
+            max_slippage_bps=setting.max_slippage,
+        )
+        swap_event = SwapEvent(
+            tx_event = tx_event,
+            by = 'copytrade',
+            user_pubkey=wallet,
+            swap_direction=SwapDirection.Sell,
+            input_mint=holding.mint,
+            output_mint=WSOL.__str__(),
+            amount=holding.my_amount,
+            ui_amount=holding.ui_my_amount,
+            timestamp=timestamp,
+            slippage_bps=slippage_bps,
+            dynamic_slippage=True,
+            min_slippage_bps=setting.min_slippage,
+            max_slippage_bps=setting.max_slippage,
+            priority_fee=setting.sell_priority_fee,
+        )
+    else:
+        slippage_bps = setting.quick_slippage
+        swap_event = SwapEvent(
+            tx_event = tx_event,
+            by = 'copytrade',
+            user_pubkey=wallet,
+            swap_direction=SwapDirection.Sell,
+            input_mint=holding.mint,
+            output_mint=WSOL.__str__(),
+            amount=holding.my_amount,
+            ui_amount=holding.ui_my_amount,
+            slippage_bps=slippage_bps,
+            timestamp=timestamp,
+            priority_fee=setting.sell_priority_fee,
+        )
+    
+    swap_event_producer = SwapEventProducer(RedisClient.get_instance())
+    await swap_event_producer.produce(swap_event=swap_event)
+
+    await callback.message.answer(f"🚀 卖出 {holding.ui_my_amount} 个 {holding.symbol}")
+    logger.info(f"Sell {holding.ui_my_amount} {holding.symbol}, Wallet: {wallet}")
+
+
+    
 SELL_PATTERN = re.compile(r"sell_(\d*\.?\d+)_(\w+)")
-
-
 @router.callback_query(lambda c: SELL_PATTERN.match(c.data))
 async def sell(callback: CallbackQuery, state: FSMContext):
     if callback.message is None:
@@ -586,7 +709,6 @@ async def sell(callback: CallbackQuery, state: FSMContext):
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=int(ui_amount * 10 ** SOL_DECIMAL),
-            swap_direction=SwapDirection.Sell,
             min_slippage_bps=setting.min_slippage,
             max_slippage_bps=setting.max_slippage,
         )
@@ -779,7 +901,6 @@ async def handle_sellx(message: Message, state: FSMContext):
             input_mint=token_info.mint,
             output_mint=WSOL.__str__(),
             amount=int(ui_amount * 10 ** SOL_DECIMAL),
-            swap_direction=SwapDirection.Sell,
         )
         swap_event = SwapEvent(
             user_pubkey=wallet,

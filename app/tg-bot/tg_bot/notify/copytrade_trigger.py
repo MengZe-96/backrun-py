@@ -96,14 +96,14 @@ class CopyTradeNotify:
         else:
             token_symbol = token_info.symbol
 
-        wallet_alias = await self.copytrade_service.get_wallet_alias(
+        target_alias = await self.copytrade_service.get_target_alias(
             target_wallet=tx_event.who,
             chat_id=chat_id,
         )
 
         return template.render(
             wallet_address=tx_event.who,
-            wallet_name=wallet_alias if wallet_alias else short_text(tx_event.who),
+            wallet_name=target_alias if target_alias else short_text(tx_event.who),
             symbol=token_symbol,
             sol_ui_amount=sol_ui_amount,
             token_ui_amount=token_ui_amount,
