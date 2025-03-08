@@ -10,6 +10,7 @@ from solbot_common.cp.swap_result import SwapResultConsumer
 from solbot_common.log import logger
 from solbot_common.models.swap_record import TransactionStatus
 from solbot_common.types.swap import SwapResult
+from solbot_common.types.enums import SwapDirection
 
 from tg_bot.services.user import UserService
 
@@ -77,17 +78,14 @@ class SwapResultNotify:
     async def _build_message_for_copytrade(self, data: SwapResult) -> str:
         """构建用于跟单交易结果的消息"""
         event = data.swap_event
-        if event.swap_mode == "ExactIn" or event.swap_mode == "ExactOut":
-            pass
-        else:
-            raise ValueError(f"Invalid swap_mode: {event.swap_mode}")
+        assert isinstance(event.swap_direction, SwapDirection)
 
     async def _build_message_by_user_swap(self, data: SwapResult) -> str:
         """构建用于用户主动交易结果的消息"""
         event = data.swap_event
         swap_record = data.swap_record
 
-        if event.swap_mode == "ExactIn":
+        if event.swap_direction == SwapDirection.Buy:
             mint = event.output_mint
             token_info = await self.token_info_cache.get(mint)
             if token_info is None:
@@ -112,7 +110,7 @@ class SwapResultNotify:
                     name=name,
                     signature=data.transaction_hash,
                 )
-        elif event.swap_mode == "ExactOut":
+        elif event.swap_direction == SwapDirection.Sell:
             mint = event.input_mint
             token_info = await self.token_info_cache.get(mint)
             if token_info is None:
@@ -140,9 +138,9 @@ class SwapResultNotify:
 
     async def build_message(self, data: SwapResult) -> str:
         """构建消息"""
-        if data.by == "copytrade":
-            return await self._build_message_for_copytrade(data)
-        elif data.by == "user":
+        # if data.by == "copytrade":
+        #     return await self._build_message_for_copytrade(data)
+        if data.by == "user" or data.by == "copytrade":
             return await self._build_message_by_user_swap(data)
         else:
             raise ValueError(f"Invalid by: {data.by}")

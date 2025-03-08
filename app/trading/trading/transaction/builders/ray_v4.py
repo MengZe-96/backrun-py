@@ -29,10 +29,11 @@ from spl.token.instructions import (
     initialize_account,
 )
 
-from trading.swap import SwapDirection, SwapInType
 from trading.tx import build_transaction
 
 from .base import TransactionBuilder
+
+from solbot_common.types.enums import SwapDirection, SwapInType
 
 
 class RaydiumV4TransactionBuilder(TransactionBuilder):
@@ -72,7 +73,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         token_mint = pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint
 
         # 计算交易金额
-        amount_in = int(sol_in * SOL_DECIMAL)
+        amount_in = int(sol_in * 10 ** SOL_DECIMAL)
 
         # 获取池子储备量
         base_reserve, quote_reserve, token_decimal = await get_amm_v4_reserves(pool_keys)
@@ -249,7 +250,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
 
         # 应用滑点
         slippage_adjustment = 1 - (slippage_bps / 10000)  # 转换bps为百分比
-        minimum_amount_out = int(amount_out * slippage_adjustment * SOL_DECIMAL)
+        minimum_amount_out = int(amount_out * slippage_adjustment * 10 ** SOL_DECIMAL)
 
         # 计算输入金额
         amount_in = int(sell_amount * (10**token_decimal))

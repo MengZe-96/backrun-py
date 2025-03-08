@@ -15,22 +15,40 @@ def from_db_model(obj: CopyTradeModel) -> CopyTrade:
         owner=obj.owner,
         chat_id=obj.chat_id,
         target_wallet=obj.target_wallet,
-        wallet_alias=obj.wallet_alias,
-        is_fixed_buy=obj.is_fixed_buy,
-        auto_follow=obj.auto_follow,
-        stop_loss=obj.stop_loss,
-        no_sell=obj.no_sell,
+        target_alias=obj.target_alias,
+        # delete some fields
         priority=obj.priority,
         anti_sandwich=obj.anti_sandwich,
         auto_slippage=obj.auto_slippage,
+        custom_slippage = obj.custom_slippage,
         active=obj.active,
+        # 新增参数, 当有一笔新的快速交易出现时，会计算与fast_trade_start_time的时间间隔，如果超过fast_trade_duration则重置fast_trade_start_time
+        anti_fast_trade = obj.anti_fast_trade,
+        auto_buy = obj.auto_buy,
+        auto_sell = obj.auto_sell,
+        auto_buy_ratio = obj.auto_buy_ratio, # 跟单钱包的仓位缩放比例
+        min_buy_sol = obj.min_buy_sol, # 单笔最小购买金额，以sol计价
+        max_buy_sol = obj.max_buy_sol, # 单笔最大购买金额，以sol计价
+        min_sell_ratio = obj.min_sell_ratio, # 单笔最小meme卖出比例
+        filter_min_buy = obj.filter_min_buy, # 过滤小于该金额的买入
+        max_position = obj.max_position, # 最大仓位金额，以sol计价
+        max_buy_time = obj.max_buy_time, # 单聪明钱单meme最大购买次数
+        # 快速交易限制
+        fast_trade_threshold = obj.fast_trade_threshold, # 快速交易时间间隔senconds,小于该间隔的都视作快速交易
+        fast_trade_duration = obj.fast_trade_duration, # 快速交易累计时间，在此时间中，快速交易次数超过fast_trade_time_threshold则暂停跟单
+        fast_trade_sleep_threshold = obj.fast_trade_sleep_threshold, # 快速交易次数阈值，超过该次数则暂停跟单
+        fast_trade_sleep_time = obj.fast_trade_sleep_time,
+        # 新增统计数据
+        fast_trade_time = obj.fast_trade_time, # fast_trade_start_time -> fast_trade_start_time+fast_trade_duration, 内快速交易的次数
+        current_position = obj.current_position, # 当前持仓所用sol数量
+        fast_trade_start_time = obj.fast_trade_start_time, # 快速交易开始时间
+        failed_time = obj.failed_time,
+        filtered_time = obj.filtered_time,
+        sol_sold = obj.sol_sold,
+        sol_earned = obj.sol_earned,
+        token_number = obj.token_number,
     )
 
-    if obj.fixed_buy_amount is not None:
-        copytrade.fixed_buy_amount = round(obj.fixed_buy_amount, 4)
-
-    if obj.custom_slippage_bps is not None:
-        copytrade.custom_slippage = round(obj.custom_slippage_bps // 100, 4)
     return copytrade
 
 
@@ -49,17 +67,37 @@ class CopyTradeService:
             owner=copytrade.owner,
             chat_id=copytrade.chat_id,
             target_wallet=copytrade.target_wallet,
-            wallet_alias=copytrade.wallet_alias,
-            is_fixed_buy=copytrade.is_fixed_buy,
-            fixed_buy_amount=copytrade.fixed_buy_amount,
-            auto_follow=copytrade.auto_follow,
-            stop_loss=copytrade.stop_loss,
-            no_sell=copytrade.no_sell,
+            target_alias=copytrade.target_alias,
+            # delete some fields
             priority=copytrade.priority,
             anti_sandwich=copytrade.anti_sandwich,
             auto_slippage=copytrade.auto_slippage,
-            custom_slippage_bps=int(copytrade.custom_slippage * 100),
+            custom_slippage=copytrade.custom_slippage,
             active=True,
+            # 新增参数, 当有一笔新的快速交易出现时，会计算与fast_trade_start_time的时间间隔，如果超过fast_trade_duration则重置fast_trade_start_time
+            anti_fast_trade = copytrade.anti_fast_trade,
+            auto_buy = copytrade.auto_buy,
+            auto_sell = copytrade.auto_sell,
+            auto_buy_ratio = copytrade.auto_buy_ratio, # 跟单钱包的仓位缩放比例
+            min_buy_sol = copytrade.min_buy_sol, # 单笔最小购买金额，以sol计价
+            max_buy_sol = copytrade.max_buy_sol, # 单笔最大购买金额，以sol计价
+            min_sell_ratio = copytrade.min_sell_ratio, # 单笔最小meme卖出比例
+            filter_min_buy = copytrade.filter_min_buy, # 过滤小于该金额的买入
+            max_position = copytrade.max_position, # 最大仓位金额，以sol计价
+            max_buy_time = copytrade.max_buy_time, # 单聪明钱单meme最大购买次数
+            fast_trade_threshold = copytrade.fast_trade_threshold, # 快速交易时间间隔senconds,小于该间隔的都视作快速交易
+            fast_trade_duration = copytrade.fast_trade_duration, # 快速交易累计时间，在此时间中，快速交易次数超过fast_trade_time_threshold则暂停跟单
+            fast_trade_sleep_threshold = copytrade.fast_trade_sleep_threshold, # 快速交易次数阈值，超过该次数则暂停跟单
+            fast_trade_sleep_time = copytrade.fast_trade_sleep_time,
+            # 新增全局状态数据
+            fast_trade_time = copytrade.fast_trade_time, # fast_trade_start_time -> fast_trade_start_time+fast_trade_duration, 内快速交易的次数
+            current_position = copytrade.current_position, # 当前持仓所用sol数量
+            fast_trade_start_time = copytrade.fast_trade_start_time, # 快速交易开始时间 
+            failed_time = copytrade.failed_time,
+            filtered_time = copytrade.filtered_time,
+            sol_sold = copytrade.sol_sold,
+            sol_earned = copytrade.sol_earned,
+            token_number = copytrade.token_number,
         )
 
         session.add(model)
@@ -87,17 +125,37 @@ class CopyTradeService:
         if obj is None:
             raise ValueError(f"Copytrade with pk {copytrade.pk} not found")
         obj.target_wallet = copytrade.target_wallet
-        obj.wallet_alias = copytrade.wallet_alias
-        obj.is_fixed_buy = copytrade.is_fixed_buy
-        obj.fixed_buy_amount = copytrade.fixed_buy_amount
-        obj.auto_follow = copytrade.auto_follow
-        obj.stop_loss = copytrade.stop_loss
-        obj.no_sell = copytrade.no_sell
+        obj.target_alias = copytrade.target_alias
+        # delete some fields
         obj.priority = copytrade.priority
         obj.anti_sandwich = copytrade.anti_sandwich
         obj.auto_slippage = copytrade.auto_slippage
-        obj.custom_slippage_bps = int(copytrade.custom_slippage * 100)
+        obj.custom_slippage = copytrade.custom_slippage
         obj.active = copytrade.active
+        # 新增参数, 当有一笔新的快速交易出现时，会计算与fast_trade_start_time的时间间隔，如果超过fast_trade_duration则重置fast_trade_start_time
+        obj.anti_fast_trade = copytrade.anti_fast_trade
+        obj.auto_buy = copytrade.auto_buy
+        obj.auto_sell = copytrade.auto_sell
+        obj.auto_buy_ratio = copytrade.auto_buy_ratio # 跟单钱包的仓位缩放比例
+        obj.min_buy_sol = copytrade.min_buy_sol # 单笔最小购买金额，以sol计价
+        obj.max_buy_sol = copytrade.max_buy_sol # 单笔最大购买金额，以sol计价
+        obj.min_sell_ratio = copytrade.min_sell_ratio # 单笔最小meme卖出比例
+        obj.filter_min_buy = copytrade.filter_min_buy # 过滤小于该金额的买入
+        obj.max_position = copytrade.max_position # 最大仓位金额，以sol计价
+        obj.max_buy_time = copytrade.max_buy_time # 单聪明钱单meme最大购买次数
+        obj.fast_trade_threshold = copytrade.fast_trade_threshold # 快速交易时间间隔senconds,小于该间隔的都视作快速交易
+        obj.fast_trade_duration = copytrade.fast_trade_duration # 快速交易累计时间，在此时间中，快速交易次数超过fast_trade_time_threshold则暂停跟单
+        obj.fast_trade_sleep_threshold = copytrade.fast_trade_sleep_threshold # 快速交易次数阈值，超过该次数则暂停跟单
+        obj.fast_trade_sleep_time = copytrade.fast_trade_sleep_time
+        # 新增全局状态数据
+        obj.fast_trade_time = copytrade.fast_trade_time # fast_trade_start_time -> fast_trade_start_time+fast_trade_duration, 内快速交易的次数
+        obj.current_position = copytrade.current_position # 当前持仓所用sol数量
+        obj.fast_trade_start_time = copytrade.fast_trade_start_time # 快速交易开始时间 
+        obj.failed_time = copytrade.failed_time
+        obj.filtered_time = copytrade.filtered_time
+        obj.sol_sold = copytrade.sol_sold
+        obj.sol_earned = copytrade.sol_earned
+        obj.token_number = copytrade.token_number
         session.add(obj)
 
         assert obj.id is not None, "obj.id is None"
@@ -143,7 +201,7 @@ class CopyTradeService:
         stmt = select(
             CopyTradeModel.id,
             CopyTradeModel.target_wallet,
-            CopyTradeModel.wallet_alias,
+            CopyTradeModel.target_alias,
             CopyTradeModel.active,
         )
         result = await session.execute(stmt)
@@ -151,7 +209,7 @@ class CopyTradeService:
             CopyTradeSummary(
                 pk=row[0],  # type: ignore
                 target_wallet=row[1],
-                wallet_alias=row[2],
+                target_alias=row[2],
                 active=row[3],
             )
             for row in result.all()
@@ -168,14 +226,14 @@ class CopyTradeService:
         return from_db_model(obj)
 
     @provide_session
-    async def get_wallet_alias(
+    async def get_target_alias(
         self,
         target_wallet: str,
         chat_id: int,
         *,
         session: AsyncSession = NEW_ASYNC_SESSION,
     ) -> str | None:
-        """ "Get the wallet alias of a target wallet
+        """ "Get the target alias of a target wallet
 
 
         Args:
@@ -183,7 +241,7 @@ class CopyTradeService:
             chat_id (int): The chat ID
 
         Returns:
-            str: The wallet alias
+            str: The target alias
         """
         stmt = select(CopyTradeModel).where(
             CopyTradeModel.target_wallet == target_wallet,
@@ -193,7 +251,7 @@ class CopyTradeService:
         obj = result.scalar_one_or_none()
         if obj is None:
             return None
-        return obj.wallet_alias
+        return obj.target_alias
 
     @provide_session
     async def list_by_owner(
@@ -202,7 +260,7 @@ class CopyTradeService:
         stmt = select(
             CopyTradeModel.id,
             CopyTradeModel.target_wallet,
-            CopyTradeModel.wallet_alias,
+            CopyTradeModel.target_alias,
             CopyTradeModel.active,
         ).where(CopyTradeModel.chat_id == chat_id)
 
@@ -211,7 +269,7 @@ class CopyTradeService:
             CopyTradeSummary(
                 pk=row[0],  # type: ignore
                 target_wallet=row[1],
-                wallet_alias=row[2],
+                target_alias=row[2],
                 active=row[3],
             )
             for row in results.all()

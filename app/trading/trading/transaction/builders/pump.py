@@ -26,11 +26,12 @@ from spl.token.instructions import (
 )
 
 from trading.exceptions import BondingCurveNotFound
-from trading.swap import SwapDirection, SwapInType
 from trading.tx import build_transaction
 from trading.utils import has_ata, max_amount_with_slippage, min_amount_with_slippage
 
 from .base import TransactionBuilder
+
+from solbot_common.types.enums import SwapDirection, SwapInType
 
 
 # Reference: https://github.com/wisarmy/raytx/blob/main/src/pump.rs
@@ -91,7 +92,7 @@ class PumpTransactionBuilder(TransactionBuilder):
             ):
                 create_instruction = create_associated_token_account(owner, owner, token_out)
 
-            amount_specified = int(ui_amount * SOL_DECIMAL)
+            amount_specified = int(ui_amount * 10 ** SOL_DECIMAL)
         elif swap_direction == SwapDirection.Sell:
             in_amount = await AccountAmountCache().get_amount(in_ata)
             in_mint = await MintAccountCache().get_mint_account(token_in)

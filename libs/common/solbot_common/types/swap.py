@@ -5,11 +5,12 @@ from typing_extensions import Self
 
 from solbot_common.models.swap_record import SwapRecord
 from solbot_common.types.tx import TxEvent
-
+from solbot_common.types.enums import SwapDirection
+from solbot_common.models.swap_record import SwapRecord
 
 class SwapEvent(BaseModel):
     user_pubkey: str
-    swap_mode: Literal["ExactIn", "ExactOut"]
+    swap_direction: SwapDirection
     input_mint: str
     output_mint: str
     amount: int  # lamports
@@ -20,6 +21,8 @@ class SwapEvent(BaseModel):
     priority_fee: float | None = None  # SOL
     slippage_bps: int | None = None  # basis points, 100 = 1%
     by: Literal["user", "copytrade"] = "user"  # 由用户发起或自动跟单发起
+    # PREF: 待优化滑点设置
+    # 如果由用户发起则使用标准滑点standrad_slippage_bps，如果由自动跟单发起则使用跟单滑点copytrade_slippage_bps
     # --- jupiter ---
     dynamic_slippage: bool = False
     min_slippage_bps: int | None = None  # basis points

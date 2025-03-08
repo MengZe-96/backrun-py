@@ -5,7 +5,7 @@ from solbot_common.utils.jupiter import JupiterAPI
 from solders.keypair import Keypair  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
-from trading.swap import SwapDirection, SwapInType
+from solbot_common.types.enums import SwapDirection, SwapInType
 from trading.tx import sign_transaction_from_raw
 
 from .base import TransactionBuilder
@@ -50,7 +50,7 @@ class JupiterTransactionBuilder(TransactionBuilder):
         if swap_direction == SwapDirection.Buy:
             token_in = str(WSOL)
             token_out = token_address
-            amount = int(ui_amount * SOL_DECIMAL)
+            amount = int(ui_amount * 10 ** SOL_DECIMAL)
         elif swap_direction == SwapDirection.Sell:
             token_info = await self.token_info_cache.get(token_address)
             if token_info is None:
@@ -72,7 +72,7 @@ class JupiterTransactionBuilder(TransactionBuilder):
             amount=amount,
             slippage_bps=slippage_bps,
             use_jito=use_jito,
-            jito_tip_lamports=int(priority_fee * SOL_DECIMAL) if priority_fee else None,
+            jito_tip_lamports=int(priority_fee * 10 ** SOL_DECIMAL) if priority_fee else None,
         )
         swap_tx = swap_tx_response["swapTransaction"]
         signed_tx = await sign_transaction_from_raw(swap_tx, keypair)

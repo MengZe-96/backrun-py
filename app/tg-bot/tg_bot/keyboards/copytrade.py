@@ -11,8 +11,8 @@ def copytrade_keyboard_menu(
         copytrade_items = []
 
     items = []
-    for item in copytrade_items:
-        alias = item.wallet_alias
+    for idx, item in enumerate(copytrade_items):
+        alias = item.target_alias
         if alias is not None:
             show_name = short_text(alias, max_length=10)
         else:
@@ -21,7 +21,9 @@ def copytrade_keyboard_menu(
         items.append(
             [
                 InlineKeyboardButton(
-                    text="{} 跟单地址：{}".format("🟢" if item.active else "🔴", show_name),
+                    text="{} {}-{}".format(
+                        "🟢" if item.active else "🔴", idx, show_name
+                    ),
                     callback_data=f"copytrade_{item.pk}",
                 )
             ]
@@ -55,76 +57,140 @@ def create_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
             [
                 InlineKeyboardButton(
                     text=(
+                        "请输入钱包别名"
+                        if udata.target_alias is None
+                        else f"👨 名称：{short_text(udata.target_alias, 10)}"
+                    ),
+                    callback_data="set_target_alias",
+                ),
+                InlineKeyboardButton(
+                    text=(
                         "请输入跟单地址"
                         if udata.target_wallet is None
-                        else str(udata.target_wallet)
+                        else f"📍 地址：{short_text(str(udata.target_wallet), 10)}"
                     ),
                     callback_data="set_address",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text=(
-                        "请输入钱包别名（选填）"
-                        if udata.wallet_alias is None
-                        else f"钱包别名：{udata.wallet_alias}"
+                    text="{} 自动跟买".format(
+                        "✅" if udata.auto_buy else "🚫",
                     ),
-                    callback_data="set_wallet_alias",
+                    callback_data="toggle_auto_buy",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="{} 固定买入: {} SOL".format(
-                        "✅" if udata.is_fixed_buy else "",
-                        udata.fixed_buy_amount,
+                    text="过滤阈值: {}SOL".format(
+                        round(udata.filter_min_buy/10**9, 2),
                     ),
-                    callback_data="set_fixed_buy_amount",
+                    callback_data="set_filter_min_buy",
+                ),
+                InlineKeyboardButton(
+                    text="仓位比例: {}%".format(
+                        int(udata.auto_buy_ratio * 100),
+                    ),
+                    callback_data="set_auto_buy_ratio",
+                ),
+                InlineKeyboardButton(
+                    text="最多买入: {}次".format(
+                        udata.max_buy_time,
+                    ),
+                    callback_data="set_max_buy_time",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="最小加仓: {}SOL".format(
+                        round(udata.min_buy_sol/10**9, 2),
+                    ),
+                    callback_data="set_min_buy_sol",
+                ),
+                InlineKeyboardButton(
+                    text="最大加仓: {}SOL".format(
+                        round(udata.max_buy_sol/10**9, 2),
+                    ),
+                    callback_data="set_max_buy_sol",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="{} 自动跟卖".format(
+                        "✅" if udata.auto_sell else "🚫",
+                    ),
+                    callback_data="toggle_auto_sell",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="{} 自动跟买/卖".format(
-                        "✅" if udata.auto_follow else "",
+                    text="最小减仓: {}%".format(
+                        int(udata.min_sell_ratio * 100),
                     ),
-                    callback_data="toggle_auto_follow",
+                    callback_data="set_min_sell_ratio",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="{} 防割模式".format(
+                        "✅" if udata.anti_fast_trade else "🚫",
+                    ),
+                    callback_data="toggle_anti_fast_trade",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="识别阈值: {}秒".format(
+                        udata.fast_trade_threshold,
+                    ),
+                    callback_data="set_fast_trade_threshold",
                 ),
                 InlineKeyboardButton(
-                    text="{} 止盈止损".format(
-                        "✅" if udata.stop_loss else "",
+                    text="累计间隔: {}秒".format(
+                        udata.fast_trade_duration,
                     ),
-                    callback_data="toggle_take_profile_and_stop_loss",
-                ),
-                InlineKeyboardButton(
-                    text="{} 只跟买入".format(
-                        "✅" if udata.no_sell else "",
-                    ),
-                    callback_data="toggle_no_sell",
+                    callback_data="set_fast_trade_duration",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text=f"优先费: {udata.priority} SOL",
-                    callback_data="set_priority",
+                    text="休眠阈值: {}次".format(
+                        udata.fast_trade_sleep_threshold,
+                    ),
+                    callback_data="set_fast_trade_sleep_threshold",
                 ),
                 InlineKeyboardButton(
-                    text="{} 防夹: {}".format(
-                        "✅" if udata.anti_sandwich else "❌",
-                        "开" if udata.anti_sandwich else "关",
+                    text="休眠时长: {}秒".format(
+                        udata.fast_trade_sleep_time,
+                    ),
+                    callback_data="set_fast_trade_sleep_time",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="{} 防夹模式".format(
+                        "✅" if udata.anti_sandwich else "🚫",
                     ),
                     callback_data="toggle_anti_sandwich",
                 ),
+                InlineKeyboardButton(
+                    text="优先费: {}SOL".format(
+                        round(udata.priority/10**9,5),
+                    ),
+                    callback_data="set_priority",
+                )
             ],
             [
                 InlineKeyboardButton(
                     text="{} 自动滑点".format(
-                        "✅" if udata.auto_slippage else "",
+                        "✅" if udata.auto_slippage else "🚫",
                     ),
                     callback_data="toggle_auto_slippage",
                 ),
                 InlineKeyboardButton(
                     text="{} 自定义滑点: {}%".format(
                         "✅" if udata.auto_slippage is False else "",
-                        udata.custom_slippage,
+                        int(udata.custom_slippage * 100),
                     ),
                     callback_data="set_custom_slippage",
                 ),
@@ -143,79 +209,143 @@ def edit_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
             [
                 InlineKeyboardButton(
                     text=(
+                        "请输入钱包别名"
+                        if udata.target_alias is None
+                        else f"👨 名称：{short_text(udata.target_alias, 10)}"
+                    ),
+                    callback_data="set_target_alias",
+                ),
+                InlineKeyboardButton(
+                    text=(
                         "请输入跟单地址"
                         if udata.target_wallet is None
-                        else str(udata.target_wallet)
+                        else f"📍 地址：{short_text(str(udata.target_wallet), 10)}"
                     ),
                     callback_data="null",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text=(
-                        "请输入钱包别名（选填）"
-                        if udata.wallet_alias is None
-                        else f"钱包别名：{udata.wallet_alias}"
+                    text="{} 自动跟买".format(
+                        "✅" if udata.auto_buy else "🚫",
                     ),
-                    callback_data="set_wallet_alias",
+                    callback_data="toggle_auto_buy",
                 )
             ],
             [
                 InlineKeyboardButton(
-                    text="{} 固定买入: {} SOL".format(
-                        "✅" if udata.is_fixed_buy else "",
-                        udata.fixed_buy_amount,
+                    text="过滤阈值: {}SOL".format(
+                        round(udata.filter_min_buy/10**9, 2),
                     ),
-                    callback_data="set_fixed_buy_amount",
-                )
+                    callback_data="set_filter_min_buy",
+                ),
+                InlineKeyboardButton(
+                    text="仓位比例: {}%".format(
+                        int(udata.auto_buy_ratio * 100),
+                    ),
+                    callback_data="set_auto_buy_ratio",
+                ),
+                InlineKeyboardButton(
+                    text="最多买入: {}次".format(
+                        udata.max_buy_time,
+                    ),
+                    callback_data="set_max_buy_time",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text="最小加仓: {}SOL".format(
+                        round(udata.min_buy_sol/10**9, 2),
+                    ),
+                    callback_data="set_min_buy_sol",
+                ),
+                InlineKeyboardButton(
+                    text="最大加仓: {}SOL".format(
+                        round(udata.max_buy_sol/10**9, 2),
+                    ),
+                    callback_data="set_max_buy_sol",
+                ),
             ],
             [
                 InlineKeyboardButton(
                     text="{} 自动跟卖".format(
-                        "✅" if udata.auto_follow else "",
+                        "✅" if udata.auto_sell else "🚫",
                     ),
-                    callback_data="toggle_auto_follow",
-                ),
+                    callback_data="toggle_auto_sell",
+                )
+            ],
+            [
                 InlineKeyboardButton(
-                    text="{} 止盈止损".format(
-                        "✅" if udata.stop_loss else "",
+                    text="最小减仓: {}%".format(
+                        int(udata.min_sell_ratio * 100),
                     ),
-                    callback_data="toggle_take_profile_and_stop_loss",
-                ),
-                InlineKeyboardButton(
-                    text="{} 只跟买入".format(
-                        "✅" if udata.no_sell else "",
-                    ),
-                    callback_data="toggle_no_sell",
+                    callback_data="set_min_sell_ratio",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    text=f"优先费: {udata.priority} SOL",
-                    callback_data="set_priority",
+                    text="{} 防割模式".format(
+                        "✅" if udata.anti_fast_trade else "🚫",
+                    ),
+                    callback_data="toggle_anti_fast_trade",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="识别阈值: {}秒".format(
+                        udata.fast_trade_threshold,
+                    ),
+                    callback_data="set_fast_trade_threshold",
                 ),
                 InlineKeyboardButton(
-                    text="{} 防夹: {}".format(
-                        "✅" if udata.anti_sandwich else "❌",
-                        "开" if udata.anti_sandwich else "关",
+                    text="累计间隔: {}秒".format(
+                        udata.fast_trade_duration,
+                    ),
+                    callback_data="set_fast_trade_duration",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="休眠阈值: {}次".format(
+                        udata.fast_trade_sleep_threshold,
+                    ),
+                    callback_data="set_fast_trade_sleep_threshold",
+                ),
+                InlineKeyboardButton(
+                    text="休眠时长: {}秒".format(
+                        udata.fast_trade_sleep_time,
+                    ),
+                    callback_data="set_fast_trade_sleep_time",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="{} 防夹模式".format(
+                        "✅" if udata.anti_sandwich else "🚫",
                     ),
                     callback_data="toggle_anti_sandwich",
                 ),
+                InlineKeyboardButton(
+                    text="优先费: {}SOL".format(
+                        round(udata.priority/10**9,5),
+                    ),
+                    callback_data="set_priority",
+                )
             ],
             [
                 InlineKeyboardButton(
                     text="{} 自动滑点".format(
-                        "✅" if udata.auto_slippage else "",
+                        "✅" if udata.auto_slippage else "🚫",
                     ),
                     callback_data="toggle_auto_slippage",
                 ),
                 InlineKeyboardButton(
                     text="{} 自定义滑点: {}%".format(
                         "✅" if udata.auto_slippage is False else "",
-                        udata.custom_slippage,
+                        int(udata.custom_slippage*100),
                     ),
                     callback_data="set_custom_slippage",
-                ),
+                )
             ],
             [
                 InlineKeyboardButton(text="删除跟单", callback_data="delete_copytrade"),
@@ -223,8 +353,6 @@ def edit_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
                     text="停止跟单" if udata.active is True else "启动跟单",
                     callback_data="toggle_copytrade",
                 ),
-            ],
-            [
                 InlineKeyboardButton(text="⬅️ 返回", callback_data="back_to_copytrade"),
             ],
         ],

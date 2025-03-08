@@ -4,7 +4,7 @@ from solana.rpc.async_api import AsyncClient
 from solders.keypair import Keypair  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
-from trading.swap import SwapDirection, SwapInType
+from solbot_common.types.enums import SwapDirection, SwapInType
 
 
 class TransactionBuilder(ABC):

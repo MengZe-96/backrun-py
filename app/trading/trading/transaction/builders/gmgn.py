@@ -6,7 +6,7 @@ from solbot_common.utils.gmgn import GmgnAPI
 from solders.keypair import Keypair  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
-from trading.swap import SwapDirection, SwapInType
+from solbot_common.types.enums import SwapDirection, SwapInType
 from trading.tx import sign_transaction_from_raw
 
 from .base import TransactionBuilder
@@ -45,14 +45,14 @@ class GMGNTransactionBuilder(TransactionBuilder):
         Returns:
             VersionedTransaction: The built transaction ready to be signed and sent
         """
-        if swap_direction == "sell" and in_type is None:
+        if swap_direction == SwapDirection.Sell and in_type is None:
             raise ValueError("in_type must be specified when selling")
 
         if swap_direction == SwapDirection.Buy:
             token_in = str(WSOL)
             token_out = token_address
             swap_mode = "ExactIn"
-            amount = str(int(ui_amount * SOL_DECIMAL))
+            amount = str(int(ui_amount * 10 ** SOL_DECIMAL))
         elif swap_direction == SwapDirection.Sell:
             token_info = await self.token_info_cache.get(token_address)
             if token_info is None:
@@ -60,7 +60,7 @@ class GMGNTransactionBuilder(TransactionBuilder):
             decimals = token_info.decimals
             token_in = token_address
             token_out = str(WSOL)
-            swap_mode = "ExactOut"
+            swap_mode = "ExactIn"
             amount = str(int(ui_amount * 10**decimals))
         else:
             raise ValueError("swap_direction must be buy or sell")

@@ -6,6 +6,7 @@ from solbot_common.constants import SOL_DECIMAL, WSOL
 from solbot_common.cp.swap_event import SwapEventProducer
 from solbot_common.log import logger
 from solbot_common.types.swap import SwapEvent
+from solbot_common.types.enums import SwapDirection
 from solbot_common.utils import calculate_auto_slippage
 from solbot_db.redis import RedisClient
 from solbot_services.bot_setting import BotSettingService as SettingService
@@ -107,18 +108,18 @@ async def swap_command(message: Message):
     if cmd == "buy":
         input_mint = WSOL.__str__()
         output_mint = token_info.mint
-        from_amount = int(float(ui_amount) * SOL_DECIMAL)
-        swap_mode = "ExactIn"
+        from_amount = int(float(ui_amount) * 10 ** SOL_DECIMAL)
+        swap_direction = SwapDirection.Buy
     else:
         if ui_amount.endswith("%"):
             await message.answer(
                 text="暂时不支持以百分比卖出",
             )
             return
-        from_amount = int(float(ui_amount) * 10**token_info.decimals)
         input_mint = token_info.mint
         output_mint = WSOL.__str__()
-        swap_mode = "ExactOut"
+        from_amount = int(float(ui_amount) * 10 ** token_info.decimals)
+        swap_direction = SwapDirection.Sell
 
     if setting.sandwich_mode:
         slippage_bps = setting.sandwich_slippage_bps
@@ -127,7 +128,9 @@ async def swap_command(message: Message):
             input_mint=input_mint,
             output_mint=output_mint,
             amount=from_amount,
-            swap_mode=swap_mode,
+            # TODO: add swap_mode
+            # swap_mode="ExactIn" if cmd == "buy" else "ExactOut"
+            swap_mode="ExactIn",
             min_slippage_bps=setting.min_slippage,
             max_slippage_bps=setting.max_slippage,
         )
@@ -138,7 +141,7 @@ async def swap_command(message: Message):
 
     swap_event = SwapEvent(
         user_pubkey=wallet,
-        swap_mode=swap_mode,
+        swap_direction=swap_direction,
         input_mint=input_mint,
         output_mint=output_mint,
         amount=from_amount,

@@ -18,7 +18,7 @@ class SwapRecord(Base, table=True):
     signature: str | None = Field(default=None, nullable=True, description="交易 hash")
     status: TransactionStatus | None = Field(default=None, nullable=True, description="交易状态")
     user_pubkey: str = Field(nullable=False, index=True)
-    swap_mode: str = Field(nullable=False)
+    swap_direction: str = Field(nullable=False, description="交易方向")
     input_mint: str = Field(nullable=False)
     output_mint: str = Field(nullable=False)
     input_amount: int = Field(nullable=False, sa_type=BIGINT, description="输入金额")

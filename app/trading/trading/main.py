@@ -9,6 +9,8 @@ from solbot_common.log import logger
 from solbot_common.prestart import pre_start
 from solbot_common.types.swap import SwapEvent, SwapResult
 from solbot_common.utils.utils import get_async_client
+from solbot_services.holding import HoldingService
+from solbot_services.copytrade import CopyTradeService
 from solbot_db.redis import RedisClient
 from solders.signature import Signature  # type: ignore
 
@@ -47,6 +49,10 @@ class Trading:
         """处理单个交易事件的核心逻辑"""
         async with self.semaphore:
             logger.info(f"Processing swap event: {swap_event}")
+            # 交易过滤，跳过交易
+            permission = await HoldingService.check_swap_permission(swap_event)
+            if not permission:
+                return
 
             try:
                 sig = await self._execute_swap(swap_event)
@@ -98,8 +104,10 @@ class Trading:
             user_pubkey=swap_event.user_pubkey,
             transaction_hash=str(sig),
             submmit_time=int(time.time()),
+            by = swap_event.by,
         )
-
+        # 根据swap_result同步Holding数据
+        await HoldingService.update_holding_tokens(swap_result)
         await self.swap_result_producer.produce(swap_result)
         logger.info(f"Recorded transaction: {sig}")
         return swap_result
@@ -111,7 +119,11 @@ class Trading:
             user_pubkey=swap_event.user_pubkey,
             transaction_hash=None,
             submmit_time=int(time.time()),
+            by = swap_event.by,
         )
+        if swap_result.by == 'copytrade':
+            # Holding失败次数 + 1
+            await CopyTradeService.add_failed_time(swap_result.swap_event.tx_event.who)
         await self.swap_result_producer.produce(swap_result)
         return swap_result
 

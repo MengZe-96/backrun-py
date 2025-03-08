@@ -5,12 +5,12 @@ from solbot_common.constants import PUMP_FUN_PROGRAM, RAY_V4
 from solbot_common.log import logger
 from solbot_common.models.tg_bot.user import User
 from solbot_common.types.swap import SwapEvent
+from solbot_common.types.enums import SwapDirection, SwapInType
 from solbot_db.session import NEW_ASYNC_SESSION, provide_session
 from solders.keypair import Keypair  # type: ignore
 from solders.signature import Signature  # type: ignore
 from sqlmodel import select
 
-from trading.swap import SwapDirection, SwapInType
 from trading.transaction import TradingRoute, TradingService
 
 PUMP_FUN_PROGRAM_ID = str(PUMP_FUN_PROGRAM)
@@ -46,14 +46,8 @@ class TradingExecutor:
         else:
             raise ValueError("slippage_bps must be specified")
 
-        if swap_event.swap_mode == "ExactIn":
-            swap_direction = SwapDirection.Buy
-            token_address = swap_event.output_mint
-        elif swap_event.swap_mode == "ExactOut":
-            swap_direction = SwapDirection.Sell
-            token_address = swap_event.input_mint
-        else:
-            raise ValueError("swap_mode must be ExactIn or ExactOut")
+        assert isinstance(swap_event.swap_direction, SwapDirection)
+        token_address = swap_event.output_mint if swap_event.swap_direction == SwapDirection.Buy else swap_event.input_mint
 
         sig = None
         keypair = await self.__get_keypair(swap_event.user_pubkey)
@@ -98,7 +92,7 @@ class TradingExecutor:
             keypair,
             token_address,
             swap_event.ui_amount,
-            swap_direction,
+            swap_event.swap_direction,
             slippage_bps,
             swap_in_type,
             use_jito=settings.trading.use_jito,

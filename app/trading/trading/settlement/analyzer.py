@@ -10,6 +10,7 @@ from typing import TypedDict
 
 from solbot_common.constants import SOL_DECIMAL, WSOL
 from solbot_common.utils.helius import HeliusAPI
+from solbot_common.utils.shyft import ShyftAPI
 
 # [
 #   {
@@ -341,6 +342,7 @@ class TransactionAnalyzer:
 
     def __init__(self) -> None:
         self.helius_api = HeliusAPI()
+        self.shyft_api = ShyftAPI()
 
     async def analyze_transaction(self, tx_signature: str, user_account: str, mint: str) -> Result:
         """分析交易详情
@@ -358,7 +360,11 @@ class TransactionAnalyzer:
         timestamp = tx_detail["timestamp"]
         tx_type = tx_detail["type"]
         if tx_type != "SWAP":
-            raise NotImplementedError(f"不支持的交易类型: {tx_type}")
+            confirm_swap = await self.shyft_api.is_transaction_swap(tx_signature)
+            if not confirm_swap:
+                raise NotImplementedError(f"不支持的交易类型: {tx_type}")
+            else:
+                tx_type = "SWAP"
 
         sol_change = 0
         token_change = 0
@@ -369,26 +375,26 @@ class TransactionAnalyzer:
             if token_transfer["fromUserAccount"] == user_account and token_transfer["mint"] == str(
                 WSOL
             ):
-                sol_change -= token_transfer["tokenAmount"]
+                # sol_change -= token_transfer["tokenAmount"]
                 swap_sol_change -= token_transfer["tokenAmount"]
-            elif token_transfer["toUserAccount"] == user_account and token_transfer["mint"] == mint:
+            if token_transfer["toUserAccount"] == user_account and token_transfer["mint"] == mint:
                 token_change += token_transfer["tokenAmount"]
             # Sell
-            elif (
+            if (
                 token_transfer["fromUserAccount"] == user_account and token_transfer["mint"] == mint
             ):
                 token_change -= token_transfer["tokenAmount"]
-            elif token_transfer["toUserAccount"] == user_account and token_transfer["mint"] == str(
+            if token_transfer["toUserAccount"] == user_account and token_transfer["mint"] == str(
                 WSOL
             ):
-                sol_change += token_transfer["tokenAmount"]
+                # sol_change += token_transfer["tokenAmount"]
                 swap_sol_change += token_transfer["tokenAmount"]
 
         for native_transfer in tx_detail["nativeTransfers"]:
             if native_transfer["fromUserAccount"] == user_account:
-                sol_change -= native_transfer["amount"] / SOL_DECIMAL
+                sol_change -= native_transfer["amount"] / 10 ** SOL_DECIMAL
             elif native_transfer["toUserAccount"] == user_account:
-                sol_change += native_transfer["amount"] / SOL_DECIMAL
+                sol_change += native_transfer["amount"] / 10 ** SOL_DECIMAL
 
         return {
             "fee": fee,

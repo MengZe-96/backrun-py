@@ -15,6 +15,34 @@ from solbot_common.layouts.bonding_curve_account import BondingCurveAccount
 from solbot_common.layouts.global_account import GlobalAccount
 from solbot_common.layouts.mint_account import MintAccount
 
+from common.constants import WSOL
+import httpx
+async def get_token_prices(mints: list, vs_token: str = WSOL.__str__()) -> dict:
+    """
+    异步函数，用于从 Jupiter V2 API 获取指定 token 的价格信息。
+    参数:
+    mints (list): 要查询的 token ID 列表。
+    vsToken (str): 用于比较的 token ID。
+    返回:
+    dict: 包含每个 token 价格信息的字典。
+    异常:
+    Exception: 如果 API 请求失败，则抛出带有状态码的异常。
+    """
+    url = "https://api.jup.ag/price/v2"
+    params = {
+        "ids": ",".join(mints),
+        "vsToken": vs_token
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()['data']
+            price = {}
+            for key in data:
+                price[key] = 0 if data[key]['price'] is None else float(data[key]['price'])
+            return price
+        else:
+            raise Exception(f"Jupiter 价格获取失败，状态码：{response.status_code}")
 
 def get_bonding_curve_pda(mint: Pubkey, program: Pubkey) -> Pubkey:
     return Pubkey.find_program_address([b"bonding-curve", bytes(mint)], program)[0]

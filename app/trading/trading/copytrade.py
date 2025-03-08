@@ -6,13 +6,14 @@
 import asyncio
 from typing import Literal
 
-from solbot_common.constants import SOL_DECIMAL, WSOL
+from solbot_common.constants import WSOL
 from solbot_common.cp.copytrade_event import NotifyCopyTradeProducer
 from solbot_common.cp.swap_event import SwapEventProducer
 from solbot_common.cp.tx_event import TxEventConsumer
 from solbot_common.log import logger
 from solbot_common.models.tg_bot.copytrade import CopyTrade
 from solbot_common.types.swap import SwapEvent
+from solbot_common.types.enums import SwapDirection
 from solbot_common.types.tx import TxEvent, TxType
 from solbot_common.utils import calculate_auto_slippage
 from solbot_db.redis import RedisClient
@@ -40,7 +41,6 @@ class CopyTradeProcessor:
         self.tx_event_consumer.register_callback(self._process_tx_event)
         self.copytrade_service = CopyTradeService()
         self.setting_service = SettingService()
-        self.holding_service = HoldingService()
         self.swap_event_producer = SwapEventProducer(redis_client)
         self.notify_copytrade_producer = NotifyCopyTradeProducer(redis_client)
 
@@ -48,17 +48,10 @@ class CopyTradeProcessor:
         """处理交易事件"""
         logger.info(f"Processing tx event: {tx_event}")
         copytrade_items = await self.copytrade_service.get_by_target_wallet(tx_event.who)
-        swap_mode = "ExactIn" if tx_event.tx_direction == "buy" else "ExactOut"
-        # buy_pct = 0
         sell_pct = 0
-        if swap_mode == "ExactIn":
+        if tx_event.tx_direction == SwapDirection.Buy:
             input_mint = WSOL.__str__()
             output_mint = tx_event.mint
-            # buy_pct = round(
-            #     (tx_event.post_token_amount - tx_event.pre_token_amount)
-            #     / tx_event.post_token_amount,
-            #     4,
-            # )
         else:
             input_mint = tx_event.mint
             output_mint = WSOL.__str__()
@@ -71,13 +64,15 @@ class CopyTradeProcessor:
                     / tx_event.pre_token_amount,
                     4,
                 )
+                # 如果卖出比例大于95%，则全部卖出，处理留尾巴
+                sell_pct = 1 if sell_pct > 0.95 else sell_pct
         program_id = tx_event.program_id
         timestamp = tx_event.timestamp
 
         tasks = []
         for copytrade in copytrade_items:
             coro = self._process_copytrade(
-                swap_mode=swap_mode,
+                swap_direction=tx_event.tx_direction,
                 tx_event=tx_event,
                 program_id=program_id,
                 sell_pct=sell_pct,
@@ -92,7 +87,7 @@ class CopyTradeProcessor:
 
     async def _process_copytrade(
         self,
-        swap_mode: Literal["ExactIn", "ExactOut"],
+        swap_direction: SwapDirection,
         tx_event: TxEvent,
         program_id: str | None,
         sell_pct: float,
@@ -113,58 +108,60 @@ class CopyTradeProcessor:
                     f"Setting not found, chat_id: {copytrade.chat_id}, wallet: {copytrade.owner}"
                 )
 
-            if swap_mode == "ExactIn":
-                if copytrade.is_fixed_buy:
-                    ui_amount = copytrade.fixed_buy_amount
-                    if ui_amount is None:
-                        raise ValueError("fixed_buy_amount is None")
-                    amount = int(ui_amount * SOL_DECIMAL)
-                elif copytrade.auto_follow:
-                    # TODO: 跟随买入
-                    raise NotImplementedError("auto_follow")
+            if swap_direction == SwapDirection.Buy:
+                if copytrade.auto_buy:
+                    amount = tx_event.from_amount * copytrade.auto_buy_ratio
+                    amount = min(copytrade.max_buy_sol, amount)
+                    amount = int(max(copytrade.min_buy_sol, amount))
+                    ui_amount = amount / 10 ** tx_event.from_decimals
                 else:
-                    raise AssertionError("not possible")
-            else:
-                # 获取当前持仓的数量
-                balance = await self.holding_service.get_token_account_balance(
-                    mint=tx_event.mint,
-                    wallet=copytrade.owner,
-                )
-                if balance == 0:
-                    logger.info(f"No holdings for {tx_event.mint}, skip...")
+                    logger.info("Not auto buy, skip...")
                     return
+            else:
+                if copytrade.auto_sell:
+                    # 数据库获取token balance
+                    holding = await HoldingService.get_positions(
+                        target_wallets=[tx_event.who], mint=input_mint, mode=3
+                    )
+                    if holding is None:
+                        logger.info(f"No holdings for {tx_event.mint}, skip...")
+                        return
 
-                # 自动跟买跟卖
-                if copytrade.auto_follow:
-                    amount = int(int(balance.balance * balance.decimals) * sell_pct)
-                    ui_amount = amount / balance.decimals
+                    my_amount = holding.my_amount
+
+                    if my_amount <= 0:
+                        logger.info(f"No holdings for {tx_event.mint}, skip...")
+                        return
+
+                    amount = int(my_amount * sell_pct)
+                    ui_amount = amount / 10 ** holding.decimals
                 else:
-                    logger.info("Not auto follow, skip...")
+                    logger.info("Not auto sell, skip...")
                     return
 
             if copytrade.anti_sandwich:
                 slippage_bps = setting.sandwich_slippage_bps
             elif copytrade.auto_slippage is False:
-                slippage_bps = copytrade.custom_slippage_bps
+                slippage_bps = copytrade.custom_slippage * 100
             else:
                 slippage_bps = await calculate_auto_slippage(
                     input_mint=input_mint,
                     output_mint=output_mint,
                     amount=amount,
-                    swap_mode=swap_mode,
+                    swap_mode="ExactIn",
                 )
 
-            if swap_mode == "ExactOut":
+            if swap_direction == SwapDirection.Sell:
                 amount_pct = sell_pct
                 swap_in_type = "pct"
             else:
                 amount_pct = None
                 swap_in_type = "qty"
 
-            priority_fee = copytrade.priority
+            priority_fee = copytrade.priority / 10 ** 9
             swap_event = SwapEvent(
                 user_pubkey=copytrade.owner,
-                swap_mode=swap_mode,
+                swap_direction=swap_direction,
                 input_mint=input_mint,
                 output_mint=output_mint,
                 amount=amount,

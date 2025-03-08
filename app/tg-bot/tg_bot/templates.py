@@ -21,36 +21,134 @@ if TYPE_CHECKING:
 env = Environment(loader=BaseLoader())
 
 # 定义模板
-START_TEMPLATE = env.from_string(
-    """Hi {{ mention }}! 👋
-💳 钱包地址:
-<code>{{ wallet_address }}</code>
-(点击复制)
-
-💰 钱包余额: {{ balance }} SOL
-{%- if expiration_datetime %}
-⌚ 到期时间: {{ expiration_datetime }}
-{%- endif %}
+HOLDING_MENU_TEMPLATE = env.from_string(
+    """🎖️ 跟单战绩 🎖️
+💰 收支：{{ui_sol_earned}}/{{ui_sol_sold}} SOL
+💎 仓位：{{ui_current_position}}/{{ui_max_position}} SOL
+🪙 累计币种：{{token_number}} TOKEN
+📋 页码：{{page}}/{{total_pages}}
 """
 )
+def render_holding_menu_message(
+        ui_sol_sold, 
+        ui_sol_earned, 
+        ui_current_position, 
+        ui_max_position, 
+        token_number,
+        page,
+        total_pages):
+    return HOLDING_MENU_TEMPLATE.render(
+        ui_sol_sold=round(ui_sol_sold, 2),
+        ui_sol_earned=round(ui_sol_earned, 2),
+        ui_current_position=round(ui_current_position, 2),
+        ui_max_position=round(ui_max_position, 2),
+        token_number=token_number,
+        page = page,
+        total_pages = total_pages
+    )
+
+HOLDING_DETAIL_SUMMARY_TEMPLATE = env.from_string(
+    """🪴 聪明钱 {{target_alias}} 详情 🪴
+    
+📌 地址：<code>{{target_wallet}}</code>
+💰 收支：{{ui_sol_earned}}/{{ui_sol_sold}} SOL
+💎 仓位：{{ui_current_position}}/{{ui_max_position}} SOL
+💵 价值：{{ui_current_value}} SOL
+🪙 持仓：{{holding_token_number}} TOKENS
+⌛️ 过滤：{{filtered_time}} TIMES
+⛔ 失败：{{failed_time}} TIMES
+"""
+)
+def render_holding_detail_summary_message(
+        target_alias, 
+        target_wallet, 
+        ui_sol_sold, 
+        ui_sol_earned, 
+        ui_current_position, 
+        ui_max_position, 
+        ui_current_value,
+        holding_token_number, 
+        failed_time, 
+        filtered_time
+    ):
+    return HOLDING_DETAIL_SUMMARY_TEMPLATE.render(
+        target_alias = target_alias,
+        target_wallet = target_wallet,
+        ui_sol_sold = round(ui_sol_sold, 2),
+        ui_sol_earned = round(ui_sol_earned, 2),
+        ui_current_position = round(ui_current_position, 2),
+        ui_max_position = round(ui_max_position, 2),
+        ui_current_value = round(ui_current_value, 2),
+        holding_token_number = holding_token_number,
+        failed_time = failed_time,
+        filtered_time = filtered_time
+    )
+
+HOLDING_DETAIL_TEMPLATE = env.from_string(
+    """——————🪙 {{idx}}: {{token_symbol}} 🪙——————
+📍 地址：<code>{{mint}}</code>
+💰 收支：{{ui_sol_earned}}/{{ui_sol_sold}} SOL
+💎 仓位：{{ui_my_amount}}/{{ui_target_amount}} {{token_symbol}}
+💵 价值：{{ui_current_value}} SOL
+🛒 购买：{{buy_time}}/{{max_buy_time}} TIMES
+"""
+)
+def render_holding_detail_message(
+        idx,
+        token_symbol,
+        mint,
+        ui_my_amount,
+        ui_target_amount,
+        ui_current_value,
+        buy_time,
+        max_buy_time,
+        ui_sol_sold, 
+        ui_sol_earned,
+    ):
+    return HOLDING_DETAIL_TEMPLATE.render(
+        idx = idx,
+        token_symbol = token_symbol,
+        mint = mint,
+        ui_my_amount = round(ui_my_amount, 2),
+        ui_target_amount = round(ui_target_amount, 2),
+        ui_current_value = round(ui_current_value, 2),
+        buy_time = buy_time,
+        max_buy_time = max_buy_time,
+        ui_sol_sold = round(ui_sol_sold, 2), 
+        ui_sol_earned = round(ui_sol_earned, 2),
+    )
+
+START_TEMPLATE = env.from_string(
+    """🤖 Solana Copytrade Bot 🤖
+
+💳 钱包地址:
+<code>{{ wallet_address }}</code>
+
+💰 钱包余额: {{ balance }} SOL
+"""
+)
+# 移除无用信息，移除欢迎语、到期时间
+# Hi {{ mention }}! 👋
+# {%- if expiration_datetime %}
+# ⌚ 到期时间: {{ expiration_datetime }}
+# {%- endif %}
 
 # 首次使用模板（未注册）
 FIRST_USE_TEMPLATE = env.from_string(
-    """Hi {{ mention }}! 👋
-
-📝 欢迎使用 Solana Trading Bot!
+    """👋 Solana Copytrade Bot 👋
 
 💳 钱包地址:
 <code>{{ wallet_address }}</code>
-(点击复制)
 
-{%- if expiration_datetime %}
-⌚ 到期时间: {{ expiration_datetime }}
-{%- endif %}
-Tips: 由于您是第一次使用 bot，已为您生成一个新钱包。
-您可以在任何时候使用 /wallet 命令更改钱包地址或导出私钥。
+✅ Tips: 初始化bot完成，已生成一个新钱包。
+可在任何时候使用 /wallet 命令更改钱包地址或导出私钥。
 """
 )
+# 移除无用信息，欢迎语和到期时间
+# Hi {{ mention }}! 👋
+# {%- if expiration_datetime %}
+# ⌚ 到期时间: {{ expiration_datetime }}
+# {%- endif %}
 
 COPYTRADE_TEMPLATE = env.from_string(
     """复制交易设置:

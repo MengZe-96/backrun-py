@@ -6,7 +6,8 @@ from solders.keypair import Keypair  # type: ignore
 from solders.signature import Signature  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
-from trading.swap import SwapDirection, SwapInType
+from solbot_common.types.enums import SwapDirection, SwapInType
+
 from trading.transaction.base import TransactionSender
 from trading.transaction.builders.base import TransactionBuilder
 from trading.transaction.builders.gmgn import GMGNTransactionBuilder

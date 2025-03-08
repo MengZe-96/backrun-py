@@ -8,6 +8,7 @@ from solbot_cache.token_info import TokenInfoCache
 from solbot_common.cp.copytrade_event import NotifyCopyTradeConsumer
 from solbot_common.log import logger
 from solbot_common.types.swap import SwapEvent
+from solbot_common.types.enums import SwapDirection
 
 from tg_bot.services.copytrade import CopyTradeService
 from tg_bot.services.user import UserService
@@ -76,11 +77,11 @@ class CopyTradeNotify:
             raise ValueError("tx_event is None")
 
         tx_event = data.tx_event
-        if tx_event.tx_direction == "buy":
+        if tx_event.tx_direction == SwapDirection.Buy:
             template = _BUY_TEMPLATE
-            sol_ui_amount = tx_event.to_amount / (10**tx_event.from_decimals)
-            token_ui_amount = tx_event.from_amount / (10**tx_event.to_decimals)
-        elif tx_event.tx_direction == "sell":
+            sol_ui_amount = tx_event.from_amount / (10**tx_event.from_decimals)
+            token_ui_amount = tx_event.to_amount / (10**tx_event.to_decimals)
+        elif tx_event.tx_direction == SwapDirection.Sell:
             template = _SELL_TEMPLATE
             token_ui_amount = tx_event.from_amount / (10**tx_event.from_decimals)
             sol_ui_amount = tx_event.to_amount / (10**tx_event.to_decimals)
@@ -94,14 +95,14 @@ class CopyTradeNotify:
         else:
             token_symbol = token_info.symbol
 
-        wallet_alias = await self.copytrade_service.get_wallet_alias(
+        target_alias = await self.copytrade_service.get_target_alias(
             target_wallet=tx_event.who,
             chat_id=chat_id,
         )
 
         return template.render(
             wallet_address=tx_event.who,
-            wallet_name=wallet_alias if wallet_alias else short_text(tx_event.who),
+            wallet_name=target_alias if target_alias else short_text(tx_event.who),
             symbol=token_symbol,
             sol_ui_amount=sol_ui_amount,
             token_ui_amount=token_ui_amount,
