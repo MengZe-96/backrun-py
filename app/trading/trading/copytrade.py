@@ -151,12 +151,16 @@ class CopyTradeProcessor:
                     swap_mode="ExactIn",
                 )
 
-            if swap_direction == SwapDirection.Sell:
-                amount_pct = sell_pct
-                swap_in_type = "pct"
-            else:
-                amount_pct = None
-                swap_in_type = "qty"
+            # if swap_direction == SwapDirection.Sell:
+            #     amount_pct = sell_pct
+            #     swap_in_type = "pct"
+            # else:
+            #     amount_pct = None
+            #     swap_in_type = "qty"
+            
+            # copytrade all use qty
+            amount_pct = None
+            swap_in_type = "qty"
 
             priority_fee = copytrade.priority / 10 ** 9
             swap_event = SwapEvent(
