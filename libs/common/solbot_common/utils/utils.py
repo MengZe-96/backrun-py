@@ -14,9 +14,9 @@ from spl.token.instructions import get_associated_token_address
 from solbot_common.layouts.bonding_curve_account import BondingCurveAccount
 from solbot_common.layouts.global_account import GlobalAccount
 from solbot_common.layouts.mint_account import MintAccount
-
-from common.constants import WSOL
+from solbot_common.constants import WSOL
 import httpx
+
 async def get_token_prices(mints: list, vs_token: str = WSOL.__str__()) -> dict:
     """
     异步函数，用于从 Jupiter V2 API 获取指定 token 的价格信息。

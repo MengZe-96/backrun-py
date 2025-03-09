@@ -1,5 +1,5 @@
 from typing import TypedDict
-from common.config import settings
+from solbot_common.config import settings
 import httpx
 
 

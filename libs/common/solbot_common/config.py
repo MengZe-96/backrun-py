@@ -50,7 +50,7 @@ class TomlConfigSettingsSource(PydanticBaseSettingsSource):
                 field_value = file_content_toml.get(field_name)
                 return field_value, field_name, False
         except Exception as e:
-            raise RuntimeError(f"Error on open f{env_file}: {e}") from e
+            raise RuntimeError(f"Error on open {env_file}: {e}") from e
 
     def prepare_field_value(
         self, field_name: str, field: FieldInfo, value: Any, value_is_complex: bool

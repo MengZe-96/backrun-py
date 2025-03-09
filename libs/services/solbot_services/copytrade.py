@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import List
 
 from solbot_common.types.copytrade import CopyTrade
 from solbot_common.models.tg_bot.copytrade import CopyTrade as CopyTradeModel
@@ -47,7 +48,7 @@ class CopyTradeService:
         result = await session.execute(stmt)
         return result.scalars().all()
 
-     @classmethod
+    @classmethod
     @provide_session
     async def get_target_setting(
         cls, target_wallet, *, session: AsyncSession = NEW_ASYNC_SESSION
