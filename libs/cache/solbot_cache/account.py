@@ -5,17 +5,18 @@ from solana.rpc.async_api import AsyncClient
 from solbot_common.layouts.global_account import GlobalAccount
 from solbot_db.redis import RedisClient
 from solders.pubkey import Pubkey  # type: ignore
+from solbot_common.log import logger
 
 
 class GlobalAccountCache:
     def __init__(self, client: AsyncClient) -> None:
-        self.celient = client
+        self.client = client
         self.redis = RedisClient.get_instance()
         self.prefix = "global_account"
 
     async def _get(self, program: Pubkey) -> bytes | None:
         global_account_pda = Pubkey.find_program_address([b"global"], program)[0]
-        token_account = await self.celient.get_account_info_json_parsed(global_account_pda)
+        token_account = await self.client.get_account_info_json_parsed(global_account_pda)
         if token_account is None:
             return None
         value = token_account.value
@@ -31,7 +32,7 @@ class GlobalAccountCache:
                 return None
             data = {"global": base64.b64encode(val).decode()}
             await self.redis.set(f"{self.prefix}:{program}", json.dumps(data))
-            return GlobalAccount.from_buffer(val)
+            return GlobalAccount.from_buffer(val[:113])
         json_data = json.loads(val)
         global_account_bytes = base64.b64decode(json_data["global"])
-        return GlobalAccount.from_buffer(global_account_bytes)
+        return GlobalAccount.from_buffer(global_account_bytes[:113])
