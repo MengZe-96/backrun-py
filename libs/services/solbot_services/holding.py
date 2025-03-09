@@ -201,7 +201,7 @@ class HoldingService:
                     }
 
                 # 判定快速交易，更新快速交易的状态
-                if tx.timestamp - holding.lastest_trade_timestamp < copytrade_setting.fast_trade_threshold:
+                if tx.timestamp - holding.latest_trade_timestamp < copytrade_setting.fast_trade_threshold:
                     # 是否需要更新fast_trade_start_time
                     if tx.timestamp - copytrade_setting.fast_trade_start_time > copytrade_setting.fast_trade_duration:
                         state_delta['fast_trade_start_time'] = tx.timestamp - copytrade_setting.fast_trade_start_time # delta
