@@ -66,12 +66,15 @@ class TradingExecutor:
                 logger.info(
                     f"Token {token_address} is not launched on Raydium, using Pump protocol to trade"
                 )
-            else:
+            elif program_id == RAY_V4_PROGRAM_ID:
+                # 如果 token 在 Raydium 上启动，则使用 Raydium 协议进行交易
                 logger.info(
                     f"Token {token_address} is launched on Raydium, using Raydium protocol to trade"
                 )
-                # 如果 token 在 Raydium 上启动，则使用 Raydium 协议进行交易
-                swap_event.program_id = RAY_V4_PROGRAM_ID
+            else:
+                logger.info(
+                    f"Token {token_address} program id is None, using aggregate protocol to trade"
+                )
         except Exception as e:
             logger.exception(f"Failed to check launch status, cause: {e}")
 
@@ -83,10 +86,14 @@ class TradingExecutor:
             logger.info("Program ID is RayV4")
             trade_route = TradingRoute.RAYDIUM_V4
         elif program_id is None:
-            logger.warning("Program ID is Unknown, So We use thrid party to trade")
+            logger.warning("Program ID is Unknown, So We use aggregate dex to trade")
             trade_route = TradingRoute.DEX
         else:
             raise ValueError(f"Program ID is not supported, {swap_event.program_id}")
+
+        target_price = None
+        if swap_event.by == 'copytrade' and swap_event.swap_direction == SwapDirection.Buy:
+            target_price = (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)/ (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)
 
         sig = await self._trading_service.use_route(trade_route).swap(
             keypair,
@@ -94,6 +101,7 @@ class TradingExecutor:
             swap_event.ui_amount,
             swap_event.swap_direction,
             slippage_bps,
+            target_price,
             swap_in_type,
             use_jito=settings.trading.use_jito,
             priority_fee=swap_event.priority_fee,

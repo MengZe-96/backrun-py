@@ -21,6 +21,7 @@ class TransactionBuilder(ABC):
         ui_amount: float,
         swap_direction: SwapDirection,
         slippage_bps: int,
+        target_price: float | None = None,
         in_type: SwapInType | None = None,
         use_jito: bool = False,
         priority_fee: float | None = None,
@@ -33,6 +34,7 @@ class TransactionBuilder(ABC):
             ui_amount (float): 交易数量
             swap_direction (SwapDirection): 交易方向
             slippage_bps (int): 滑点，以 bps 为单位
+            target_price (Optional[float], optional): 聪明钱价格. Defaults to None
             in_type (SwapInType | None, optional): 输入类型. Defaults to None.
             use_jito (bool, optional): 是否使用 Jito. Defaults to False.
             priority_fee (Optional[float], optional): 优先费用. Defaults to None.

@@ -37,6 +37,7 @@ class Swapper:
         ui_amount: float,
         swap_direction: SwapDirection,
         slippage_bps: int,
+        target_price: float | None = None,
         in_type: SwapInType | None = None,
         use_jito: bool = False,
         priority_fee: float | None = None,
@@ -49,6 +50,7 @@ class Swapper:
             ui_amount (float): 交易数量
             swap_direction (SwapDirection): 交易方向
             slippage_bps (int): 滑点，以 bps 为单位
+            target_price
             in_type (SwapInType | None, optional): 输入类型. Defaults to None.
             use_jito (bool, optional): 是否使用 Jito. Defaults to False.
             priority_fee (float | None, optional): 优先费用. Defaults to None.
@@ -62,6 +64,7 @@ class Swapper:
             ui_amount=ui_amount,
             swap_direction=swap_direction,
             slippage_bps=slippage_bps,
+            target_price=target_price,
             in_type=in_type,
             use_jito=use_jito,
             priority_fee=priority_fee,
@@ -93,6 +96,7 @@ class AggregateTransactionBuilder(TransactionBuilder):
         ui_amount: float,
         swap_direction: SwapDirection,
         slippage_bps: int,
+        target_price: float | None = None,
         in_type: SwapInType | None = None,
         use_jito: bool = False,
         priority_fee: float | None = None,
@@ -109,6 +113,7 @@ class AggregateTransactionBuilder(TransactionBuilder):
                 ui_amount=ui_amount,
                 swap_direction=swap_direction,
                 slippage_bps=slippage_bps,
+                target_price=target_price,
                 in_type=in_type,
                 use_jito=use_jito,
                 priority_fee=priority_fee,
@@ -125,6 +130,7 @@ class AggregateTransactionBuilder(TransactionBuilder):
         ui_amount: float,
         swap_direction: SwapDirection,
         slippage_bps: int,
+        target_price: float | None = None,
         in_type: SwapInType | None = None,
         use_jito: bool = False,
         priority_fee: float | None = None,
@@ -149,6 +155,7 @@ class AggregateTransactionBuilder(TransactionBuilder):
                 ui_amount,
                 swap_direction,
                 slippage_bps,
+                target_price,
                 in_type,
                 use_jito,
                 priority_fee,
@@ -184,13 +191,15 @@ class TradingService:
     def __init__(self, rpc_client: AsyncClient):
         """初始化交易服务"""
         self._rpc_client = rpc_client
-        self._aggreage_txn_builder = AggregateTransactionBuilder(
-            self._rpc_client,
-            builders=[
-                # GMGNTransactionBuilder(self._rpc_client),
-                JupiterTransactionBuilder(self._rpc_client),
-            ],
-        )
+        # self._aggreage_txn_builder = AggregateTransactionBuilder(
+        #     self._rpc_client,
+        #     builders=[
+        #         # GMGNTransactionBuilder(self._rpc_client),
+        #         JupiterTransactionBuilder(self._rpc_client),
+        #     ],
+        # )
+        self._aggreage_txn_builder = JupiterTransactionBuilder(self._rpc_client)
+        #####
         self._pump_txn_builder = PumpTransactionBuilder(self._rpc_client)
         self._raydium_v4_txn_builder = RaydiumV4TransactionBuilder(self._rpc_client)
         self._gmgn_sender = GMGNTransactionSender(self._rpc_client)

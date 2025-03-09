@@ -32,10 +32,12 @@ from trading.utils import has_ata, max_amount_with_slippage, min_amount_with_sli
 from .base import TransactionBuilder
 
 from solbot_common.types.enums import SwapDirection, SwapInType
+from solbot_common.utils.shyft import ShyftAPI
 
 
 # Reference: https://github.com/wisarmy/raytx/blob/main/src/pump.rs
 class PumpTransactionBuilder(TransactionBuilder):
+    shyft = ShyftAPI()
     async def build_swap_transaction(
         self,
         keypair: Keypair,
@@ -43,6 +45,7 @@ class PumpTransactionBuilder(TransactionBuilder):
         ui_amount: float,
         swap_direction: SwapDirection,
         slippage_bps: int,
+        target_price: float | None = None,
         in_type: SwapInType | None = None,
         use_jito: bool = False,
         priority_fee: float | None = None,
@@ -133,13 +136,26 @@ class PumpTransactionBuilder(TransactionBuilder):
         )
 
         if swap_direction == SwapDirection.Buy:
-            max_sol_cost = max_amount_with_slippage(amount_specified, slippage_bps)
-            sol_amount_threshold = max_sol_cost
             token_amount = (
-                amount_specified
-                * bonding_curve_account.virtual_token_reserves
-                // bonding_curve_account.virtual_sol_reserves
-            )
+                    amount_specified
+                    * bonding_curve_account.virtual_token_reserves
+                    // bonding_curve_account.virtual_sol_reserves
+                )
+            # 设置跟单滑点
+            if target_price is None:
+                sol_amount_threshold = max_amount_with_slippage(amount_specified, slippage_bps)
+            else:
+                sol_amount_threshold = amount_specified
+                out_mint = await MintAccountCache().get_mint_account(token_out)
+                if out_mint is None:
+                    out_mint = await self.shyft.get_token_info(token_address)
+                    mint_decimals = out_mint['decimals']
+                else:
+                    mint_decimals = out_mint.decimals
+                min_amount_out = int((amount_specified / 10 ** SOL_DECIMAL) * (target_price * (1 - slippage_bps / 10000)) * 10 ** mint_decimals)
+                if token_amount < min_amount_out:
+                    raise ValueError(f"已达滑点上限，最小输出金额: {min_amount_out}, 实际输出金额: {token_amount}")
+                token_amount = min_amount_out
             input_accounts = {
                 "fee_recipient": fee_recipient,
                 "mint": mint,
@@ -191,7 +207,7 @@ class PumpTransactionBuilder(TransactionBuilder):
             .accounts(input_accounts)
             .instruction()
         )
-        logger.debug(f"Build swap input accounts: {input_accounts}")
+        # logger.debug(f"Build swap input accounts: {input_accounts}")
 
         if create_instruction is not None:
             instructions.append(create_instruction)
@@ -206,7 +222,7 @@ class PumpTransactionBuilder(TransactionBuilder):
         if len(instructions) == 0:
             raise Exception("instructions is empty")
 
-        logger.debug(f"Swap instructions: {instructions}")
+        # logger.debug(f"Swap instructions: {instructions}")
 
         return await build_transaction(
             keypair=keypair,

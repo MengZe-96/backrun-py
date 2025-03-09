@@ -2,12 +2,12 @@ from solana.rpc.async_api import AsyncClient
 from solbot_cache.token_info import TokenInfoCache
 from solbot_common.constants import SOL_DECIMAL, WSOL
 from solbot_common.utils.jupiter import JupiterAPI
+from solbot_common.utils.shyft import ShyftAPI
 from solders.keypair import Keypair  # type: ignore
 from solders.transaction import VersionedTransaction  # type: ignore
 
 from solbot_common.types.enums import SwapDirection, SwapInType
 from trading.tx import sign_transaction_from_raw
-
 from .base import TransactionBuilder
 
 
@@ -17,7 +17,8 @@ class JupiterTransactionBuilder(TransactionBuilder):
     def __init__(self, rpc_client: AsyncClient) -> None:
         super().__init__(rpc_client=rpc_client)
         self.token_info_cache = TokenInfoCache()
-        self.jupiter_client = JupiterAPI()
+        self.jupiter_client = JupiterAPI() # base_url="https://public.jupiterapi.com"
+        self.shyft = ShyftAPI()
 
     async def build_swap_transaction(
         self,
@@ -26,17 +27,19 @@ class JupiterTransactionBuilder(TransactionBuilder):
         ui_amount: float,
         swap_direction: SwapDirection,
         slippage_bps: int,
+        target_price: float | None = None,
         in_type: SwapInType | None = None,
         use_jito: bool = False,
         priority_fee: float | None = None,
     ) -> VersionedTransaction:
-        """Build swap transaction with GMGN API.
+        """Build swap transaction with Jupiter API.
 
         Args:
             token_address (str): token address
             amount_in (float): amount in
             swap_direction (SwapDirection): swap direction
             slippage (int): slippage, percentage
+            target_price (float | None, optional): target price. Defaults to None.
             in_type (SwapInType | None, optional): in type. Defaults to None.
             use_jto (bool, optional): use jto. Defaults to False.
             priority_fee (float | None, optional): priority fee. Defaults to None.
@@ -64,12 +67,19 @@ class JupiterTransactionBuilder(TransactionBuilder):
 
         if use_jito and priority_fee is None:
             raise ValueError("priority_fee must be specified when using jito")
+        
+        # 买入设置跟单滑点
+        min_amount_out = None
+        if target_price is not None and swap_direction == SwapDirection.Buy:
+            token_info = await self.shyft.get_token_info(token_address)
+            min_amount_out = int(ui_amount * target_price * (1 - slippage_bps / 10000) * 10 ** token_info['decimals'])
 
         swap_tx_response = await self.jupiter_client.get_swap_transaction(
             input_mint=token_in,
             output_mint=token_out,
             user_publickey=str(keypair.pubkey()),
             amount=amount,
+            min_amount_out=min_amount_out if min_amount_out is not None else None,
             slippage_bps=slippage_bps,
             use_jito=use_jito,
             jito_tip_lamports=int(priority_fee * 10 ** SOL_DECIMAL) if priority_fee else None,

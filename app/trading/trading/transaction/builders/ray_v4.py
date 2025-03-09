@@ -43,6 +43,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         token_address: str,
         sol_in: float,
         slippage_bps: int,
+        target_price: float | None = None,
     ) -> list[Instruction]:
         """构建购买代币的指令列表
 
@@ -86,11 +87,17 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         new_base_reserve = constant_product / new_quote_reserve
         amount_out = base_reserve - new_base_reserve
 
-        # 应用滑点
-        slippage_adjustment = 1 - (slippage_bps / 10000)  # 转换bps为百分比
-        minimum_amount_out = int(amount_out * slippage_adjustment * (10**token_decimal))
+        # 应用跟单滑点
+        if target_price is None:
+            slippage_adjustment = 1 - (slippage_bps / 10000)  # 转换bps为百分比
+            minimum_amount_out = int(amount_out * slippage_adjustment * (10**token_decimal))
+        else:
+            minimum_amount_out = int(target_price * (1 - slippage_bps / 10000) * sol_in * (10**token_decimal))
 
-        logger.info(f"输入金额: {amount_in}, 最小输出金额: {minimum_amount_out}")
+        # PREF: 如果minimum_amount_out小于amount_out，说明已达滑点上限，直接返回
+        # logger.info(f"输入金额: {amount_in}, 最小输出金额: {minimum_amount_out}")
+        if amount_out*(10**token_decimal) < minimum_amount_out:
+            raise ValueError(f"已达滑点上限，最小输出金额: {minimum_amount_out}, 实际输出金额: {amount_out*(10**token_decimal)}")
 
         # 检查代币账户是否存在
         token_account = None
@@ -316,7 +323,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         ]
 
         # 如果卖出100%，则关闭代币账户
-        if ui_amount == 100:
+        if token_balance == ui_amount:
             close_token_account_ix = close_account(
                 CloseAccountParams(
                     program_id=TOKEN_PROGRAM_ID,
@@ -336,6 +343,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         ui_amount: float,
         swap_direction: SwapDirection,
         slippage_bps: int,
+        target_price: float | None = None,
         in_type: SwapInType | None = None,
         use_jito: bool = False,
         priority_fee: float | None = None,
@@ -364,6 +372,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
                 token_address=token_address,
                 sol_in=ui_amount,
                 slippage_bps=slippage_bps,
+                target_price=target_price,
             )
         elif swap_direction == SwapDirection.Sell:
             if in_type is None:

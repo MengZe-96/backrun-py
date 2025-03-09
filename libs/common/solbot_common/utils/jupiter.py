@@ -1,11 +1,11 @@
 from typing import Literal
-
+from solbot_common.log import logger
 import httpx
 
 
 class JupiterAPI:
-    def __init__(self):
-        self.client = httpx.AsyncClient(base_url="https://api.jup.ag")
+    def __init__(self, base_url="https://api.jup.ag"):
+        self.client = httpx.AsyncClient(base_url=base_url)
 
     async def get_quote(
         self,
@@ -42,6 +42,7 @@ class JupiterAPI:
         output_mint: str,
         user_publickey: str,
         amount: int,
+        min_amount_out: int | None,
         slippage_bps: int,
         priority_level: Literal["medium", "high", "veryHigh"] = "medium",
         max_priority_fee_lamports: int = 10**8,
@@ -87,6 +88,12 @@ class JupiterAPI:
             dict: 交易信息
         """
         quote_response = await self.get_quote(input_mint, output_mint, amount, slippage_bps)
+        # 加入跟单滑点
+        if min_amount_out is not None:
+            quote_response['otherAmountThreshold'] = str(min_amount_out)
+            quote_response['slippageBps'] = int((int(quote_response['outAmount']) - min_amount_out) / int(quote_response['outAmount']) * 10000)
+            if int(quote_response['outAmount']) < min_amount_out:
+                raise ValueError(f"已达滑点上限，最小输出金额: {min_amount_out}, 实际输出金额: {int(quote_response['outAmount'])}")
         if use_jito and not jito_tip_lamports:
             raise ValueError("jito_tip_lamports is required if use_jito is True")
         elif use_jito:
