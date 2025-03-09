@@ -142,7 +142,7 @@ class CopyTradeProcessor:
             if copytrade.anti_sandwich:
                 slippage_bps = setting.sandwich_slippage_bps
             elif copytrade.auto_slippage is False:
-                slippage_bps = copytrade.custom_slippage * 100
+                slippage_bps = copytrade.custom_slippage * 10000
             else:
                 slippage_bps = await calculate_auto_slippage(
                     input_mint=input_mint,
