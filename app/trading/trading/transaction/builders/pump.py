@@ -111,15 +111,15 @@ class PumpTransactionBuilder(TransactionBuilder):
 
                 if amount_in_pct == 1:
                     # sell all, close ata
-                    logger.info(f"Sell all, will be close ATA for mint {token_in}")
-                    close_instruction = close_account(
-                        CloseAccountParams(
-                            program_id=program_id,
-                            account=in_ata,
-                            dest=owner,
-                            owner=owner,
-                        )
-                    )
+                    # logger.info(f"Sell all, will be close ATA for mint {token_in}")
+                    # close_instruction = close_account(
+                    #     CloseAccountParams(
+                    #         program_id=program_id,
+                    #         account=in_ata,
+                    #         dest=owner,
+                    #         owner=owner,
+                    #     )
+                    # )
                     amount_specified = in_amount
                 else:
                     amount_specified = int(in_amount * amount_in_pct)

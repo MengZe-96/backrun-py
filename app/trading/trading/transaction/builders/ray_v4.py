@@ -231,13 +231,12 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         # 获取代币账户
         token_account = get_associated_token_address(payer_keypair.pubkey(), token_mint)
 
-        # 获取代币余额
-        token_balance = await get_token_balance(token_account, self.rpc_client)
-        if token_balance is None or token_balance == 0:
-            raise ValueError(f"没有可用的代币余额: {token_mint}")
-
         # 计算要卖出的数量
         if in_type == SwapInType.Pct:
+            # 获取代币余额
+            token_balance = await get_token_balance(token_account, self.rpc_client)
+            if token_balance is None or token_balance == 0:
+                raise ValueError(f"没有可用的代币余额: {token_mint}")
             sell_amount = token_balance * (ui_amount / 100)
             logger.info(f"代币余额: {token_balance}, 卖出数量: {sell_amount} ({ui_amount}%)")
         else:
@@ -323,16 +322,16 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         ]
 
         # 如果卖出100%，则关闭代币账户
-        if token_balance == ui_amount:
-            close_token_account_ix = close_account(
-                CloseAccountParams(
-                    program_id=TOKEN_PROGRAM_ID,
-                    account=token_account,
-                    dest=payer_keypair.pubkey(),
-                    owner=payer_keypair.pubkey(),
-                )
-            )
-            instructions.append(close_token_account_ix)
+        # if token_balance == ui_amount:
+        #     close_token_account_ix = close_account(
+        #         CloseAccountParams(
+        #             program_id=TOKEN_PROGRAM_ID,
+        #             account=token_account,
+        #             dest=payer_keypair.pubkey(),
+        #             owner=payer_keypair.pubkey(),
+        #         )
+        #     )
+        #     instructions.append(close_token_account_ix)
 
         return instructions
 
