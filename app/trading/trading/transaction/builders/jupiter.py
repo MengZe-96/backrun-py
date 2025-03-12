@@ -71,8 +71,9 @@ class JupiterTransactionBuilder(TransactionBuilder):
         # 买入设置跟单滑点
         min_amount_out = None
         if target_price is not None and swap_direction == SwapDirection.Buy:
-            token_info = await self.shyft.get_token_info(token_address)
-            min_amount_out = int(ui_amount * target_price * (1 - slippage_bps / 10000) * 10 ** token_info['decimals'])
+            # token_info = await self.shyft.get_token_info(token_address)
+            token_info = await self.token_info_cache.get(token_address)
+            min_amount_out = int(ui_amount * target_price * (1 - slippage_bps / 10000) * 10 ** token_info.decimals)
 
         swap_tx_response = await self.jupiter_client.get_swap_transaction(
             input_mint=token_in,

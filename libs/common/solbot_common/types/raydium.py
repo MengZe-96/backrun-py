@@ -5,8 +5,9 @@ from enum import Enum
 from solders.pubkey import Pubkey  # type: ignore
 from typing_extensions import Self
 
-from solbot_common.constants import OPEN_BOOK_PROGRAM, RAY_AUTHORITY_V4, TOKEN_PROGRAM_ID
+from solbot_common.constants import OPEN_BOOK_PROGRAM, RAY_AUTHORITY_V4, WSOL
 from solbot_common.layouts.amm_v4 import LIQUIDITY_STATE_LAYOUT_V4, MARKET_STATE_LAYOUT_V3
+from solbot_cache.token_info import TokenInfoCache
 
 
 def bytes_of(value):
@@ -53,7 +54,10 @@ class AmmV4PoolKeys:
 
         ray_authority_v4 = RAY_AUTHORITY_V4
         open_book_program = OPEN_BOOK_PROGRAM
-        token_program_id = TOKEN_PROGRAM_ID
+        # token_program_id = TOKEN_PROGRAM_ID
+        # 区分spl token与token 2022的program id
+        mint = market_decoded.quote_mint.decode() if market_decoded.base_mint.decode() == WSOL.__str__() else market_decoded.base_mint.decode()
+        token_program = TokenInfoCache.get_token_program(mint) # bytes to string
         pool_keys = cls(
             amm_id=amm_id,
             base_mint=Pubkey.from_bytes(market_decoded.base_mint),
@@ -76,7 +80,7 @@ class AmmV4PoolKeys:
             event_queue=Pubkey.from_bytes(market_decoded.event_queue),
             ray_authority_v4=ray_authority_v4,
             open_book_program=open_book_program,
-            token_program_id=token_program_id,
+            token_program_id=token_program
         )
 
         return pool_keys

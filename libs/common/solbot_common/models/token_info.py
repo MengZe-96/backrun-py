@@ -10,3 +10,4 @@ class TokenInfo(Base, table=True):
     token_name: str = Field(nullable=False)
     symbol: str = Field(nullable=False)
     decimals: int = Field(nullable=False)
+    token_program: str = Field(nullable=False)

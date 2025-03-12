@@ -33,11 +33,13 @@ from .base import TransactionBuilder
 
 from solbot_common.types.enums import SwapDirection, SwapInType
 from solbot_common.utils.shyft import ShyftAPI
+from solbot_cache.token_info import TokenInfoCache
 
 
 # Reference: https://github.com/wisarmy/raytx/blob/main/src/pump.rs
 class PumpTransactionBuilder(TransactionBuilder):
     shyft = ShyftAPI()
+    token_info_cache = TokenInfoCache()
     async def build_swap_transaction(
         self,
         keypair: Keypair,
@@ -148,8 +150,8 @@ class PumpTransactionBuilder(TransactionBuilder):
                 sol_amount_threshold = amount_specified
                 out_mint = await MintAccountCache().get_mint_account(token_out)
                 if out_mint is None:
-                    out_mint = await self.shyft.get_token_info(token_address)
-                    mint_decimals = out_mint['decimals']
+                    out_mint = await self.token_info_cache.get(token_address)
+                    mint_decimals = out_mint.decimals
                 else:
                     mint_decimals = out_mint.decimals
                 min_amount_out = int((amount_specified / 10 ** SOL_DECIMAL) * (target_price * (1 - slippage_bps / 10000)) * 10 ** mint_decimals)

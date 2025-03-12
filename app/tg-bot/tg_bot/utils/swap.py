@@ -2,7 +2,7 @@ from typing import TypedDict
 
 from solbot_common.utils import get_associated_token_address, get_async_client
 from solders.pubkey import Pubkey  # type: ignore
-from spl.token.constants import TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID  # type: ignore
+from solbot_cache.token_info import TokenInfoCache
 
 
 class TokenAccountBalance(TypedDict):
@@ -22,8 +22,11 @@ async def get_token_account_balance(token_mint: str, owner: str) -> TokenAccount
         int: 余额，单位 lamports
     """
     rpc_client = get_async_client()
+    token_program = await TokenInfoCache.get_token_program(token_mint)
     account = get_associated_token_address(
-        Pubkey.from_string(owner), Pubkey.from_string(token_mint), TOKEN_PROGRAM_ID
+        Pubkey.from_string(owner), 
+        Pubkey.from_string(token_mint), 
+        token_program
     )
     resp = await rpc_client.get_token_account_balance(pubkey=account)
     try:
@@ -33,19 +36,4 @@ async def get_token_account_balance(token_mint: str, owner: str) -> TokenAccount
             "decimals": value.decimals,
         }
     except AttributeError:
-        pass
-
-    account = get_associated_token_address(
-        Pubkey.from_string(owner),
-        Pubkey.from_string(token_mint),
-        TOKEN_2022_PROGRAM_ID,
-    )
-    resp = await rpc_client.get_token_account_balance(pubkey=account)
-    try:
-        value = resp.value
-    except AttributeError:
         return None
-    return {
-        "amount": int(value.amount),
-        "decimals": value.decimals,
-    }

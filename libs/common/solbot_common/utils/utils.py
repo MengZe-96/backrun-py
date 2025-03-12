@@ -37,10 +37,10 @@ async def get_token_prices(mints: list, vs_token: str = WSOL.__str__()) -> dict:
         response = await client.get(url, params=params)
         if response.status_code == 200:
             data = response.json()['data']
-            price = {}
+            prices = {}
             for key in data:
-                price[key] = 0 if data[key]['price'] is None else float(data[key]['price'])
-            return price
+                prices[key] = 0 if data[key] is None else float(data[key]['price'])
+            return prices
         else:
             raise Exception(f"Jupiter 价格获取失败，状态码：{response.status_code}")
 

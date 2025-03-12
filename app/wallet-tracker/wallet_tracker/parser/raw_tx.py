@@ -1,9 +1,9 @@
 from functools import cache
 
 import orjson as json
-from solbot_common.constants import SWAP_PROGRAMS, TOKEN_PROGRAM_ID, WSOL
+from solbot_common.constants import SWAP_PROGRAMS, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, WSOL
 from solbot_common.types import SolAmountChange, TokenAmountChange, TxEvent, TxType
-
+from solbot_common.log import logger
 from wallet_tracker.exceptions import (
     NotSwapTransaction,
     UnknownTransactionType,
@@ -29,6 +29,7 @@ class RawTXParser(TransactionParserInterface):
     def get_tx_hash(self) -> str:
         txs = self.tx_detail["transaction"]["signatures"]
         if len(txs) > 1:
+            logger.info(self.tx_detail["transaction"])
             raise ValueError("multiple txs in one transaction")
         return txs[0]
 
@@ -47,7 +48,7 @@ class RawTXParser(TransactionParserInterface):
         for token_post_balance in token_post_balances:
             if token_post_balance["owner"] != self.get_who():
                 continue
-            if token_post_balance["programId"] == str(TOKEN_PROGRAM_ID) and token_post_balance[
+            if (token_post_balance["programId"] == str(TOKEN_PROGRAM_ID) or token_post_balance["programId"] == str(TOKEN_2022_PROGRAM_ID)) and token_post_balance[
                 "mint"
             ] != str(WSOL):
                 return token_post_balance["mint"]
@@ -55,7 +56,7 @@ class RawTXParser(TransactionParserInterface):
         for token_pre_balance in token_pre_balances:
             if token_pre_balance["owner"] != self.get_who():
                 continue
-            if token_pre_balance["programId"] == str(TOKEN_PROGRAM_ID) and token_pre_balance[
+            if (token_pre_balance["programId"] == str(TOKEN_PROGRAM_ID) or token_pre_balance["programId"] == str(TOKEN_2022_PROGRAM_ID)) and token_pre_balance[
                 "mint"
             ] != str(WSOL):
                 return token_pre_balance["mint"]

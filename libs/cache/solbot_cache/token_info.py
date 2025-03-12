@@ -5,7 +5,8 @@ from solbot_common.config import settings
 from solbot_common.log import logger
 from solbot_common.models import TokenInfo
 from solbot_common.utils import get_async_client
-from solbot_common.utils.shyft import ShyftAPI
+# from solbot_common.utils.shyft import ShyftAPI
+from solbot_common.utils.helius import HeliusAPI
 from solbot_db.session import NEW_ASYNC_SESSION, provide_session, start_async_session
 from solders.pubkey import Pubkey  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,31 +15,6 @@ from typing_extensions import Self
 
 from solbot_cache.cached import cached
 
-
-# {
-#   "status": "Success",
-#   "message": "Retrieved Token Info from Token Hash",
-#   "result": {
-#     "tokenHash": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-#     "data": {
-#       "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-#       "tokenName": "USD Coin",
-#       "symbol": "USDC",
-#       "decimals": 6,
-#       "description": "",
-#       "logo": "https://s3.coinmarketcap.com/static-gravity/image/5a8229787b5e4c809b5914eef709b59a.png",
-#       "tags": [
-#         "stablecoin",
-#         "saber-mkt-usd"
-#       ],
-#       "verified": "true",
-#       "network": [
-#         "mainnet"
-#       ],
-#       "metadataToken": ""
-#     }
-#   }
-# }
 class TokenInfoDict(TypedDict):
     mint: str
     tokenName: str
@@ -62,10 +38,25 @@ class TokenInfoCache:
 
     def __init__(self) -> None:
         self.rpc_client = get_async_client()
-        self.shyft_api = ShyftAPI(settings.api.shyft_api_key)
+        # self.shyft_api = ShyftAPI(settings.api.shyft_api_key)
+        self.helius_api = HeliusAPI()
 
     def __repr__(self) -> str:
         return "TokenInfoCache()"
+
+    @classmethod
+    @provide_session
+    async def get_token_program(cls, mint: Pubkey | str, *, session: AsyncSession = NEW_ASYNC_SESSION
+    ) -> Pubkey:
+        if not isinstance(mint, str):
+            mint = str(mint)
+
+        smtm = select(TokenInfo).where(TokenInfo.mint == mint)
+        token_info = (await session.execute(statement=smtm)).scalar_one_or_none()
+        if token_info is not None:
+            return Pubkey.from_string(token_info.token_program)
+
+        raise ValueError(f"Did not find token info in cache: {mint}.")
 
     @cached(ttl=60 * 60 * 24)
     @provide_session
@@ -90,12 +81,14 @@ class TokenInfoCache:
         logger.info(f"Did not find token info in cache: {mint}, fetching...")
 
         try:
-            data = await self.shyft_api.get_token_info(mint.__str__())
+            # data = await self.shyft_api.get_token_info(mint.__str__())
+            data = await self.helius_api.get_token_info(str(mint))
             token_info = TokenInfo(
                 mint=data["address"],
                 token_name=data["name"],
                 symbol=data["symbol"],
                 decimals=data["decimals"],
+                token_program = data['token_program']
             )
 
             async def _write_to_db():
@@ -110,6 +103,7 @@ class TokenInfoCache:
                         existing_token.token_name = _token_info.token_name
                         existing_token.symbol = _token_info.symbol
                         existing_token.decimals = _token_info.decimals
+                        existing_token.token_program = _token_info.token_program
                     else:
                         session.add(_token_info)
 

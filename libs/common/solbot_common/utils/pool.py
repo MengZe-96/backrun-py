@@ -6,6 +6,7 @@ from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Processed
 from solana.rpc.types import MemcmpOpts
 from solbot_cache.cached import cached
+from solbot_cache.token_info import TokenInfoCache
 from solders.instruction import AccountMeta, Instruction  # type: ignore
 from solders.pubkey import Pubkey  # type: ignore
 
@@ -18,6 +19,7 @@ from solbot_common.constants import (
     RAYDIUM_CLMM,
     RAYDIUM_CPMM,
     TOKEN_PROGRAM_ID,
+    TOKEN_2022_PROGRAM_ID,
     WSOL,
 )
 from solbot_common.layouts.amm_v4 import LIQUIDITY_STATE_LAYOUT_V4, MARKET_STATE_LAYOUT_V3
@@ -81,7 +83,10 @@ async def fetch_amm_v4_pool_keys(pool_id: str) -> AmmV4PoolKeys | None:
 
     ray_authority_v4 = RAY_AUTHORITY_V4
     open_book_program = OPEN_BOOK_PROGRAM
-    token_program_id = TOKEN_PROGRAM_ID
+    # token_program_id = TOKEN_PROGRAM_ID
+    # 区分spl token与token 2022的program id
+    mint = market_decoded.quote_mint.decode() if market_decoded.base_mint.decode() == WSOL.__str__() else market_decoded.base_mint.decode()
+    token_program = TokenInfoCache.get_token_program(mint) # bytes to string
     pool_keys = AmmV4PoolKeys(
         amm_id=amm_id,
         base_mint=Pubkey.from_bytes(market_decoded.base_mint),
@@ -104,7 +109,7 @@ async def fetch_amm_v4_pool_keys(pool_id: str) -> AmmV4PoolKeys | None:
         event_queue=Pubkey.from_bytes(market_decoded.event_queue),
         ray_authority_v4=ray_authority_v4,
         open_book_program=open_book_program,
-        token_program_id=token_program_id,
+        token_program_id=token_program
     )
 
     return pool_keys
@@ -250,6 +255,7 @@ def make_amm_v4_swap_instruction(
     accounts: AmmV4PoolKeys,
     owner: Pubkey,
 ) -> Instruction:
+    # PREF: 区分spl token与token 2022的program id
     keys = [
         AccountMeta(pubkey=accounts.token_program_id, is_signer=False, is_writable=False),
         AccountMeta(pubkey=accounts.amm_id, is_signer=False, is_writable=True),
@@ -344,7 +350,7 @@ def make_clmm_swap_instruction(
     elif action == DIRECTION.SELL:
         input_vault = accounts.token_vault_1
         output_vault = accounts.token_vault_0
-
+    # PREF: 区分spl token与token 2022的program id
     keys = [
         AccountMeta(pubkey=owner, is_signer=True, is_writable=True),
         AccountMeta(pubkey=accounts.amm_config, is_signer=False, is_writable=False),

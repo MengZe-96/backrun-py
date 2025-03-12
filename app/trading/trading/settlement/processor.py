@@ -12,6 +12,7 @@ from solbot_common.types.swap import SwapEvent
 from solbot_common.types.enums import SwapDirection
 from solbot_common.utils.utils import validate_transaction
 from solbot_db.session import NEW_ASYNC_SESSION, provide_session
+from solbot_cache.token_info import TokenInfoCache
 from solders.signature import Signature  # type: ignore
 
 from .analyzer import TransactionAnalyzer
@@ -25,6 +26,7 @@ class SwapSettlementProcessor:
 
     def __init__(self):
         self.analyzer = TransactionAnalyzer()
+        self.token_info_cache = TokenInfoCache()
 
     @provide_session
     async def record(
@@ -95,11 +97,11 @@ class SwapSettlementProcessor:
             output_token_decimals = swap_event.tx_event.to_decimals
         elif swap_event.swap_direction == SwapDirection.Buy:
             input_token_decimals = 9
-            token_info = await self.analyzer.shyft_api.get_token_info(output_mint)
-            output_token_decimals = token_info['decimals']
+            token_info = await self.token_info_cache.get(output_mint)
+            output_token_decimals = token_info.decimals
         else:
-            token_info = await self.analyzer.shyft_api.get_token_info(input_mint)
-            input_token_decimals = token_info['decimals']
+            token_info = await self.token_info_cache.get(input_mint)
+            input_token_decimals = token_info.decimals
             output_token_decimals = 9
 
         if signature is None:

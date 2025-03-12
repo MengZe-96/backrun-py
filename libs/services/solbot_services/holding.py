@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 from solbot_db.session import NEW_ASYNC_SESSION, provide_session
 from solbot_common.log import logger
+from solbot_cache.token_info import TokenInfoCache
 from solbot_services.copytrade import CopyTradeService
 
 
@@ -44,6 +45,7 @@ class HoldingService:
             hidden_small_amount (bool, optional): 是否隐藏小额 Token. Defaults to False.
 
         """
+        # PREF: 使用Helius获取token 2022 及 spl token
         all_tokens = await self.shyft.get_all_tokens(wallet)
         if hidden_small_amount:
             all_tokens = [token for token in all_tokens if token["balance"] > 0]
@@ -136,8 +138,8 @@ class HoldingService:
             if holding is None and swap.swap_direction == SwapDirection.Buy:
             # 1. 跟买建仓 -> copytrade buy
                 # 获取数据库TokenInfo
-                shyft = ShyftAPI()
-                token_info = await shyft.get_token_info(tx.mint)
+                token_info_cache = TokenInfoCache()
+                token_info = await token_info_cache.get(mint=tx.mint)
                 # 增加holding，并更新copytrade全局状态
                 await CopyTradeService.update_target_state(
                     state_delta={
@@ -152,7 +154,7 @@ class HoldingService:
                     target_alias= copytrade_setting.target_alias,
                     target_wallet=tx.who,
                     mint=tx.mint,
-                    symbol= token_info['symbol'],
+                    symbol= token_info.symbol,
                     decimals=record.output_token_decimals,
                     my_amount=record.output_amount,
                     target_amount=tx.to_amount,
