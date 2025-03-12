@@ -435,19 +435,23 @@ ASSET_TEMPLATE = env.from_string(
 
 💰 钱包余额: {{ sol_balance }} SOL
 
-🔮 代币 | 数量
+🔮 代币 | 数量 | 价值（SOL）
 {%- for token in tokens %}
-{{ loop.index }}. <a href="https://t.me/{{ bot_name }}?start=asset_{{ token.mint }}">{{ token.symbol }}</a> | {{ token.balance_str }}
+{{ loop.index }}. <a href="https://t.me/{{ bot_name }}?start=asset_{{ token.mint }}">{{ token.symbol }}</a> | {{ token.balance_str }} | {{values[token.mint]}} SOL
 {%- endfor -%}
 """
 )
 
 
-def render_asset_message(wallet: str, sol_balance: float, tokens: list[HoldingToken]):
+def render_asset_message(wallet: str, sol_balance: float, tokens: list[HoldingToken], prices: dict):
     bot_name = get_bot_name()
+    values = {}
+    for token in tokens:
+        values[token.mint] = str(round(prices[token.mint] * token.balance, 4))
     return ASSET_TEMPLATE.render(
         bot_name=bot_name,
         wallet=wallet,
         sol_balance=sol_balance,
         tokens=tokens,
+        values=values
     )
