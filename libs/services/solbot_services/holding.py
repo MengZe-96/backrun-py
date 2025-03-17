@@ -74,18 +74,21 @@ class HoldingService:
         # 交易许可验证
         if holding is None: # 新token需要验证设置部分
             if(copytrade_setting.current_position < copytrade_setting.max_position and
+               (copytrade_setting.sol_sold - copytrade_setting.sol_earned) < copytrade_setting.max_position and
                 copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold and
                 copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount):
                 return True
             else:
                 # PREF: 过滤次数 + 1, 反馈原因
                 logger.info(f"current_position < max_position: {copytrade_setting.current_position < copytrade_setting.max_position}, "
+                            f"copytrade_setting.sol_sold - copytrade_setting.sol_earned >= {copytrade_setting.max_position}, "
                             f"fast_trade_time < fast_trade_sleep_threshold: {copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold}, "
                             f"filter_min_buy <= tx_event.from_amount: {copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount}."
                 )
         else: # 旧有token需要验证仓位和设置
             if (holding.buy_time < holding.max_buy_time and
                 copytrade_setting.current_position < copytrade_setting.max_position and
+                (copytrade_setting.sol_sold - copytrade_setting.sol_earned) < copytrade_setting.max_position and
                 copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold and
                 copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount):
                 return True
@@ -94,6 +97,7 @@ class HoldingService:
                 logger.info(
                     f"holding.buy_time < holding.max_buy_time: {holding.buy_time < holding.max_buy_time}, "
                     f"current_position < max_position: {copytrade_setting.current_position < copytrade_setting.max_position}, "
+                    f"copytrade_setting.sol_sold - copytrade_setting.sol_earned >= {copytrade_setting.max_position}, "
                     f"fast_trade_time < fast_trade_sleep_threshold: {copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold}, "
                     f"filter_min_buy <= tx_event.from_amount: {copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount}."
                 )
