@@ -207,7 +207,7 @@ class RaydiumPoolStoreage:
         return await self.pool_data.get(str(pool_id)) is not None
 
     async def update(self, pool_id: Pubkey, pool_data: AMMData) -> None:
-        pool_keys = AmmV4PoolKeys.from_pool_data(
+        pool_keys = await AmmV4PoolKeys.from_pool_data(
             pool_id, pool_data["amm_data"], pool_data["market_data"]
         )
         mint = pool_keys.base_mint if pool_keys.base_mint != WSOL else pool_keys.quote_mint

@@ -43,8 +43,8 @@ class HeliusAPI:
         data = response.json()['result']
         return {
             'address': mint,
-            'name': data['content']['metadata']['name'],
-            'symbol': data['content']['metadata']['symbol'],
+            'name': data['content']['metadata']['name'] if data['content']['metadata'] else None,
+            'symbol': data['content']['metadata']['symbol'] if data['content']['metadata'] else None,
             'decimals': data['token_info']['decimals'],
             'token_program': data['token_info']['token_program']
         }

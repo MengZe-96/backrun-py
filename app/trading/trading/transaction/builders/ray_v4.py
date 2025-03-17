@@ -64,7 +64,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
             raise ValueError(f"未找到代币 {token_address} 的交易池")
 
         # 构建池子密钥
-        pool_keys = AmmV4PoolKeys.from_pool_data(
+        pool_keys = await AmmV4PoolKeys.from_pool_data(
             pool_id=pool_data["pool_id"],
             amm_data=pool_data["amm_data"],
             market_data=pool_data["market_data"],
@@ -219,7 +219,7 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
             raise ValueError(f"未找到代币 {token_address} 的交易池")
 
         # 构建池子密钥
-        pool_keys = AmmV4PoolKeys.from_pool_data(
+        pool_keys = await AmmV4PoolKeys.from_pool_data(
             pool_id=pool_data["pool_id"],
             amm_data=pool_data["amm_data"],
             market_data=pool_data["market_data"],

@@ -37,9 +37,9 @@ class AmmV4PoolKeys:
     ray_authority_v4: Pubkey
     open_book_program: Pubkey
     token_program_id: Pubkey
-
+    
     @classmethod
-    def from_pool_data(cls, pool_id: str | Pubkey, amm_data: bytes, market_data: bytes) -> Self:
+    async def from_pool_data(cls, pool_id: str | Pubkey, amm_data: bytes, market_data: bytes) -> Self:
         if isinstance(pool_id, str):
             amm_id = Pubkey.from_string(pool_id)
         else:
@@ -56,12 +56,16 @@ class AmmV4PoolKeys:
         open_book_program = OPEN_BOOK_PROGRAM
         # token_program_id = TOKEN_PROGRAM_ID
         # 区分spl token与token 2022的program id
-        mint = market_decoded.quote_mint.decode() if market_decoded.base_mint.decode() == WSOL.__str__() else market_decoded.base_mint.decode()
-        token_program = TokenInfoCache.get_token_program(mint) # bytes to string
+        base_mint = Pubkey.from_bytes(market_decoded.base_mint)
+        quote_mint = Pubkey.from_bytes(market_decoded.base_mint)
+        mint = quote_mint if base_mint == WSOL else base_mint
+        # PREF: 尽量不实例化
+        token_info_cache = TokenInfoCache()
+        token_info = await token_info_cache.get(mint) # bytes to string
         pool_keys = cls(
             amm_id=amm_id,
-            base_mint=Pubkey.from_bytes(market_decoded.base_mint),
-            quote_mint=Pubkey.from_bytes(market_decoded.quote_mint),
+            base_mint=base_mint,
+            quote_mint=quote_mint,
             base_decimals=amm_data_decoded.coinDecimals,
             quote_decimals=amm_data_decoded.pcDecimals,
             open_orders=Pubkey.from_bytes(amm_data_decoded.ammOpenOrders),
@@ -80,7 +84,7 @@ class AmmV4PoolKeys:
             event_queue=Pubkey.from_bytes(market_decoded.event_queue),
             ray_authority_v4=ray_authority_v4,
             open_book_program=open_book_program,
-            token_program_id=token_program
+            token_program_id=Pubkey.from_string(token_info.token_program)
         )
 
         return pool_keys

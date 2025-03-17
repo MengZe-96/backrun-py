@@ -5,7 +5,7 @@ from solbot_common.config import settings
 from solbot_common.log import logger
 from solbot_common.models import TokenInfo
 from solbot_common.utils import get_async_client
-# from solbot_common.utils.shyft import ShyftAPI
+from solbot_common.utils.shyft import ShyftAPI
 from solbot_common.utils.helius import HeliusAPI
 from solbot_db.session import NEW_ASYNC_SESSION, provide_session, start_async_session
 from solders.pubkey import Pubkey  # type: ignore
@@ -38,7 +38,7 @@ class TokenInfoCache:
 
     def __init__(self) -> None:
         self.rpc_client = get_async_client()
-        # self.shyft_api = ShyftAPI(settings.api.shyft_api_key)
+        self.shyft_api = ShyftAPI(settings.api.shyft_api_key)
         self.helius_api = HeliusAPI()
 
     def __repr__(self) -> str:
@@ -81,8 +81,12 @@ class TokenInfoCache:
         logger.info(f"Did not find token info in cache: {mint}, fetching...")
 
         try:
-            # data = await self.shyft_api.get_token_info(mint.__str__())
             data = await self.helius_api.get_token_info(str(mint))
+            # PREF: 当name和symbol字段为none时，考虑是否仅取mint的前四位来取消二次shyft获取
+            if data['name'] is None:
+                _data = await self.shyft_api.get_token_info(str(mint))
+                data['name'] = _data['name']
+                data['symbol'] = _data['symbol']
             token_info = TokenInfo(
                 mint=data["address"],
                 token_name=data["name"],
