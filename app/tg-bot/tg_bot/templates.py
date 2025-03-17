@@ -85,7 +85,8 @@ def render_holding_detail_summary_message(
     )
 
 HOLDING_DETAIL_TEMPLATE = env.from_string(
-    """——————🪙 {{idx}}: {{token_symbol}} 🪙——————
+    """
+——————🪙 {{idx}}: {{token_symbol}} 🪙——————
 📍 地址：<code>{{mint}}</code>
 💰 收支：{{ui_sol_earned}}/{{ui_sol_sold}} SOL
 💎 仓位：{{ui_my_amount}}/{{ui_target_amount}} {{token_symbol}}
