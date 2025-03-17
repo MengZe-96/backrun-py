@@ -58,9 +58,9 @@ class TradingExecutor:
         program_id = swap_event.program_id
 
         try:
-            is_pump_token_launched = await self._launch_cache.is_pump_token_launched(token_address)
             if program_id == PUMP_FUN_PROGRAM_ID or (
-                token_address.endswith("pump") and not is_pump_token_launched
+                token_address.endswith("pump") and 
+                not await self._launch_cache.is_pump_token_launched(token_address)
             ):
                 should_use_pump = True
                 logger.info(

@@ -1,8 +1,9 @@
 from solbot_common.constants import PUMP_FUN_PROGRAM
 from solbot_common.utils.utils import get_async_client, get_bonding_curve_account
+from solbot_common.log import logger
 from solders.pubkey import Pubkey  # type: ignore
 
-from .cached import cached
+# from .cached import cached
 
 
 class LaunchCache:
@@ -19,7 +20,7 @@ class LaunchCache:
     def __repr__(self) -> str:
         return "LaunchCache()"
 
-    @cached(ttl=None, noself=True)
+    # @cached(ttl=None, noself=True)
     async def is_pump_token_launched(self, mint: str | Pubkey) -> bool:
         """检查 pump 代币是否已被发射。
 
@@ -41,6 +42,7 @@ class LaunchCache:
             PUMP_FUN_PROGRAM,
         )
         if result is None:
-            return False
+            logger.info("Get bonding curve account failed, default as launched.")
+            return True
         _, _, bonding_curve_account = result
         return bonding_curve_account.virtual_sol_reserves == 0
