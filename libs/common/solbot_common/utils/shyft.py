@@ -187,3 +187,20 @@ class ShyftAPI:
             return True
         else:
             return False
+
+    async def get_parsed_transaction(self, tx_hash: str) -> dict:
+        """获取交易详情"""
+        response = await self.client.get(
+            "/sol/v1/transaction/parsed",
+            params={
+                "network": "mainnet-beta",
+                "txn_signature": tx_hash,
+                "commitment": "confirmed",
+            },
+        )
+        response.raise_for_status()
+        js = response.json()
+        if js["success"] is True:
+            return js["result"]
+        else:
+            return None
