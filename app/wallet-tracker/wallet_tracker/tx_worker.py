@@ -42,6 +42,7 @@ class TransactionWorker:
     async def process_transaction(self, tx_detail: dict):
         """处理单个交易"""
         tx_parser = RawTXParser(tx_detail)
+        await tx_parser.set_who()
         tx_hash = tx_parser.get_tx_hash()
 
         # 使用 orjson 的 dumps，它返回 bytes，需要解码为 str

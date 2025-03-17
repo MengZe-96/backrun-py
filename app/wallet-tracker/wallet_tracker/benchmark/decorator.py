@@ -91,7 +91,7 @@ async def with_fetch_tx(tx_hash: str):
 async def with_parse_tx(tx_hash: str):
     data = await _mark_start_parse(tx_hash)
     start_time = data["timestamp"]
-    logger.info(f"Parsing transaction: {tx_hash}, start_time: {start_time}")
+    # logger.info(f"Parsing transaction: {tx_hash}, start_time: {start_time}")
     try:
         yield
     finally:

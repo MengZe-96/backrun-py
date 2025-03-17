@@ -4,6 +4,8 @@ import orjson as json
 from solbot_common.constants import SWAP_PROGRAMS, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, WSOL
 from solbot_common.types import SolAmountChange, TokenAmountChange, TxEvent, TxType
 from solbot_common.log import logger
+from solbot_services.copytrade import CopyTradeService
+from solbot_common.models.tg_bot.monitor import Monitor
 from wallet_tracker.exceptions import (
     NotSwapTransaction,
     UnknownTransactionType,
@@ -25,28 +27,43 @@ class RawTXParser(TransactionParserInterface):
     def get_block_time(self) -> int:
         return self.tx_detail["blockTime"]
 
+    # PREF: deal with multi-hash
     @cache
     def get_tx_hash(self) -> str:
         txs = self.tx_detail["transaction"]["signatures"]
-        if len(txs) > 1:
-            logger.info(self.tx_detail["transaction"])
-            raise ValueError("multiple txs in one transaction")
+        # if len(txs) > 1:
+        #     logger.info(self.tx_detail["transaction"])
+        #     raise ValueError("multiple txs in one transaction")
         return txs[0]
 
-    @cache
-    def get_who(self) -> str:
+    async def set_who(self) -> str:
         account_keys = self.tx_detail["transaction"]["message"]["accountKeys"]
-        signer = account_keys[0]
-        if isinstance(signer, str):
-            return signer
-        return signer["pubkey"]
+        # 查询其中属于聪明钱的地址，以防多个singer
+        if len(self.tx_detail["transaction"]["signatures"]) > 1:
+            # 从数据库中获取已激活的目标地址
+            monitor_addresses = await Monitor.get_active_wallet_addresses()
+            copytrade_addresses = await CopyTradeService.get_active_wallet_addresses()
+            # 合并两个列表
+            active_wallet_addresses = list(set(list(monitor_addresses) + list(copytrade_addresses)))
+            for account_key in account_keys:
+                if account_key in active_wallet_addresses:
+                    if isinstance(account_key, str):
+                        self.who = account_key
+                    else:
+                        self.who = account_key["pubkey"]
+        else:
+            singer = account_keys[0]
+            if isinstance(singer, str):
+                self.who = singer
+            else:
+                self.who = singer["pubkey"]
 
     @cache
     def get_mint(self) -> str:
         token_post_balances = self.tx_detail["meta"]["postTokenBalances"]
         token_pre_balances = self.tx_detail["meta"]["preTokenBalances"]
         for token_post_balance in token_post_balances:
-            if token_post_balance["owner"] != self.get_who():
+            if token_post_balance["owner"] != self.who:
                 continue
             if (token_post_balance["programId"] == str(TOKEN_PROGRAM_ID) or token_post_balance["programId"] == str(TOKEN_2022_PROGRAM_ID)) and token_post_balance[
                 "mint"
@@ -54,7 +71,7 @@ class RawTXParser(TransactionParserInterface):
                 return token_post_balance["mint"]
 
         for token_pre_balance in token_pre_balances:
-            if token_pre_balance["owner"] != self.get_who():
+            if token_pre_balance["owner"] != self.who:
                 continue
             if (token_pre_balance["programId"] == str(TOKEN_PROGRAM_ID) or token_pre_balance["programId"] == str(TOKEN_2022_PROGRAM_ID)) and token_pre_balance[
                 "mint"
@@ -66,20 +83,18 @@ class RawTXParser(TransactionParserInterface):
     def get_token_amount_change(self) -> TokenAmountChange:
         pre_token_balances = self.tx_detail["meta"]["preTokenBalances"]
         post_token_balances = self.tx_detail["meta"]["postTokenBalances"]
-        who = self.get_who()
         mint = self.get_mint()
-
         pre_token_amount = 0
         post_token_amount = 0
         decimals = 6
         for pre_token_balance in pre_token_balances:
-            if pre_token_balance["mint"] == mint and pre_token_balance["owner"] == who:
+            if pre_token_balance["mint"] == mint and pre_token_balance["owner"] == self.who:
                 pre_token_amount = int(pre_token_balance["uiTokenAmount"]["amount"])
                 decimals = pre_token_balance["uiTokenAmount"]["decimals"]
                 break
 
         for post_token_balance in post_token_balances:
-            if post_token_balance["mint"] == mint and post_token_balance["owner"] == who:
+            if post_token_balance["mint"] == mint and post_token_balance["owner"] == self.who:
                 post_token_amount = int(post_token_balance["uiTokenAmount"]["amount"])
                 decimals = post_token_balance["uiTokenAmount"]["decimals"]
                 break
@@ -148,6 +163,8 @@ class RawTXParser(TransactionParserInterface):
         #     if "Err" in self.tx_detail["meta"]["status"]:
         #         raise TransactionError(str(self.tx_detail["meta"]["status"]["Err"]))
 
+        # PREF: 修正多个tx时，输入输出金额错误的情况
+
         try:
             # 不是 swap 交易
             pre_token_balances = self.tx_detail["meta"]["preTokenBalances"]
@@ -165,7 +182,6 @@ class RawTXParser(TransactionParserInterface):
 
         signature = self.get_tx_hash()
         timestamp = self.get_block_time()
-        who = self.get_who()
         mint = self.get_mint()
         token_amount_change = self.get_token_amount_change()
         sol_amount_change = self.get_sol_amount_change()
@@ -189,7 +205,7 @@ class RawTXParser(TransactionParserInterface):
 
         return TxEvent(
             signature=signature,
-            who=who,
+            who=self.who,
             from_amount=from_amount,
             from_decimals=from_decimals,
             to_amount=to_amount,
