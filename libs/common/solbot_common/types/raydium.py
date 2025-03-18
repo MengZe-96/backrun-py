@@ -57,7 +57,7 @@ class AmmV4PoolKeys:
         # token_program_id = TOKEN_PROGRAM_ID
         # 区分spl token与token 2022的program id
         base_mint = Pubkey.from_bytes(market_decoded.base_mint)
-        quote_mint = Pubkey.from_bytes(market_decoded.base_mint)
+        quote_mint = Pubkey.from_bytes(market_decoded.quote_mint)
         mint = quote_mint if base_mint == WSOL else base_mint
         # PREF: 尽量不实例化
         token_info_cache = TokenInfoCache()
