@@ -1031,7 +1031,7 @@ async def start_set_fast_trade_sleep_threshold(callback: CallbackQuery, state: F
 
     # Send prompt message with force reply
     msg = await callback.message.answer(
-        "👋 请输入快速交易休眠时长（10-100000秒）：",
+        "👋 请输入快速交易休眠阈值（1-1000次）：",
         parse_mode="HTML",
         reply_markup=ForceReply(),
     )
@@ -1066,7 +1066,7 @@ async def handle_set_fast_trade_sleep_threshold(message: Message, state: FSMCont
         fast_trade_sleep_threshold = int(fast_trade_sleep_threshold)
     except ValueError:
         msg = await message.reply(
-            "❌ 无效的休眠时长，请重新输入：", reply_markup=ForceReply()
+            "❌ 无效的休眠阈值，请重新输入：", reply_markup=ForceReply()
         )
         await state.update_data(prompt_message_id=msg.message_id)
         await state.update_data(prompt_chat_id=msg.chat.id)
@@ -1078,9 +1078,9 @@ async def handle_set_fast_trade_sleep_threshold(message: Message, state: FSMCont
             )
         return
 
-    if fast_trade_sleep_threshold < 10 or fast_trade_sleep_threshold > 100000:
+    if fast_trade_sleep_threshold < 1 or fast_trade_sleep_threshold > 1000:
         msg = await message.reply(
-            "❌ 无效的休眠时长，请重新输入：", reply_markup=ForceReply()
+            "❌ 无效的休眠阈值，请重新输入：", reply_markup=ForceReply()
         )
         await state.update_data(prompt_message_id=msg.message_id)
         await state.update_data(prompt_chat_id=msg.chat.id)
