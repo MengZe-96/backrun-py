@@ -57,7 +57,7 @@ async def build_transaction(
                 TransferParams(
                     from_pubkey=keypair.pubkey(),
                     to_pubkey=Pubkey.from_string("96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5"),
-                    lamports=int(jito_fee * SOL_DECIMAL),
+                    lamports=int(jito_fee * 10 ** SOL_DECIMAL),
                 )
             )
         )
