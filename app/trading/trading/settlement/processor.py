@@ -65,12 +65,16 @@ class SwapSettlementProcessor:
         Returns:
             Coroutine[None, None, TransactionStatus | None]: 协程
         """
+        # 此处取循环次数和轮询时间的小值
         tx_status = None
-        for _ in range(60):
+        n = 10
+        time_threshold = 10
+        start_time = time.time()
+        for i in range(n):
             try:
                 tx_status = await validate_transaction(tx_hash)
             except Exception as e:
-                logger.error(f"Failed to get transaction status: {e}")
+                logger.error(f"({i}/{n}) Retry to get transaction status: {tx_hash}.")
                 await asyncio.sleep(1)
                 continue
 
@@ -78,7 +82,9 @@ class SwapSettlementProcessor:
                 return TransactionStatus.SUCCESS
             elif tx_status is False:
                 return TransactionStatus.FAILED
-            await asyncio.sleep(1)
+            if time.time() - start_time > time_threshold:
+                break
+            await asyncio.sleep(0.5)
         return TransactionStatus.EXPIRED
 
     async def process(self, signature: Signature | None, swap_event: SwapEvent) -> SwapRecord:

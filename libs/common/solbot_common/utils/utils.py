@@ -124,7 +124,8 @@ async def validate_transaction(
     value = response.value[0]
     if value is None:
         return None
-    if value.confirmation_status == TransactionConfirmationStatus.Confirmed:
+    if (value.confirmation_status == TransactionConfirmationStatus.Confirmed or
+        value.confirmation_status == TransactionConfirmationStatus.Finalized):
         return value.err is None
     return None
 
