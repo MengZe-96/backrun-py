@@ -95,7 +95,7 @@ class TradingExecutor:
         if swap_event.by == 'copytrade' and swap_event.swap_direction == SwapDirection.Buy:
             target_price = (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)/ (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)
 
-        sig = await self._trading_service.use_route(trade_route).swap(
+        sig = await self._trading_service.use_route(trade_route, settings.trading.use_jito).swap(
             keypair,
             token_address,
             swap_event.ui_amount,
