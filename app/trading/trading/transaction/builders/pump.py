@@ -180,7 +180,9 @@ class PumpTransactionBuilder(TransactionBuilder):
                 * bonding_curve_account.virtual_sol_reserves
                 // bonding_curve_account.virtual_token_reserves
             )
-            min_sol_cost = min_amount_with_slippage(sol_output, slippage_bps)
+            # min_sol_cost = min_amount_with_slippage(sol_output, slippage_bps)
+            # 卖出设为max滑点
+            min_sol_cost = min_amount_with_slippage(sol_output, 9900)
             sol_amount_threshold = min_sol_cost
             token_amount = amount_specified
             input_accounts = {

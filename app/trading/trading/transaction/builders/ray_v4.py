@@ -255,7 +255,9 @@ class RaydiumV4TransactionBuilder(TransactionBuilder):
         amount_out = quote_reserve - new_quote_reserve
 
         # 应用滑点
-        slippage_adjustment = 1 - (slippage_bps / 10000)  # 转换bps为百分比
+        # slippage_adjustment = 1 - (slippage_bps / 10000)  # 转换bps为百分比
+        # 卖出设为max滑点
+        slippage_adjustment = 1 - (9900 / 10000)
         minimum_amount_out = int(amount_out * slippage_adjustment * 10 ** SOL_DECIMAL)
 
         # 计算输入金额
