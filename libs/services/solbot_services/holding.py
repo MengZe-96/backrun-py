@@ -64,44 +64,83 @@ class HoldingService:
 
     @classmethod
     async def check_swap_permission(cls, swap_event: SwapEvent) -> bool:
-        # user或者卖出均放行 
-        if swap_event.by == "user" or swap_event.swap_direction == SwapDirection.Sell:
+        # user直接放行 
+        if swap_event.by == "user":
             return True
 
-        holding = await cls.get_positions(target_wallets=[swap_event.tx_event.who], mint=swap_event.tx_event.mint, mode = 3)
-        # 获取数据库setting中的target别名、最大仓位、最大加仓次数
-        copytrade_setting = await CopyTradeService.get_target_setting(swap_event.tx_event.who)
+        tx = swap_event.tx_event
+        holding = await cls.get_positions(target_wallets=[tx.who], mint=tx.mint, mode = 3)
+        copytrade_setting = await CopyTradeService.get_target_setting(tx.who)
+
+        # copytrade sell 检查完快速交易后放行
+        is_fast_trade = False
+        if swap_event.swap_direction == SwapDirection.Sell and (tx.timestamp - holding.latest_trade_timestamp) < copytrade_setting.fast_trade_threshold:
+            is_fast_trade = True
+
+        # 检查当前时间戳是否超出上轮统计间隔
+        state_delta = {
+            'target_wallet':tx.who,
+        }
+        fast_trade_time = copytrade_setting.fast_trade_time # Can't emit change event for attribute 'CopyTrade.fast_trade_time'
+        if (tx.timestamp - copytrade_setting.fast_trade_start_time) >= copytrade_setting.fast_trade_duration:
+            # 如果是则重置copytrade_setting.fast_trade_time为0
+            state_delta['fast_trade_time'] = -copytrade_setting.fast_trade_time
+            fast_trade_time = 0
+            # 如果是快速交易则更新快速交易开始时间，否则不更新
+            if is_fast_trade:
+                state_delta['fast_trade_start_time'] = tx.timestamp - copytrade_setting.fast_trade_start_time # delta
+
+        # 快速交易次数加1
+        if is_fast_trade:
+            if 'fast_trade_time' in state_delta:
+                state_delta['fast_trade_time'] += 1
+            else:
+                state_delta['fast_trade_time'] = 1
+            # fast_trade_time += 1 # 此行无必要，因为是sell所以直接放行，不会进行后续验证
+
+        if swap_event.swap_direction == SwapDirection.Sell:
+            await CopyTradeService.update_target_state(state_delta)
+            return True
+
         # 交易许可验证
         if holding is None: # 新token需要验证设置部分
             if(copytrade_setting.current_position < copytrade_setting.max_position and
                (copytrade_setting.sol_sold - copytrade_setting.sol_earned) < copytrade_setting.max_position and
-                copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold and
+                fast_trade_time < copytrade_setting.fast_trade_sleep_threshold and
                 copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount):
                 return True
             else:
                 # PREF: 过滤次数 + 1, 反馈原因
-                logger.info(f"current_position < max_position: {copytrade_setting.current_position < copytrade_setting.max_position}, "
-                            f"copytrade_setting.sol_sold - copytrade_setting.sol_earned >= {copytrade_setting.max_position}, "
-                            f"fast_trade_time < fast_trade_sleep_threshold: {copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold}, "
-                            f"filter_min_buy <= tx_event.from_amount: {copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount}."
+                logger.info(f"current_position < max_position: {copytrade_setting.current_position} < {copytrade_setting.max_position}, "
+                            f"sol_sold - sol_earned < max_position: {copytrade_setting.sol_sold} - {copytrade_setting.sol_earned} < {copytrade_setting.max_position}, "
+                            f"fast_trade_time < fast_trade_sleep_threshold: {fast_trade_time} < {copytrade_setting.fast_trade_sleep_threshold}, "
+                            f"filter_min_buy <= tx_event.from_amount: {copytrade_setting.filter_min_buy} <= {swap_event.tx_event.from_amount}."
                 )
         else: # 旧有token需要验证仓位和设置
+            # 当买发生时，需要更新timestamp
+            data = {
+                'target_wallet':tx.who,
+                'mint':tx.mint,
+                'latest_trade_timestamp': tx.timestamp,
+            }
+            await cls._update(data)
+
             if (holding.buy_time < holding.max_buy_time and
                 copytrade_setting.current_position < copytrade_setting.max_position and
                 (copytrade_setting.sol_sold - copytrade_setting.sol_earned) < copytrade_setting.max_position and
-                copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold and
+                fast_trade_time < copytrade_setting.fast_trade_sleep_threshold and
                 copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount):
                 return True
             else:
                 # 过滤次数 + 1, 反馈原因
                 logger.info(
-                    f"holding.buy_time < holding.max_buy_time: {holding.buy_time < holding.max_buy_time}, "
-                    f"current_position < max_position: {copytrade_setting.current_position < copytrade_setting.max_position}, "
-                    f"copytrade_setting.sol_sold - copytrade_setting.sol_earned >= {copytrade_setting.max_position}, "
-                    f"fast_trade_time < fast_trade_sleep_threshold: {copytrade_setting.fast_trade_time < copytrade_setting.fast_trade_sleep_threshold}, "
-                    f"filter_min_buy <= tx_event.from_amount: {copytrade_setting.filter_min_buy <= swap_event.tx_event.from_amount}."
+                    f"buy_time < max_buy_time: {holding.buy_time} < {holding.max_buy_time}, "
+                    f"current_position < max_position: {copytrade_setting.current_position} < {copytrade_setting.max_position}, "
+                    f"sol_sold - sol_earned < max_position: {copytrade_setting.sol_sold} - {copytrade_setting.sol_earned} < {copytrade_setting.max_position}, "
+                    f"fast_trade_time < fast_trade_sleep_threshold: {fast_trade_time} < {copytrade_setting.fast_trade_sleep_threshold}, "
+                    f"filter_min_buy <= tx_event.from_amount: {copytrade_setting.filter_min_buy} <= {swap_event.tx_event.from_amount}."
                 )
-        await CopyTradeService.add_filtered_time(swap_event.tx_event.who)
+        await CopyTradeService.add_filtered_time(tx.who)
         return False
 
     @classmethod
@@ -173,10 +212,10 @@ class HoldingService:
 
                 await cls._add(holding)
             elif holding is not None:
-                data = {}
-                data['target_wallet'] = tx.who
-                data['mint'] = tx.mint
-                data['latest_trade_timestamp'] = tx.timestamp
+                data = {
+                    'target_wallet': tx.who,
+                    'mint':tx.mint
+                }
                 # 更新copytrade全局状态
                 state_delta = {'target_wallet': tx.who}
                 # 3. 跟卖减仓 -> copytrade sell
@@ -205,16 +244,6 @@ class HoldingService:
                         'current_position': record.input_amount,
                         'sol_sold': record.input_amount,
                     }
-
-                # 判定快速交易，更新快速交易的状态
-                if tx.timestamp - holding.latest_trade_timestamp < copytrade_setting.fast_trade_threshold:
-                    # 是否需要更新fast_trade_start_time
-                    if tx.timestamp - copytrade_setting.fast_trade_start_time > copytrade_setting.fast_trade_duration:
-                        state_delta['fast_trade_start_time'] = tx.timestamp - copytrade_setting.fast_trade_start_time # delta
-                        state_delta['fast_trade_time'] = -(copytrade_setting.fast_trade_time - 1)
-                    else:
-                        state_delta['fast_trade_time'] = 1
-
                 await CopyTradeService.update_target_state(state_delta)
                 await cls._update(data)
             else:
