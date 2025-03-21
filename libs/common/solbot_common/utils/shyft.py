@@ -1,6 +1,7 @@
 from typing import TypedDict
 from solbot_common.config import settings
-import httpx
+from solbot_common.log import logger
+import httpx, asyncio
 
 
 # "name": "BOOK OF MEME",
@@ -190,17 +191,25 @@ class ShyftAPI:
 
     async def get_parsed_transaction(self, tx_hash: str) -> dict:
         """获取交易详情"""
-        response = await self.client.get(
-            "/sol/v1/transaction/parsed",
-            params={
-                "network": "mainnet-beta",
-                "txn_signature": tx_hash,
-                "commitment": "confirmed",
-            },
-        )
-        response.raise_for_status()
-        js = response.json()
-        if js["success"] is True:
-            return js["result"]
-        else:
-            return None
+        n = 5
+        for i in range(n):
+            try:
+                response = await self.client.get(
+                    "/sol/v1/transaction/parsed",
+                    params={
+                        "network": "mainnet-beta",
+                        "txn_signature": tx_hash,
+                    },
+                )
+                response.raise_for_status()
+                js = response.json()
+                if js["success"] is True:
+                    return js["result"]
+                else:
+                    return None
+            except Exception as _:
+                logger.info(f"Retry {i}/{n} get parsed transaction via Shyft.")
+                await asyncio.sleep(0.1)
+        return None
+
+            
