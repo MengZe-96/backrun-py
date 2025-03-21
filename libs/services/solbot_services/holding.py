@@ -384,7 +384,7 @@ class HoldingService:
             assert mint is None, f"[Get Position Mode 1] Mint must be None, but: {mint}."
             stmt = select(HoldingModel).where(
                 (HoldingModel.target_wallet.in_(target_wallets)) &
-                (HoldingModel.target_amount > 0)
+                (HoldingModel.my_amount > 0)
             )
             result = await session.execute(stmt)
             holdings = result.scalars().all()
@@ -411,7 +411,7 @@ class HoldingService:
             assert target_wallets is None, f"[Get Position Mode 2] Target wallet must be None, but: {target_wallets}."
             assert mint is None, f"[Get Position Mode 2] Mint must be None, but: {mint}."
             stmt = select(HoldingModel).where(
-                HoldingModel.target_amount > 0
+                HoldingModel.my_amount > 0
             )
             result = await session.execute(stmt)
             holdings = result.scalars().all()
