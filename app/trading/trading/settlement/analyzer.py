@@ -12,322 +12,9 @@ from solbot_common.constants import SOL_DECIMAL, WSOL
 # from solbot_common.utils.helius import HeliusAPI
 from solbot_common.utils.shyft import ShyftAPI
 from solbot_common.config import settings
+from solbot_cache.token_info import TokenInfoCache
 
 from datetime import datetime, timezone
-
-# [
-#   {
-#     "description": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg swapped 0.001 SOL for 3.689514 GFUgXbMeDnLkhZaJS3nYFqunqkFNMRo9ukhyajeXpump",
-#     "type": "SWAP",
-#     "source": "RAYDIUM",
-#     "fee": 305000,
-#     "feePayer": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#     "signature": "3byYeiXfEUW2ykRKvvHs7UYPt5CsVNBZvKFP5ANvESjVbgFbpkTfLXsUaNu6FjbWTrdxj72UPQtj8dzXfHGajnpF",
-#     "slot": 310105416,
-#     "timestamp": 1735290280,
-#     "tokenTransfers": [
-#       {
-#         "fromTokenAccount": "6fMtMUiZR3KfvAk9z7Upx2k8SDf1E6E5rcu4fedMaG9g",
-#         "toTokenAccount": "9w1QyPL16ZPgjjjoKse1T1G5kVQRCBVLwGhMVUuvUXd3",
-#         "fromUserAccount": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#         "toUserAccount": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-#         "tokenAmount": 0.001,
-#         "mint": "So11111111111111111111111111111111111111112",
-#         "tokenStandard": "Fungible"
-#       },
-#       {
-#         "fromTokenAccount": "EF8m8beMNBMoVaaAAGeoAznxpx6eUNVQ3RgQPcxAMZw9",
-#         "toTokenAccount": "4Y1ypoSop5JezbosNUqMqNvWoiBzhL5d1LFC2NCtE6Fq",
-#         "fromUserAccount": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-#         "toUserAccount": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#         "tokenAmount": 3.689514,
-#         "mint": "GFUgXbMeDnLkhZaJS3nYFqunqkFNMRo9ukhyajeXpump",
-#         "tokenStandard": "Fungible"
-#       }
-#     ],
-#     "nativeTransfers": [
-#       {
-#         "fromUserAccount": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#         "toUserAccount": "BB5dnY55FXS1e1NXqZDwCzgdYJdMCj3B92PU6Q5Fb6DT",
-#         "amount": 10000
-#       }
-#     ],
-#     "accountData": [
-#       {
-#         "account": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#         "nativeBalanceChange": -1315000,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "6fMtMUiZR3KfvAk9z7Upx2k8SDf1E6E5rcu4fedMaG9g",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "9DCxsMizn3H1hprZ7xWe6LDzeUeZBksYFpBWBtSf1PQX",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "4Y1ypoSop5JezbosNUqMqNvWoiBzhL5d1LFC2NCtE6Fq",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": [
-#           {
-#             "userAccount": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#             "tokenAccount": "4Y1ypoSop5JezbosNUqMqNvWoiBzhL5d1LFC2NCtE6Fq",
-#             "rawTokenAmount": {
-#               "tokenAmount": "3689514",
-#               "decimals": 6
-#             },
-#             "mint": "GFUgXbMeDnLkhZaJS3nYFqunqkFNMRo9ukhyajeXpump"
-#           }
-#         ]
-#       },
-#       {
-#         "account": "ComputeBudget111111111111111111111111111111",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "11111111111111111111111111111111",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "BB5dnY55FXS1e1NXqZDwCzgdYJdMCj3B92PU6Q5Fb6DT",
-#         "nativeBalanceChange": 10000,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "66NGSPspUYoF4rAAUa4So2XjkMtc9u5EpVjcg8N8dhCJ",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "9Frt99T7Z9if73GeBymnjTdSaiZaLayLpYpCtnxKEzvg",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "9w1QyPL16ZPgjjjoKse1T1G5kVQRCBVLwGhMVUuvUXd3",
-#         "nativeBalanceChange": 1000000,
-#         "tokenBalanceChanges": [
-#           {
-#             "userAccount": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-#             "tokenAccount": "9w1QyPL16ZPgjjjoKse1T1G5kVQRCBVLwGhMVUuvUXd3",
-#             "rawTokenAmount": {
-#               "tokenAmount": "1000000",
-#               "decimals": 9
-#             },
-#             "mint": "So11111111111111111111111111111111111111112"
-#           }
-#         ]
-#       },
-#       {
-#         "account": "EF8m8beMNBMoVaaAAGeoAznxpx6eUNVQ3RgQPcxAMZw9",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": [
-#           {
-#             "userAccount": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-#             "tokenAccount": "EF8m8beMNBMoVaaAAGeoAznxpx6eUNVQ3RgQPcxAMZw9",
-#             "rawTokenAmount": {
-#               "tokenAmount": "-3689514",
-#               "decimals": 6
-#             },
-#             "mint": "GFUgXbMeDnLkhZaJS3nYFqunqkFNMRo9ukhyajeXpump"
-#           }
-#         ]
-#       },
-#       {
-#         "account": "CdNDXyc9v52LcUnNiRgjVt2kqafTkPocaRR882izSBTJ",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "9JaC9jwtstwqAxjLDoDzXP1eYfZRfi2GLgGXogDM3Trb",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "DLumRgy7PvNMU1Gp5op8Syb7PD2Tqj7DUm6x8MGzcYvj",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "Av1NaTRYgdviyuLfVanw65dL22SGWYsip9GQEeZospBr",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "9AGXis3MNoFBuSu6GyVLvdXYWDocrxcgGnz4ieeJJAnM",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "6hp3pF5XBT4BNUPiwhNLAqcxBh2T5QmHxnioD5G5NswW",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "SysvarRent111111111111111111111111111111111",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "So11111111111111111111111111111111111111112",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       },
-#       {
-#         "account": "3WYKDwGpKM2m4Kf3bLwQoD4Hci4QBheP2ujdgwxEy5gy",
-#         "nativeBalanceChange": 0,
-#         "tokenBalanceChanges": []
-#       }
-#     ],
-#     "transactionError": null,
-#     "instructions": [
-#       {
-#         "accounts": [],
-#         "data": "3QCwqmHZ4mdq",
-#         "programId": "ComputeBudget111111111111111111111111111111",
-#         "innerInstructions": []
-#       },
-#       {
-#         "accounts": [],
-#         "data": "Kq1GWK",
-#         "programId": "ComputeBudget111111111111111111111111111111",
-#         "innerInstructions": []
-#       },
-#       {
-#         "accounts": [
-#           "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#           "6fMtMUiZR3KfvAk9z7Upx2k8SDf1E6E5rcu4fedMaG9g"
-#         ],
-#         "data": "3ipZX9UbHT6idhJNYkpSNyLgzFkkJyrjohQtzzxk9976vaxEjD7TWc6CebnSPnCrD14TfPsxkSpouU2SRfFX8HqwNNyxtxRMjBriF3FRQBUBTdkcmWvY6XrMD4qPfaoH7dhUCrLt1oMbs8nwo6XyKa9ebyKv9WnroJDjVj7tt",
-#         "programId": "11111111111111111111111111111111",
-#         "innerInstructions": []
-#       },
-#       {
-#         "accounts": [
-#           "6fMtMUiZR3KfvAk9z7Upx2k8SDf1E6E5rcu4fedMaG9g",
-#           "So11111111111111111111111111111111111111112",
-#           "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#           "SysvarRent111111111111111111111111111111111"
-#         ],
-#         "data": "2",
-#         "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-#         "innerInstructions": []
-#       },
-#       {
-#         "accounts": [
-#           "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-#           "66NGSPspUYoF4rAAUa4So2XjkMtc9u5EpVjcg8N8dhCJ",
-#           "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-#           "9Frt99T7Z9if73GeBymnjTdSaiZaLayLpYpCtnxKEzvg",
-#           "9DCxsMizn3H1hprZ7xWe6LDzeUeZBksYFpBWBtSf1PQX",
-#           "9w1QyPL16ZPgjjjoKse1T1G5kVQRCBVLwGhMVUuvUXd3",
-#           "EF8m8beMNBMoVaaAAGeoAznxpx6eUNVQ3RgQPcxAMZw9",
-#           "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX",
-#           "CdNDXyc9v52LcUnNiRgjVt2kqafTkPocaRR882izSBTJ",
-#           "9JaC9jwtstwqAxjLDoDzXP1eYfZRfi2GLgGXogDM3Trb",
-#           "DLumRgy7PvNMU1Gp5op8Syb7PD2Tqj7DUm6x8MGzcYvj",
-#           "Av1NaTRYgdviyuLfVanw65dL22SGWYsip9GQEeZospBr",
-#           "9AGXis3MNoFBuSu6GyVLvdXYWDocrxcgGnz4ieeJJAnM",
-#           "6hp3pF5XBT4BNUPiwhNLAqcxBh2T5QmHxnioD5G5NswW",
-#           "3WYKDwGpKM2m4Kf3bLwQoD4Hci4QBheP2ujdgwxEy5gy",
-#           "6fMtMUiZR3KfvAk9z7Upx2k8SDf1E6E5rcu4fedMaG9g",
-#           "4Y1ypoSop5JezbosNUqMqNvWoiBzhL5d1LFC2NCtE6Fq",
-#           "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg"
-#         ],
-#         "data": "63SfuT4qF7xKWqPb3WZW5Ku",
-#         "programId": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
-#         "innerInstructions": [
-#           {
-#             "accounts": [
-#               "6fMtMUiZR3KfvAk9z7Upx2k8SDf1E6E5rcu4fedMaG9g",
-#               "9w1QyPL16ZPgjjjoKse1T1G5kVQRCBVLwGhMVUuvUXd3",
-#               "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg"
-#             ],
-#             "data": "3QCwqmHZ4mdq",
-#             "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-#           },
-#           {
-#             "accounts": [
-#               "EF8m8beMNBMoVaaAAGeoAznxpx6eUNVQ3RgQPcxAMZw9",
-#               "4Y1ypoSop5JezbosNUqMqNvWoiBzhL5d1LFC2NCtE6Fq",
-#               "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1"
-#             ],
-#             "data": "3LXuNgQTeivs",
-#             "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-#           }
-#         ]
-#       },
-#       {
-#         "accounts": [
-#           "6fMtMUiZR3KfvAk9z7Upx2k8SDf1E6E5rcu4fedMaG9g",
-#           "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#           "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg"
-#         ],
-#         "data": "A",
-#         "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-#         "innerInstructions": []
-#       },
-#       {
-#         "accounts": [
-#           "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#           "BB5dnY55FXS1e1NXqZDwCzgdYJdMCj3B92PU6Q5Fb6DT"
-#         ],
-#         "data": "3Bxs43ZMjSRQLs6o",
-#         "programId": "11111111111111111111111111111111",
-#         "innerInstructions": []
-#       }
-#     ],
-#     "events": {
-#       "swap": {
-#         "nativeInput": {
-#           "account": "HyygEkpVJJpuUyUYdAWQTZMwX4Ee1BS9ND7Yd2YdkWQg",
-#           "amount": "1000000"
-#         },
-#         "nativeOutput": null,
-#         "tokenInputs": [],
-#         "tokenOutputs": [
-#           {
-#             "userAccount": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
-#             "tokenAccount": "EF8m8beMNBMoVaaAAGeoAznxpx6eUNVQ3RgQPcxAMZw9",
-#             "rawTokenAmount": {
-#               "tokenAmount": "3689514",
-#               "decimals": 6
-#             },
-#             "mint": "GFUgXbMeDnLkhZaJS3nYFqunqkFNMRo9ukhyajeXpump"
-#           }
-#         ],
-#         "nativeFees": [],
-#         "tokenFees": [],
-#         "innerSwaps": []
-#       }
-#     }
-#   }
-# ]
 
 
 class Result(TypedDict):
@@ -346,6 +33,7 @@ class TransactionAnalyzer:
     def __init__(self) -> None:
         # self.helius_api = HeliusAPI()
         self.shyft_api = ShyftAPI()
+        self.token_info_cache = TokenInfoCache()
 
     async def analyze_transaction(self, tx_signature: str, user_account: str, mint: str) -> Result:
         """分析交易详情
@@ -363,35 +51,58 @@ class TransactionAnalyzer:
         # PREF: ADD PUMP SELL
         # 测试金额累计是否正确
         tx_type = tx_details['type']
-        if tx_type != "SWAP":
+        if tx_type == "SWAP":
+            swap_sol_change = None
+            token_change = None
+
+            for action in tx_details['actions']:
+                # PREF: setting wallet is not updated.
+                if 'swapper' in action['info'] and action['info']['swapper'] == settings.wallet.pubkey:
+                    if action['info']['tokens_swapped']['in']['token_address'] == str(WSOL):
+                        swap_sol_change = float(action['info']['tokens_swapped']['in']['amount'])
+                        token_change = float(action['info']['tokens_swapped']['out']['amount'])
+                    else:
+                        assert action['info']['tokens_swapped']['out']['token_address'] == str(WSOL)
+                        swap_sol_change = float(action['info']['tokens_swapped']['out']['amount'])
+                        token_change = float(action['info']['tokens_swapped']['in']['amount'])
+                    break
+
+            assert swap_sol_change is not None and token_change is not None, f"Sol or Token change is None: {settings.wallet.pubkey}"
+            return {
+                "fee": fee,
+                "slot": slot,
+                "timestamp": timestamp,
+                "sol_change": fee + swap_sol_change,
+                "swap_sol_change": swap_sol_change,
+                "other_sol_change": fee,
+                "token_change": token_change,
+            }
+        # 假设出现问题
+        elif tx_type == "TOKEN_TRANSFER":
+            assert len(tx_details['events']) == 1 and tx_details['events'][0]['name'] == 'SwapEvent', f"Error Tx Parsed: {tx_details}"
+            swap_event = tx_details['events'][0]
+            swap_sol_change = None
+            token_change = None
+            if swap_event['data']['input_mint'] == str(WSOL):
+                swap_sol_change = swap_event['data']['input_amount'] / 10 ** SOL_DECIMAL
+                token_change = swap_event['data']['output_amount'] / 10 ** (await self.token_info_cache.get(swap_event['data']['output_mint'])).decimals
+            elif swap_event['data']['output_mint'] == str(WSOL):
+                swap_sol_change = swap_event['data']['output_amount'] / 10 ** SOL_DECIMAL
+                token_change = swap_event['data']['input_amount'] / 10 ** (await self.token_info_cache.get(swap_event['data']['input_mint'])).decimals
+            else:
+                raise ValueError("Input & Output mint both not SOL.")
+            
+            return {
+                "fee": fee,
+                "slot": slot,
+                "timestamp": timestamp,
+                "sol_change": swap_sol_change + fee,
+                "swap_sol_change": swap_sol_change,
+                "other_sol_change": fee,
+                "token_change": token_change,
+            }
+        else:
             raise NotImplementedError(f"不支持的交易类型: {tx_type}")
-
-        swap_sol_change = None
-        token_change = None
-
-        for action in tx_details['actions']:
-            # PREF: setting wallet is not updated.
-            if 'swapper' in action['info'] and action['info']['swapper'] == settings.wallet.pubkey:
-                if action['info']['tokens_swapped']['in']['token_address'] == str(WSOL):
-                    swap_sol_change = float(action['info']['tokens_swapped']['in']['amount'])
-                    token_change = float(action['info']['tokens_swapped']['out']['amount'])
-                else:
-                    assert action['info']['tokens_swapped']['out']['token_address'] == str(WSOL)
-                    swap_sol_change = float(action['info']['tokens_swapped']['out']['amount'])
-                    token_change = float(action['info']['tokens_swapped']['in']['amount'])
-                break
-
-        assert swap_sol_change is not None and token_change is not None, f"Sol or Token change is None: {settings.wallet.pubkey}"
-        sol_change = fee + swap_sol_change
-        return {
-            "fee": fee,
-            "slot": slot,
-            "timestamp": timestamp,
-            "sol_change": sol_change,
-            "swap_sol_change": swap_sol_change,
-            "other_sol_change": sol_change - swap_sol_change,
-            "token_change": token_change,
-        }
         
 
 

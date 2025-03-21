@@ -3,7 +3,7 @@
 交易验证器用于验证交易的上链情况.
 """
 
-import asyncio
+import asyncio, time
 
 from solbot_common.constants import SOL_DECIMAL
 from solbot_common.log import logger
@@ -111,19 +111,21 @@ class SwapSettlementProcessor:
             output_token_decimals = 9
 
         if signature is None:
+            # 更新失败，处理target状态
             swap_record = SwapRecord(
                 user_pubkey=swap_event.user_pubkey,
                 swap_diretcion=swap_event.swap_direction,
                 input_mint=swap_event.input_mint,
                 output_mint=swap_event.output_mint,
-                input_amount=swap_event.amount,
+                input_amount=0, # 失败记录为0
                 input_token_decimals=input_token_decimals,
-                output_amount=swap_event.amount,
+                output_amount=0, # 失败记录为0
                 output_token_decimals=output_token_decimals,
             )
         else:
             tx_status = await self.validate(signature)
             # PREF: 在此考虑是否重新提交交易。
+            # 更新失败，处理target状态
             if tx_status != TransactionStatus.SUCCESS:
                 swap_record = SwapRecord(
                     signature=str(signature),
@@ -132,9 +134,9 @@ class SwapSettlementProcessor:
                     swap_direction=swap_event.swap_direction,
                     input_mint=swap_event.input_mint,
                     output_mint=swap_event.output_mint,
-                    input_amount=swap_event.amount,
+                    input_amount=0, # 失败记录为0
                     input_token_decimals=input_token_decimals,
-                    output_amount=swap_event.amount,
+                    output_amount=0, # 失败记录为0
                     output_token_decimals=output_token_decimals,
                 )
             else:
