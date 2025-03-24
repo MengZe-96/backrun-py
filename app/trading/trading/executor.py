@@ -92,9 +92,14 @@ class TradingExecutor:
             raise ValueError(f"Program ID is not supported, {swap_event.program_id}")
 
         target_price = None
-        if swap_event.by == 'copytrade' and swap_event.swap_direction == SwapDirection.Buy:
-            target_price = (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)/ (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)
-
+        if swap_event.by == 'copytrade':
+            if swap_event.swap_direction == SwapDirection.Buy:
+                target_price = (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)/ (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)
+            else:
+                target_price = (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)/ (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)
+        else:
+            pass
+        
         sig = await self._trading_service.use_route(trade_route, settings.trading.use_jito).swap(
             keypair,
             token_address,
