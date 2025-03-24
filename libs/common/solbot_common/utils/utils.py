@@ -53,15 +53,19 @@ async def get_bonding_curve_account(
 ) -> tuple[Pubkey, Pubkey, BondingCurveAccount] | None:
     bonding_curve = get_bonding_curve_pda(mint, program)
     associated_bonding_curve = get_associated_token_address(bonding_curve, mint)
-
-    account_info = await client.get_account_info_json_parsed(bonding_curve)
-    if account_info is None:
-        return None
-    value = account_info.value
-    if value is None:
-        return None
-    bonding_curve_account = BondingCurveAccount.from_buffer(bytes(value.data))
-    return (bonding_curve, associated_bonding_curve, bonding_curve_account)
+    # Retry 
+    n = 5
+    for i in range(n):
+        try:
+            account_info = await client.get_account_info_json_parsed(bonding_curve)
+            if account_info is None or account_info.value is None:
+                continue
+            bonding_curve_account = BondingCurveAccount.from_buffer(bytes((account_info.value).data))
+            return (bonding_curve, associated_bonding_curve, bonding_curve_account)
+        except Exception as _:
+            logger.info(f"Retry {i}/{n} get bonding curve account.")
+    raise ValueError("bonding curve account not found")
+    
 
 
 async def get_global_account(client: AsyncClient, program: Pubkey) -> GlobalAccount | None:
