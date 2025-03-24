@@ -20,7 +20,7 @@ dependencies = [
     "orjson>=3.10.11",
     "aioredis[hiredis]>=2.0.1",
     "pymysql>=1.1.1",
-    "anchorpy>=0.20.1",
+    "anchorpy==0.20.1",
     "backoff>=2.2.1",
     "solana-tx-parser>=0.0.1",
     "sentry-sdk>=2.21.0",
