@@ -33,8 +33,16 @@ class JupiterAPI:
             "amount": amount,
             "slippageBps": slippage_bps,
         }
-        resp = await self.client.get("/swap/v1/quote", params=params)
-        return resp.json()
+        # Add Retry
+        n = 5
+        for i in range(n):
+            try:
+                resp = await self.client.get("/swap/v1/quote", params=params)
+                resp.raise_for_status()
+                return resp.json()
+            except Exception as e:
+                logger.info(f"Retry {i}/{n} jupiter quote: {e}")
+        raise ValueError("Jupiter quote Failed.")
 
     async def get_swap_transaction(
         self,
@@ -105,17 +113,25 @@ class JupiterAPI:
                     "priorityLevel": priority_level,
                 }
             }
-
+        logger.info(f"int(quote_response['outAmount'])={int(quote_response['outAmount'])}, min_amount_out = {min_amount_out}.")
+        logger.info(f"quote_response['slippageBps']={quote_response['slippageBps']}")
         data = {
             "quoteResponse": quote_response,
             "userPublicKey": user_publickey,
             "dynamicComputeUnitLimit": True,
-            "dynamicSlippage": True,
+            "dynamicSlippage": False,
             "prioritizationFeeLamports": prioritizationFeeLamports,
         }
-        resp = await self.client.post("/swap/v1/swap", json=data)
-        resp.raise_for_status()
-        return resp.json()
+        # Add Retry
+        n = 5
+        for i in range(n):
+            try:
+                resp = await self.client.post("/swap/v1/swap", json=data)
+                resp.raise_for_status()
+                return resp.json()
+            except Exception as e:
+                logger.info(f"Retry {i}/{n} jupiter get swap transcation: {e}")
+        raise ValueError("Jupiter get swap transcation Failed.")
 
     async def get_swap_instructions(
         self,
@@ -130,7 +146,13 @@ class JupiterAPI:
             "quoteResponse": quote_response,
             "userPublicKey": user_publickey,
         }
-
-        resp = await self.client.post("/swap/v1/swap-instructions", json=data)
-        resp.raise_for_status()
-        return resp.json()
+        # Add Retry
+        n = 5
+        for i in range(n):
+            try:
+                resp = await self.client.post("/swap/v1/swap-instructions", json=data)
+                resp.raise_for_status()
+                return resp.json()
+            except Exception as e:
+                logger.info(f"Retry {i}/{n} jupiter get swap instructions: {e}")
+        raise ValueError("Jupiter get swap instructions Failed.")
