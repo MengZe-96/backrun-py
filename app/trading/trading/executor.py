@@ -96,10 +96,11 @@ class TradingExecutor:
             if swap_event.swap_direction == SwapDirection.Buy:
                 target_price = (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)/ (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)
             else:
-                target_price = (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)/ (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)
+                # target_price = (swap_event.tx_event.from_amount / 10**swap_event.tx_event.from_decimals)/ (swap_event.tx_event.to_amount / 10**swap_event.tx_event.to_decimals)
+                target_price = 0
         else:
             pass
-        
+
         sig = await self._trading_service.use_route(trade_route, settings.trading.use_jito).swap(
             keypair,
             token_address,

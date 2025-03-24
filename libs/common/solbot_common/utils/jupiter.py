@@ -1,6 +1,6 @@
 from typing import Literal
 from solbot_common.log import logger
-import httpx
+import httpx, asyncio
 
 
 class JupiterAPI:
@@ -99,18 +99,23 @@ class JupiterAPI:
         # 加入跟单滑点
         if min_amount_out is not None:
             quote_response['otherAmountThreshold'] = str(min_amount_out)
-            quote_response['slippageBps'] = int((int(quote_response['outAmount']) - min_amount_out) / int(quote_response['outAmount']) * 10000)
+            quote_response['slippageBps'] = min(
+                int((int(quote_response['outAmount']) - min_amount_out) / int(quote_response['outAmount']) * 10000),
+                9900
+            )
             if int(quote_response['outAmount']) < min_amount_out:
                 raise ValueError(f"已达滑点上限，最小输出金额: {min_amount_out}, 实际输出金额: {int(quote_response['outAmount'])}")
         if use_jito and not jito_tip_lamports:
             raise ValueError("jito_tip_lamports is required if use_jito is True")
         elif use_jito:
-            prioritizationFeeLamports = {"jitoTipLamports": jito_tip_lamports}
+            prioritizationFeeLamports = {
+                "jitoTipLamports": jito_tip_lamports,
+            }
         else:
             prioritizationFeeLamports = {
                 "priorityLevelWithMaxLamports": {
-                    "maxLamports": max_priority_fee_lamports,
-                    "priorityLevel": priority_level,
+                    "maxLamports": jito_tip_lamports,
+                    "priorityLevel": "veryHigh",
                 }
             }
         logger.info(f"int(quote_response['outAmount'])={int(quote_response['outAmount'])}, min_amount_out = {min_amount_out}.")
@@ -131,6 +136,7 @@ class JupiterAPI:
                 return resp.json()
             except Exception as e:
                 logger.info(f"Retry {i}/{n} jupiter get swap transcation: {e}")
+                await asyncio.sleep(0.5)  # 出错后短暂延迟再重试
         raise ValueError("Jupiter get swap transcation Failed.")
 
     async def get_swap_instructions(
