@@ -78,8 +78,8 @@ class TransactionAnalyzer:
                 "token_change": token_change,
             }
         # 假设出现问题
-        elif tx_type == "TOKEN_TRANSFER":
-            assert len(tx_details['events']) == 1 and tx_details['events'][0]['name'] == 'SwapEvent', f"Error Tx Parsed: {tx_details}"
+        elif tx_type in ["TOKEN_TRANSFER", "SELL"]:
+            assert len(tx_details['events']) == 1 and tx_details['events'][0]['name'] == 'SwapEvent', f"Error Tx Parsed: {tx_details['events']}"
             swap_event = tx_details['events'][0]
             swap_sol_change = None
             token_change = None
