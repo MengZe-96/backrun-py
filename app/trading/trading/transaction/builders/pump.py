@@ -72,9 +72,8 @@ class PumpTransactionBuilder(TransactionBuilder):
             raise ValueError("swap_direction must be buy or sell")
 
         pump_program = PUMP_FUN_PROGRAM
+
         result = await get_bonding_curve_account(self.rpc_client, mint, pump_program)
-        if result is None:
-            raise BondingCurveNotFound("bonding curve account not found")
         bonding_curve, associated_bonding_curve, bonding_curve_account = result
 
         global_account = await get_global_account(self.rpc_client, pump_program)
@@ -99,17 +98,20 @@ class PumpTransactionBuilder(TransactionBuilder):
 
             amount_specified = int(ui_amount * 10 ** SOL_DECIMAL)
         elif swap_direction == SwapDirection.Sell:
-            # in_amount = await AccountAmountCache().get_amount(in_ata)
             # in_mint = await MintAccountCache().get_mint_account(token_in)
+            in_mint = await self.token_info_cache.get(token_in)
+            program_id = Pubkey.from_string(in_mint.token_program)
             # if in_mint is None:
-            #     raise Exception("in_mint not found")
+                # raise Exception("in_mint not found")
+                # in_mint = await self.token_info_cache.get(token_in)
             # PREF: 使用ui_amount计算
-            # if in_type == SwapInType.Pct:
-            #     amount_in_pct = min(ui_amount, 1)
-            #     if amount_in_pct < 0:
-            #         raise Exception("amount_in_pct must be greater than 0, range [0, 1]")
+            if in_type == SwapInType.Pct:
+                in_amount = await AccountAmountCache().get_amount(in_ata)
+                amount_in_pct = min(ui_amount, 1)
+                if amount_in_pct < 0:
+                    raise Exception("amount_in_pct must be greater than 0, range [0, 1]")
 
-            #     if amount_in_pct == 1:
+                if amount_in_pct == 1:
                     # sell all, close ata
                     # logger.info(f"Sell all, will be close ATA for mint {token_in}")
                     # close_instruction = close_account(
@@ -120,16 +122,13 @@ class PumpTransactionBuilder(TransactionBuilder):
                     #         owner=owner,
                     #     )
                     # )
-                #     amount_specified = in_amount
-                # else:
-                #     amount_specified = int(in_amount * amount_in_pct)
-            # elif in_type == SwapInType.Qty:
-            #     amount_specified = int(ui_amount * 10**in_mint.decimals)
-            # else:
-            #     raise Exception("in_type must be qty or pct")
-            in_mint = await self.token_info_cache.get(token_in)
-            amount_specified = int(ui_amount * 10 ** in_mint.decimals)
-            program_id = Pubkey.from_string(in_mint.token_program)
+                    amount_specified = in_amount
+                else:
+                    amount_specified = int(in_amount * amount_in_pct)
+            elif in_type == SwapInType.Qty:
+                amount_specified = int(ui_amount * 10**in_mint.decimals)
+            else:
+                raise Exception("in_type must be qty or pct")
         logger.info(f"swap: {token_in}, value: {amount_specified} -> {token_out}")
 
         # calculate tokens out
