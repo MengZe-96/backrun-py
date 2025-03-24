@@ -94,10 +94,10 @@ def create_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
                     callback_data="set_auto_buy_ratio",
                 ),
                 InlineKeyboardButton(
-                    text="最多买入: {}次".format(
-                        udata.max_buy_time,
+                    text="最大仓位: {}SOL".format(
+                        round(udata.max_position/10**9, 2),
                     ),
-                    callback_data="set_max_buy_time",
+                    callback_data="set_max_position",
                 ),
             ],
             [
@@ -112,6 +112,12 @@ def create_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
                         round(udata.max_buy_sol/10**9, 2),
                     ),
                     callback_data="set_max_buy_sol",
+                ),
+                InlineKeyboardButton(
+                    text="最多买入: {}次".format(
+                        udata.max_buy_time,
+                    ),
+                    callback_data="set_max_buy_time",
                 ),
             ],
             [
@@ -246,10 +252,10 @@ def edit_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
                     callback_data="set_auto_buy_ratio",
                 ),
                 InlineKeyboardButton(
-                    text="最多买入: {}次".format(
-                        udata.max_buy_time,
+                    text="最大仓位: {}SOL".format(
+                        round(udata.max_position/10**9, 2),
                     ),
-                    callback_data="set_max_buy_time",
+                    callback_data="set_max_position",
                 ),
             ],
             [
@@ -264,6 +270,12 @@ def edit_copytrade_keyboard(udata: CopyTrade) -> InlineKeyboardMarkup:
                         round(udata.max_buy_sol/10**9, 2),
                     ),
                     callback_data="set_max_buy_sol",
+                ),
+                InlineKeyboardButton(
+                    text="最多买入: {}次".format(
+                        udata.max_buy_time,
+                    ),
+                    callback_data="set_max_buy_time",
                 ),
             ],
             [

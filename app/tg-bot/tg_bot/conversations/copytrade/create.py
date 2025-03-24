@@ -7,6 +7,7 @@ from aiogram.types import CallbackQuery, ForceReply, Message
 from loguru import logger
 from solbot_common.types.copytrade import CopyTrade
 from solbot_services.bot_setting import BotSettingService as SettingService
+from solbot_common.constants import SOL_DECIMAL
 
 from tg_bot.conversations.copytrade.render import render
 from tg_bot.conversations.states import CopyTradeStates
@@ -1383,6 +1384,109 @@ async def toggle_anti_fast_trade(callback: CallbackQuery, state: FSMContext):
         reply_markup=create_copytrade_keyboard(copytrade_settings),
     )
 
+######
+@router.callback_query(F.data == "set_max_position", CopyTradeStates.CREATING)
+async def start_set_max_position(callback: CallbackQuery, state: FSMContext):
+    if callback.message is None:
+        logger.warning("No message found in update")
+        return
+
+    if not isinstance(callback.message, Message):
+        logger.warning("Message is not a Message object")
+        return
+
+    # Store original message details for later updates
+    await state.update_data(
+        original_message_id=callback.message.message_id,
+        original_chat_id=callback.message.chat.id,
+    )
+
+    # Send prompt message with force reply
+    msg = await callback.message.answer(
+        "👋 请输入最大仓位（0-1000）:",
+        parse_mode="HTML",
+        reply_markup=ForceReply(),
+    )
+
+    # Store prompt message details for cleanup
+    await state.update_data(
+        prompt_message_id=msg.message_id,
+        prompt_chat_id=msg.chat.id,
+    )
+
+    await state.set_state(CopyTradeStates.CREATE_WAITING_FOR_MAX_POSITION)
+
+
+@router.message(CopyTradeStates.CREATE_WAITING_FOR_MAX_POSITION)
+async def handle_set_max_position(message: Message, state: FSMContext):
+    if not message.text:
+        return
+
+    max_position = message.text.strip()
+
+    # Get stored data
+    data = await state.get_data()
+    copytrade_settings: CopyTrade | None = cast(CopyTrade | None, data.get("copytrade_settings"))
+
+    if copytrade_settings is None:
+        logger.warning("Copytrade settings not found in state")
+        return
+
+    try:
+        max_position = float(max_position)
+    except ValueError:
+        msg = await message.answer("❌ 无效的最大仓位，请重新输入：", reply_markup=ForceReply())
+        await state.update_data(prompt_message_id=msg.message_id)
+        await state.update_data(prompt_chat_id=msg.chat.id)
+        if message.bot is not None:
+            await message.delete()
+            await message.bot.delete_message(  # Delete prompt message
+                chat_id=data["prompt_chat_id"],
+                message_id=data["prompt_message_id"],
+            )
+        return
+
+    if max_position <= 0 or max_position > 1000:
+        msg = await message.answer("❌ 无效的最大仓位，请重新输入：", reply_markup=ForceReply())
+        await state.update_data(prompt_message_id=msg.message_id)
+        await state.update_data(prompt_chat_id=msg.chat.id)
+        if message.bot is not None:
+            await message.delete()
+            await message.bot.delete_message(  # Delete prompt message
+                chat_id=data["prompt_chat_id"],
+                message_id=data["prompt_message_id"],
+            )
+        return
+
+    # Update settings
+    copytrade_settings.max_position = int(max_position * 10 ** SOL_DECIMAL)
+    await state.update_data(copytrade_settings=copytrade_settings)
+
+    if message.bot is None:
+        logger.warning("No bot found in message")
+        return
+
+    # Clean up messages
+    try:
+        await message.delete()  # Delete user's input
+        await message.bot.delete_message(  # Delete prompt message
+            chat_id=data["prompt_chat_id"],
+            message_id=data["prompt_message_id"],
+        )
+    except Exception as e:
+        logger.warning(f"Failed to delete messages: {e}")
+
+    await message.bot.edit_message_text(
+        chat_id=data["original_chat_id"],
+        message_id=data["original_message_id"],
+        text=CREATE_COPYTRADE_MESSAGE,
+        parse_mode="HTML",
+        reply_markup=create_copytrade_keyboard(copytrade_settings),
+    )
+
+    await state.set_state(CopyTradeStates.CREATING)
+
+######
 
 @router.callback_query(F.data == "set_priority", CopyTradeStates.CREATING)
 async def start_set_priority(callback: CallbackQuery, state: FSMContext):
@@ -1402,7 +1506,7 @@ async def start_set_priority(callback: CallbackQuery, state: FSMContext):
 
     # Send prompt message with force reply
     msg = await callback.message.answer(
-        "👋 请输入优先费用:",
+        "👋 请输入优先费用（0-1）:",
         parse_mode="HTML",
         reply_markup=ForceReply(),
     )
@@ -1445,7 +1549,7 @@ async def handle_set_priority(message: Message, state: FSMContext):
             )
         return
 
-    if priority <= 0:
+    if priority <= 0 or priority > 1:
         msg = await message.answer("❌ 无效的优先费用，请重新输入：", reply_markup=ForceReply())
         await state.update_data(prompt_message_id=msg.message_id)
         await state.update_data(prompt_chat_id=msg.chat.id)
@@ -1458,7 +1562,7 @@ async def handle_set_priority(message: Message, state: FSMContext):
         return
 
     # Update settings
-    copytrade_settings.priority = priority
+    copytrade_settings.priority = int(priority * 10 ** SOL_DECIMAL)
     await state.update_data(copytrade_settings=copytrade_settings)
 
     if message.bot is None:
