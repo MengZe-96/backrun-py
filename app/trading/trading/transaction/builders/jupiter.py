@@ -77,7 +77,8 @@ class JupiterTransactionBuilder(TransactionBuilder):
 
         # 卖出设为max滑点
         if target_price is not None and swap_direction == SwapDirection.Sell:
-            min_amount_out = int(ui_amount / target_price * (1 - 9900 / 10000) * 10 ** SOL_DECIMAL)
+            slippage_bps = 9900
+            min_amount_out = int(ui_amount / target_price * (1 - slippage_bps / 10000) * 10 ** SOL_DECIMAL)
 
         swap_tx_response = await self.jupiter_client.get_swap_transaction(
             input_mint=token_in,
